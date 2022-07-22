@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
@@ -20,6 +21,7 @@ import '../../../widget/decoration.dart';
 import '../../../widget/profile_pi.dart';
 import '../../../widget/rounded_corner_page.dart';
 import '../../../widget/size.dart';
+import '../../../widget/textfield.dart';
 import '../fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import '../pages/comment/presentation/bloc/comment_bloc.dart';
 import '../pages/comment/presentation/bloc/comment_state.dart';
@@ -34,6 +36,20 @@ class _TaskDetailsState extends State<TaskDetails> {
   var isCommentDisplay = false;
   int selectedMenu = 0;
   GetCommentModel getCommentModel = GetCommentModel();
+  TextEditingController commentController = TextEditingController();
+  var authToken;
+
+  @override
+  void initState() {
+     WidgetsBinding.instance.addPostFrameCallback((_) async {
+       SharedPreferences prefs = await SharedPreferences.getInstance();
+       authToken  = prefs.getString('id');
+      await _getComment(comment_user_id: authToken);
+       // var token = prefs.getString('access');
+       print(authToken);
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -208,7 +224,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                       ],
                     )),
                     BlocListener<CommentBloc, BaseState>(
-                        listener: (context, state) {
+                        listener: (context, state) async {
                           if (state is StateOnSuccess) {
                             ProgressDialog.hideLoadingDialog(context);
                           }  else if (state is GetCommentState) {
@@ -216,22 +232,25 @@ class _TaskDetailsState extends State<TaskDetails> {
                            // GetCommentModel? model = state.model;
                             getCommentModel = state.model!;
                             print(getCommentModel.message??"");
-                            Navigator.of(context).pop();
+                           // Navigator.of(context).pop();
                           }else if (state is AddCommentState) {
                             ProgressDialog.hideLoadingDialog(context);
                             AddCommentModel? model = state.model;
                             print(model!.message??"");
-                            Navigator.of(context).pop();
+                            await _getComment(comment_user_id: authToken);
+                            //Navigator.of(context).pop();
                           }else if (state is UpdateCommentState) {
                             ProgressDialog.hideLoadingDialog(context);
                             UpdateCommentModel? model = state.model;
                             print(model!.message??"");
                             Navigator.of(context).pop();
+                            await _getComment(comment_user_id: authToken);
                           }else if (state is DeleteCommentState) {
                             ProgressDialog.hideLoadingDialog(context);
                             DeleteCommentModel? model = state.model;
                             print(model!.message??"");
-                            Navigator.of(context).pop();
+                            await _getComment(comment_user_id: authToken);
+                           // Navigator.of(context).pop();
                           }else if (state is StateErrorGeneral) {
                             ProgressDialog.hideLoadingDialog(context);
                           }
@@ -302,7 +321,6 @@ class _TaskDetailsState extends State<TaskDetails> {
               ),
             ))));
   }
-
   commentSection() {
     return Visibility(
       visible: isCommentDisplay,
@@ -320,6 +338,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                 children: [
                   TextField(
                     style: CustomTextStyle.styleMedium,
+                    controller: commentController,
                     maxLines: 3,
                     decoration: InputDecoration(
                         hintStyle: CustomTextStyle.styleMedium
@@ -351,12 +370,18 @@ class _TaskDetailsState extends State<TaskDetails> {
                 child: Container(),
               ),
               GestureDetector(
-                onTap: (){
+                onTap: () async {
+                   SharedPreferences prefs = await SharedPreferences.getInstance();
+                   var authToken = prefs.getString('id');
+                  // var token = prefs.getString('access');
+                   print(authToken);
                   _addComment(
-                    comment_user_id: '10',
-                    task_id: "",
-                    description: "COMMENT ADDED 41",
-                    project_id: "4",
+                    comment_user_id: authToken,
+                    description: commentController.text,
+                    files: [
+                      "https://upload.wikimedia.org/wikipedia/commons/3/3f/JPEG_example_flower.jpg",
+                      "https://jpeg.org/images/jpeg-home.jpg"
+                    ],
                   );
                 },
                 child: Text(
@@ -383,7 +408,7 @@ class _TaskDetailsState extends State<TaskDetails> {
       itemBuilder: (context, index) {
         return commentItem(index);
       },
-      itemCount: 2,
+      itemCount: getCommentModel.data?.length,
       primary: false,
       shrinkWrap: true,
     );
@@ -409,7 +434,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Stephen Chow",
+                   "${getCommentModel.data![index].userData?.firstName}" " ${getCommentModel.data![index].userData?.lastName}",
                     style: CustomTextStyle.styleSemiBold.copyWith(fontSize: 16),
                   ),
                   sized_16(size: 4.0),
@@ -422,64 +447,72 @@ class _TaskDetailsState extends State<TaskDetails> {
               ),
             ],
           ),
-          Visibility(
-            visible: index == 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  margin: EdgeInsets.only(left: 0, top: 8),
-                  child: Text(
-                    /*getCommentModel.data!.description ?? */"Lorem ipsum dolor sit amet,consectetur\nadipiscing.",
-                    style:
-                    CustomTextStyle.styleMedium.copyWith(color: Colors.black),
-                  ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                margin: EdgeInsets.only(left: 0, top: 8),
+                child: Text(
+                  getCommentModel.data![index].description ?? "Lorem ipsum dolor sit amet,consectetur\nadipiscing.",
+                  style:
+                  CustomTextStyle.styleMedium.copyWith(color: Colors.black),
                 ),
-                Container(
-                  margin: EdgeInsets.only(left: 0, top: 8),
-                  child:Row(
-                    children: [
-                      GestureDetector(
+              ),
+              Container(
+                margin: EdgeInsets.only(left: 0, top: 8),
+                child:Row(
+                  children: [
+                    GestureDetector(
+                      child: Text(
+                        "Edit",
+                        style: CustomTextStyle.styleBold
+                            .copyWith(color: CustomColors.colorBlue),
+                      ),
+                      onTap: (){
+                        commentController.text = getCommentModel.data![index].description ?? "";
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (context) => Theme(
+                                data: ThemeData(
+                                    bottomSheetTheme: const BottomSheetThemeData(
+                                        backgroundColor: Colors.black,
+                                        modalBackgroundColor: Colors.grey)),
+                                child: showEditDialogContent(
+                                  index,
+                                  commentController,
+                                    getCommentModel.data![index].id ?? 0,
+                                  getCommentModel.data![index].commentUserId ?? "",
+                                )));
+                        /*_updateComment(
+                          description: getCommentModel.data![index].description,
+                          task_id: "",
+                          comment_user_id: getCommentModel.data![index].commentUserId,
+                          id: authToken,
+                        );*/
+                      },
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 5),
+                      child: GestureDetector(
                         child: Text(
-                          "Edit",
+                          "Delete",
                           style: CustomTextStyle.styleBold
                               .copyWith(color: CustomColors.colorBlue),
                         ),
                         onTap: (){
-                          _updateComment(
-                            project_id: "4",
-                            description: "",
-                            task_id: "",
-                            comment_user_id: "10",
-                            id: 2,
+                          _deleteComment(
+                            comment_user_id: getCommentModel.data![index].commentUserId,
+                            id: getCommentModel.data![index].id,
                           );
                         },
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: GestureDetector(
-                          child: Text(
-                            "Delete",
-                            style: CustomTextStyle.styleBold
-                                .copyWith(color: CustomColors.colorBlue),
-                          ),
-                          onTap: (){
-                            _deleteComment(
-                              project_id: "4",
-                              task_id: "",
-                              comment_user_id: "10",
-                              id: 7,
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Visibility(
+         /* Visibility(
               visible: index == 1,
               child: Container(
                 margin: EdgeInsets.only(top: 12),
@@ -492,8 +525,54 @@ class _TaskDetailsState extends State<TaskDetails> {
                     fit: BoxFit.cover,
                   ),
                 ),
-              ))
+              ))*/
         ],
+      ),
+    );
+  }
+
+  showEditDialogContent(int index,TextEditingController description,int id,String comment_user_id) {
+    return Material(
+      child: Container(
+        decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topRight: Radius.circular(16), topLeft: Radius.circular(16)),
+            color: Colors.white),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 32,
+              ),
+              CustomTextField(
+                //initialValue: description.text,
+                label: "Description",
+                minLines: 5,
+                textEditingController: description,
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 16, top: 32),
+                child: Text(
+                  "Choose Color",
+                  style: CustomTextStyle.styleBold,
+                ),
+              ),
+              Button(
+                "Done",
+                onPress: () {
+                  _updateComment(
+                    description: description.text,
+                    task_id: "",
+                    comment_user_id: comment_user_id,
+                    id: id,
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -544,7 +623,7 @@ class _TaskDetailsState extends State<TaskDetails> {
             ),
             value: 3,
             onTap: (){
-              _deleteTask(id: "31");
+              _deleteTask(id: 31);
             },
           ),
 
@@ -579,36 +658,34 @@ class _TaskDetailsState extends State<TaskDetails> {
     );
   }
 
-  Future<String> _deleteTask({String? id }) {
+  Future<String> _deleteTask({int? id }) {
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddTaskBloc>(context).add(
-          DeleteTaskEvent(id: id ?? "" ));
+          DeleteTaskEvent(id: id ?? 0 ));
       return "";
     });
   }
 
-  Future<String> _addComment({String? comment_user_id, String?  project_id,String? task_id,String? description}) {
+  Future<String> _addComment({String? comment_user_id,List<String>? files,String? description}) {
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<CommentBloc>(context).add(
           AddCommentEvent(
-            project_id: project_id ?? "",
             description: description ?? "",
-            task_id: task_id ?? "",
-            comment_user_id: comment_user_id ?? ""
+            comment_user_id: int.parse(comment_user_id ?? ""),
+            files: files ?? [],
           ));
       return "";
     });
   }
 
-  Future<String> _updateComment({int? id,String? comment_user_id, String?  project_id,String? task_id,String? description}) {
+  Future<String> _updateComment({int? id,String? comment_user_id,String? task_id,String? description}) {
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<CommentBloc>(context).add(
           UpdateCommentEvent(
             id: id ?? 0,
-              project_id: project_id ?? "",
               description: description ?? "",
               task_id: task_id ?? "",
               comment_user_id: comment_user_id ?? ""
@@ -617,28 +694,23 @@ class _TaskDetailsState extends State<TaskDetails> {
     });
   }
 
-  Future<String> _deleteComment({int? id,String? comment_user_id, String?  project_id,String? task_id}) {
+  Future<String> _deleteComment({int? id,String? comment_user_id,}) {
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<CommentBloc>(context).add(
           DeleteCommentEvent(
               id: id ?? 0,
-              project_id: project_id ?? "",
-              task_id: task_id ?? "",
               comment_user_id: comment_user_id ?? "",
           ));
       return "";
     });
   }
 
-  Future<String> _getComment({int? id,String? comment_user_id, String?  project_id,String? task_id}) {
+  Future<String> _getComment({String? comment_user_id,}) {
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<CommentBloc>(context).add(
           GetCommentEvent(
-            id: id ?? 0,
-            project_id: project_id ?? "",
-            task_id: task_id ?? "",
             comment_user_id: comment_user_id ?? "",
           ));
       return "";

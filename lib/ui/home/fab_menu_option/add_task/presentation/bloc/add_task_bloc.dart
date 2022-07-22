@@ -4,6 +4,7 @@ import 'package:task_management/features/login/domain/usecases/forgot_password_u
 import 'package:task_management/features/login/domain/usecases/reset_passward_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/add_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/delete_task_usecase.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/get_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/invite_project_assign_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/update_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
@@ -19,11 +20,12 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
   AddTaskUsecase? addTaskUsecase;
   UpdateTaskUsecase? updateTaskUsecase;
   DeleteTaskUsecase? deleteTaskUsecase;
+  GetTaskUsecase? getTaskUsecase;
   InviteProjectAssignUsecase? inviteProjectAssignUsecase;
 
 
   AddTaskBloc(
-      {required this.addTaskUsecase,required this.deleteTaskUsecase,required this.updateTaskUsecase,required this.inviteProjectAssignUsecase}) : super(StateLoading()) {
+      {required this.getTaskUsecase,required this.addTaskUsecase,required this.deleteTaskUsecase,required this.updateTaskUsecase,required this.inviteProjectAssignUsecase}) : super(StateLoading()) {
     on<BaseEvent>((event, emit) {
       if (event is EventRequest) {
       } else if (event is AddTaskEvent) {
@@ -59,6 +61,8 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
         );
       }else if(event is DeleteTaskEvent){
         deleteTskCall(id: event.id);
+      }else if(event is GetTaskEvent){
+        getTaskCall();
       }else if(event is InviteProjectAssignEvent){
         inviteProjectAssignCall(
           assignee_ids: event.assignee_ids,
@@ -72,6 +76,8 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
         emit(UpdateTaskState(model: event.model));
       }else if (event is InviteProjectAssignSuccessEvent){
         emit(InviteProjectAssignState(model: event.model));
+      }else if (event is GetTaskSuccessEvent){
+        emit(GetTaskState(model: event.model));
       }
     });
   }
@@ -115,7 +121,7 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
   }
 
   updateTskCall({
-    String? id,
+    int? id,
     String? name,
     String? startDate,
     String? endDate,
@@ -130,7 +136,7 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
     String? task_status,}) {
     updateTaskUsecase!
         .call(UpdateTaskParams(
-      id: id ?? "",
+      id: id ?? 0,
       name: name ?? "",
       start_date: startDate ?? "",
       end_date: endDate ?? "",
@@ -153,14 +159,26 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
     });
   }
 
-  deleteTskCall({String? id}) {
+  deleteTskCall({int? id}) {
     deleteTaskUsecase!
-        .call(DeleteTaskParams(id1: id ?? "" ))
+        .call(DeleteTaskParams(id1: id ?? 0 ))
         .listen((data) {
       data.fold((onError) {
         add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(DeleteTaskSuccessEvent(model: onSuccess));
+      });
+    });
+  }
+
+  getTaskCall() {
+    getTaskUsecase!
+        .call(GetTaskParams())
+        .listen((data) {
+      data.fold((onError) {
+        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+      }, (onSuccess) {
+        add(GetTaskSuccessEvent(model: onSuccess));
       });
     });
   }

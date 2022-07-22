@@ -28,14 +28,10 @@ class DeleteCommentUsecase extends UseCase<DeleteCommentModel, DeleteCommentPara
 class DeleteCommentParams extends Equatable {
   int id;
   String comment_user_id;
-  String project_id;
-  String task_id;
 
   DeleteCommentParams({
     required this.id,
     required this.comment_user_id,
-    required this.task_id,
-    required this.project_id,
   });
 
   @override
@@ -46,8 +42,6 @@ class DeleteCommentParams extends Equatable {
 
     data['id'] = this.id;
     data['comment_user_id'] = this.comment_user_id;
-    data['task_id'] = this.task_id;
-    data['project_id'] = this.project_id;
 
     return data;
   }

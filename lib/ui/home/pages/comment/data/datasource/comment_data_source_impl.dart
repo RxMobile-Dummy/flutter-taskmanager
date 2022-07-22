@@ -10,9 +10,11 @@ import 'package:task_management/ui/home/pages/comment/domain/usecases/get_commen
 import 'package:task_management/ui/home/pages/comment/domain/usecases/update_comment_usecase.dart';
 
 import '../../../../../../core/api_call/baseClient.dart';
+import 'package:dio/dio.dart';
 
 
 import 'comment_data_source.dart';
+import 'package:path/path.dart' as pathManager;
 
 class AddCommentDataSourceImpl implements AddCommentDataSource {
   final ApiClient _apiClient;
@@ -26,12 +28,17 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
     // dio.options.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
     // dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
     // var restClient = ApiClient(dio);
-    var map = new HashMap<String, String>();
-    map['project_id'] = params.project_id;
+   /* List multipartArray = [];
+    for (var i = 0; i < params.files!.length; i++){
+      multipartArray.add(MultipartFile.fromFileSync(params.files![i], filename:
+      pathManager.basename(params.files![i])));
+    }*/
+    var map = new HashMap<String, dynamic>();
     map['comment_user_id'] = params.comment_user_id;
-    map['task_id'] = params.task_id;
     map['description'] = params.description;
-    final response = await _apiClient.addComment(map);
+   // map['files'] =  multipartArray;
+    FormData formData = new FormData.fromMap(map);
+    final response = await _apiClient.addComment(formData);
     var data ;
     if(response != null ){
       data =response;
@@ -51,7 +58,6 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
     // var restClient = ApiClient(dio);
     var map = new HashMap<String, dynamic>();
     map['id'] = params.id;
-    map['project_id'] = params.project_id;
     map['comment_user_id'] = params.comment_user_id;
     map['task_id'] = params.task_id;
     map['description'] = params.description;
@@ -75,9 +81,7 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
     // var restClient = ApiClient(dio);
     var map = new HashMap<String, dynamic>();
     map['id'] = params.id;
-    map['project_id'] = params.project_id;
     map['comment_user_id'] = params.comment_user_id;
-    map['task_id'] = params.task_id;
     final response = await _apiClient.deleteComment(map);
     var data ;
     if(response != null ){
@@ -97,10 +101,7 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
     // dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
     // var restClient = ApiClient(dio);
     var map = new HashMap<String, dynamic>();
-    map['id'] = params.id;
-    map['project_id'] = params.project_id;
     map['comment_user_id'] = params.comment_user_id;
-    map['task_id'] = params.task_id;
     final response = await _apiClient.getComment(map);
     var data ;
     if(response != null ){

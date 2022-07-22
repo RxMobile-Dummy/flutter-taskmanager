@@ -58,7 +58,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         title: "Forgot Password",
         child: Expanded(
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(16),
@@ -67,24 +67,24 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 32,
                   ),
                   CustomTextField(
-                    key: Key("tefUsername"),
+                    key: const Key("tefUsername"),
                     label: "Username",
                     hint: "Enter username",
                     textEditingController: emailController,
                     textInputType: TextInputType.emailAddress,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 24,
                   ),
                   Button("Send Request",onPress: (){
                     _forgotPassward(emailController.text);
                    // Get.to(ResetPassword());
                   },),
-                  SizedBox(
+                  const SizedBox(
                     height: 48,
                   )
                 ],
@@ -96,7 +96,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   Future<String> _forgotPassward(String email) {
     //loginBloc = BlocProvider.of<LoginBloc>(context);
-    return Future.delayed(Duration()).then((_) {
+    return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<LoginBloc>(context).add(
           ForgotPassEvent(email: email.trim()));

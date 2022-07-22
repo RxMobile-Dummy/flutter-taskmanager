@@ -25,7 +25,7 @@ class DeleteTaskUsecase extends UseCase<DeleteTaskModel, DeleteTaskParams> {
 }
 
 class DeleteTaskParams extends Equatable {
-  String id1;
+  int id1;
 
  DeleteTaskParams({required this.id1});
 

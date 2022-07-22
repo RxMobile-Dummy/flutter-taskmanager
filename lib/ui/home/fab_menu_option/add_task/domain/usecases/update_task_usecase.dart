@@ -12,20 +12,20 @@ import '../../data/model/update_task.dart';
 import '../repositories/add_task_repositories.dart';
 
 
-class UpdateTaskUsecase extends UseCase<UpdateTaskModel, UpdateTaskParams> {
+class UpdateTaskUsecase extends UseCase<AddTaskModel, UpdateTaskParams> {
   final AddTaskRepositories? addTaskRepositories;
 
   UpdateTaskUsecase({this.addTaskRepositories});
 
   @override
-  Stream<Either<Failure, UpdateTaskModel>> call(UpdateTaskParams params) {
+  Stream<Either<Failure, AddTaskModel>> call(UpdateTaskParams params) {
     return addTaskRepositories!.updateTaskCall(params);
   }
 
 }
 
 class UpdateTaskParams extends Equatable {
-  String id;
+  int id;
   String project_id;
   String name;
   String comment;

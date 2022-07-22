@@ -1,11 +1,11 @@
-class AddCommentModel {
+class UpdateNoteModel {
   bool? success;
   Data? data;
   String? message;
 
-  AddCommentModel({this.success, this.data, this.message});
+  UpdateNoteModel({this.success, this.data, this.message});
 
-  AddCommentModel.fromJson(Map<String, dynamic> json) {
+  UpdateNoteModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     data = json['data'] != null ? new Data.fromJson(json['data']) : null;
     message = json['message'];
@@ -25,44 +25,36 @@ class AddCommentModel {
 class Data {
   int? id;
   String? userId;
-  String? commentUserId;
-  String? taskId;
+  String? title;
   String? description;
   String? createdAt;
   String? updatedAt;
-  List<String>? files;
 
   Data(
       {this.id,
         this.userId,
-        this.commentUserId,
-        this.taskId,
+        this.title,
         this.description,
         this.createdAt,
-        this.updatedAt,
-        this.files});
+        this.updatedAt});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     userId = json['user_id'];
-    commentUserId = json['comment_user_id'];
-    taskId = json['task_id'];
+    title = json['title'];
     description = json['description'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    files = json['files'].cast<String>();
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['user_id'] = this.userId;
-    data['comment_user_id'] = this.commentUserId;
-    data['task_id'] = this.taskId;
+    data['title'] = this.title;
     data['description'] = this.description;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
-    data['files'] = this.files;
     return data;
   }
 }

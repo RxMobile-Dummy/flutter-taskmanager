@@ -3,6 +3,7 @@
 import 'package:task_management/features/login/data/model/forgot_password_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 
 import '../../../../../../core/base/base_bloc.dart';
@@ -16,6 +17,12 @@ class AddTaskState extends BaseState {
   AddTaskState({this.model});
 }
 
+class GetTaskState extends BaseState {
+  GetTaskModel? model;
+
+  GetTaskState({this.model});
+}
+
 
 class DeleteTaskState extends BaseState {
   DeleteTaskModel? model;
@@ -24,7 +31,7 @@ class DeleteTaskState extends BaseState {
 }
 
 class UpdateTaskState extends BaseState {
-  UpdateTaskModel? model;
+  AddTaskModel? model;
 
   UpdateTaskState({this.model});
 }
