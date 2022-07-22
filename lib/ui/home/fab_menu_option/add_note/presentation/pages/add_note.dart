@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_event.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_state.dart';
+import 'package:task_management/ui/home/pages/quick_notes.dart';
 
 import '../../../../../../core/base/base_bloc.dart';
 import '../../../../../../custom/progress_bar.dart';
@@ -14,6 +15,8 @@ import '../../../../../../widget/decoration.dart';
 import '../../../../../../widget/rounded_corner_page.dart';
 import '../../../../../../widget/textfield.dart';
 import '../../data/model/add_note_model.dart';
+import '../../data/model/get_note_model.dart';
+import 'package:task_management/injection_container.dart' as Sl;
 
 class AddNote extends StatefulWidget {
   @override
@@ -21,6 +24,10 @@ class AddNote extends StatefulWidget {
 }
 
 class _AddNoteState extends State<AddNote> {
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  GetNoteModel getNoteModel = GetNoteModel();
+
   List<Color> listColors = [
     CustomColors.colorPurple,
     CustomColors.colorBlue,
@@ -38,11 +45,17 @@ class _AddNoteState extends State<AddNote> {
           listener: (context, state) {
             if (state is StateOnSuccess) {
               ProgressDialog.hideLoadingDialog(context);
-            } if (state is AddNoteState) {
+            }else if (state is AddNoteState) {
               ProgressDialog.hideLoadingDialog(context);
               AddNotesModel? model = state.model;
               print(model!.message??"");
+            /*  Navigator.push(
+                context,MaterialPageRoute(builder: (context) =>BlocProvider<AddNoteBloc>(
+                create: (context) => Sl.Sl<AddNoteBloc>(),
+                child: QuickNotes(),
+              )),);*/
               Navigator.of(context).pop();
+              //_getNote();
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
             }
@@ -64,15 +77,20 @@ class _AddNoteState extends State<AddNote> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 32,
+                ),
+                CustomTextField(
+                  label: "title",
+                  minLines: 5,
+                  textEditingController: titleController,
                 ),
                 CustomTextField(
                   label: "Description",
                   minLines: 5,
-                  textEditingController: TextEditingController(),
+                  textEditingController: descriptionController,
                 ),
-                Container(
+                /*Container(
                   margin: EdgeInsets.only(left: 16, top: 32),
                   child: Text(
                     "Choose Color",
@@ -109,15 +127,15 @@ class _AddNoteState extends State<AddNote> {
                     ))
                         .toList(),
                   ),
-                ),
+                ),*/
                 Button(
                   "Done",
                   onPress: () {
                     _addNote(
                         task_id: "",
-                      title: "New Task 1",
+                      title: titleController.text,
                       project_id: "",
-                      description: "",
+                      description: descriptionController.text,
                     );
                   },
                 ),
@@ -136,7 +154,7 @@ class _AddNoteState extends State<AddNote> {
     String? description,
   }) {
     //loginBloc = BlocProvider.of<LoginBloc>(context);
-    return Future.delayed(Duration()).then((_) {
+    return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddNoteBloc>(context).add(
           AddNoteEvent(

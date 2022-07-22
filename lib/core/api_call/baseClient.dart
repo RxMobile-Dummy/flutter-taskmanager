@@ -8,8 +8,10 @@ import 'package:task_management/features/login/data/model/refresh_token_model.da
 import 'package:task_management/features/login/data/model/reset_passward_model.dart';
 import 'package:task_management/features/login/data/model/sign_up_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/add_note_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/get_note_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/invite_project_assign_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 import 'package:task_management/ui/home/pages/Project/data/model/add_project_model.dart';
@@ -22,9 +24,12 @@ import 'package:task_management/ui/home/pages/comment/data/model/get_comment_mod
 import 'package:task_management/ui/home/pages/comment/data/model/update_comment_model.dart';
 import 'package:task_management/ui/home/pages/tag/data/model/add_tag.dart';
 
+import '../../ui/home/fab_menu_option/add_note/data/model/delete_note_model.dart';
+import '../../ui/home/fab_menu_option/add_note/data/model/update_note_model.dart';
+
 part 'baseClient.g.dart';
 
-@RestApi(baseUrl: 'http://10.10.10.23:3008/task_app/')
+@RestApi(baseUrl: 'https://2bcf-180-211-112-179.in.ngrok.io/task_app/')
 abstract class  ApiClient {
 
   factory ApiClient(Dio dio) = _ApiClient;
@@ -53,12 +58,15 @@ abstract class  ApiClient {
   Future<DeleteTaskModel> deleteTask(
       @Body() HashMap<String, dynamic> hashMap);
 
+  @POST('get_task/')
+  Future<GetTaskModel> getTask();
+
   @POST('add_new_note/')
   Future<AddNotesModel> addNote(
       @Body() HashMap<String, dynamic> hashMap);
 
   @POST('update_task/')
-  Future<UpdateTaskModel> updateTask(
+  Future<AddTaskModel> updateTask(
       @Body() HashMap<String, dynamic> hashMap);
 
   @POST('refresh_token/')
@@ -86,7 +94,7 @@ abstract class  ApiClient {
 
   @POST('add_new_comment/')
   Future<AddCommentModel> addComment(
-      @Body() HashMap<String, dynamic> hashMap);
+      @Body() FormData formData);
 
   @POST('update_comment/')
   Future<UpdateCommentModel> updateComment(
@@ -102,6 +110,17 @@ abstract class  ApiClient {
 
   @POST('addtag/')
   Future<AddTagModel> addTag(
+      @Body() HashMap<String, dynamic> hashMap);
+
+  @POST('get_note/')
+  Future<GetNoteModel> getNote();
+
+  @POST('update_note/')
+  Future<UpdateNoteModel> updateNote(
+      @Body() HashMap<String, dynamic> hashMap);
+
+  @POST('delete_note/')
+  Future<DeleteNoteModel> deleteNote(
       @Body() HashMap<String, dynamic> hashMap);
 /*  factory ApiClient(Dio dio, {String baseUrl}) = _ApiClient;
  // final Dio _dio = Dio();

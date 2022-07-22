@@ -1,13 +1,18 @@
-class AddCommentModel {
+class GetNoteModel {
   bool? success;
-  Data? data;
+  List<Data>? data;
   String? message;
 
-  AddCommentModel({this.success, this.data, this.message});
+  GetNoteModel({this.success, this.data, this.message});
 
-  AddCommentModel.fromJson(Map<String, dynamic> json) {
+  GetNoteModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    if (json['data'] != null) {
+      data = <Data>[];
+      json['data'].forEach((v) {
+        data!.add(new Data.fromJson(v));
+      });
+    }
     message = json['message'];
   }
 
@@ -15,7 +20,7 @@ class AddCommentModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['success'] = this.success;
     if (this.data != null) {
-      data['data'] = this.data!.toJson();
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     data['message'] = this.message;
     return data;
@@ -25,44 +30,44 @@ class AddCommentModel {
 class Data {
   int? id;
   String? userId;
-  String? commentUserId;
-  String? taskId;
+  String? title;
   String? description;
   String? createdAt;
   String? updatedAt;
-  List<String>? files;
+  bool? isActive;
+  bool? isDelete;
 
   Data(
       {this.id,
         this.userId,
-        this.commentUserId,
-        this.taskId,
+        this.title,
         this.description,
         this.createdAt,
         this.updatedAt,
-        this.files});
+        this.isActive,
+        this.isDelete});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     userId = json['user_id'];
-    commentUserId = json['comment_user_id'];
-    taskId = json['task_id'];
+    title = json['title'];
     description = json['description'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    files = json['files'].cast<String>();
+    isActive = json['is_active'];
+    isDelete = json['is_delete'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['user_id'] = this.userId;
-    data['comment_user_id'] = this.commentUserId;
-    data['task_id'] = this.taskId;
+    data['title'] = this.title;
     data['description'] = this.description;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
-    data['files'] = this.files;
+    data['is_active'] = this.isActive;
+    data['is_delete'] = this.isDelete;
     return data;
   }
 }

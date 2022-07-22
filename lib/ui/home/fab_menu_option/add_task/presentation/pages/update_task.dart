@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
 
@@ -14,19 +15,20 @@ import '../../../../../../utils/style.dart';
 import '../../../../../../widget/button.dart';
 import '../../../../../../widget/decoration.dart';
 import '../../../../../../widget/rounded_corner_page.dart';
-import '../../data/model/update_task.dart';
 import '../bloc/add_task_event.dart';
 
 
-class AddTask extends StatefulWidget {
-  @override
-  _AddNoteState createState() => _AddNoteState();
-}
-
-class _AddNoteState extends State<AddTask> {
+class UpdateTask extends StatefulWidget {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController commentController = TextEditingController();
+  int taskId;
+  UpdateTask({required this.taskId,required this.commentController,required this.descriptionController,required this.titleController});
+  @override
+  _UpdateTaskState createState() => _UpdateTaskState();
+}
+
+class _UpdateTaskState extends State<UpdateTask> {
   List<Color> listColors = [
     CustomColors.colorPurple,
     CustomColors.colorBlue,
@@ -44,7 +46,7 @@ class _AddNoteState extends State<AddTask> {
           listener: (context, state) {
             if (state is StateOnSuccess) {
               ProgressDialog.hideLoadingDialog(context);
-            } else if (state is AddTaskState) {
+            } else if (state is UpdateTaskState) {
               ProgressDialog.hideLoadingDialog(context);
               AddTaskModel? model = state.model;
               print(model!.message??"");
@@ -60,9 +62,9 @@ class _AddNoteState extends State<AddTask> {
       ),
     );
   }
-Widget buildWidget(){
+  Widget buildWidget(){
     return RoundedCornerPage(
-      title: "Add Task",
+      title: "Update Task",
       child: Expanded(
         child: RoundedCornerDecoration(
           SingleChildScrollView(
@@ -113,7 +115,7 @@ Widget buildWidget(){
                   padding: EdgeInsets.only(left: 4, right: 16),
                   child: TextField(
                     style: CustomTextStyle.styleSemiBold,
-                    controller: titleController,
+                    controller: widget.titleController,
                     decoration: InputDecoration(
                         border: titleBorder(color: Colors.grey.shade200),
                         hintText: "Title",
@@ -131,7 +133,7 @@ Widget buildWidget(){
                   padding: EdgeInsets.only(left: 4, right: 16),
                   child: TextField(
                     style: CustomTextStyle.styleSemiBold,
-                    controller: descriptionController,
+                    controller: widget.descriptionController,
                     decoration: InputDecoration(
                         border: titleBorder(color: Colors.grey.shade200),
                         hintText: "Description",
@@ -143,7 +145,7 @@ Widget buildWidget(){
                         titleBorder(color: Colors.grey.shade200)),
                   ),
                 ),
-               /* Container(
+                /* Container(
                   margin: EdgeInsets.only(left: 16, top: 24),
                   child: Text(
                     "Description",
@@ -163,7 +165,7 @@ Widget buildWidget(){
                       TextField(
                         style: CustomTextStyle.styleSemiBold,
                         maxLines: 3,
-                        controller: commentController,
+                        controller: widget.commentController,
                         decoration: InputDecoration(
                             labelStyle: CustomTextStyle.styleSemiBold,
                             enabledBorder:
@@ -235,9 +237,11 @@ Widget buildWidget(){
                   child: Text("Anyone"),
                 ),
                 Button(
-                  "Add Task",
+                  "Update Task",
                   onPress: () {
-                    _addTask(
+                    _updateTask(
+                      context,
+                      id: widget.taskId,
                       start_date: "2012-09-04 06:00",
                       end_date: "2012-09-04 06:00",
                       task_status: "",
@@ -246,10 +250,10 @@ Widget buildWidget(){
                       project_id: "",
                       priority: "Urgent",
                       is_private: "false",
-                      comment: commentController.text,
+                      comment: widget.commentController.text,
                       assignee_id: "",
-                      description: descriptionController.text,
-                      name: titleController.text,
+                      description: widget.descriptionController.text,
+                      name: widget.titleController.text,
                     );
                   },
                 ),
@@ -259,10 +263,11 @@ Widget buildWidget(){
         ),
       ),
     );
-}
+  }
 
-  Future<String> _addTask({
-  String? name,
+  Future<String> _updateTask(BuildContext context,{
+    int? id,
+    String? name,
     String? description,
     String? assignee_id,
     String? comment,
@@ -274,12 +279,13 @@ Widget buildWidget(){
     String? task_status,
     String? end_date,
     String? start_date,
-}) {
+  }) {
     //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddTaskBloc>(context).add(
-          AddTaskEvent(
+          UpdateTaskEvent(
+            id: id ?? 0,
             name: name ?? "",
             description: description ?? "",
             assignee_id: assignee_id ?? "",

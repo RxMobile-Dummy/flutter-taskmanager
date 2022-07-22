@@ -32,9 +32,8 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
       } else if (event is AddCommentEvent) {
         addCommentCall(
           comment_user_id: event.comment_user_id,
-          task_id: event.task_id,
           description: event.description,
-          project_id: event.project_id,
+          files: event.files,
         );
       } else if (event is UpdateCommentEvent) {
         updateCommentCall(
@@ -42,21 +41,15 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
           comment_user_id: event.comment_user_id,
           task_id: event.task_id,
           description: event.description,
-          project_id: event.project_id,
         );
       } else if (event is DeleteCommentEvent) {
         deleteCommentCall(
           id: event.id,
           comment_user_id: event.comment_user_id,
-          task_id: event.task_id,
-          project_id: event.project_id,
         );
       } else if (event is GetCommentEvent) {
         getCommentCall(
-          id: event.id,
           comment_user_id: event.comment_user_id,
-          task_id: event.task_id,
-          project_id: event.project_id,
         );
       }else if (event is AddCommentSuccessEvent){
         emit(AddCommentState(model: event.model));
@@ -72,17 +65,15 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
 
 
   addCommentCall({
-    String? comment_user_id,
-    String? project_id,
-    String? task_id,
+    int? comment_user_id,
     String? description,
+    List<String>? files
   }) {
     addCommentUsecase!
         .call(AddCommentParams(
-      project_id: project_id ?? "",
       description: description ?? "",
-      task_id: task_id ?? "",
-      comment_user_id: comment_user_id ?? "",
+      comment_user_id: comment_user_id ?? 0,
+      files: files ?? [],
     ))
         .listen((data) {
       data.fold((onError) {
@@ -96,14 +87,12 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
   updateCommentCall({
     int? id,
     String? comment_user_id,
-    String? project_id,
     String? task_id,
     String? description,
   }) {
     updateCommentUsecase!
         .call(UpdateCommentParams(
       id: id ?? 0,
-      project_id: project_id ?? "",
       description: description ?? "",
       task_id: task_id ?? "",
       comment_user_id: comment_user_id ?? "",
@@ -120,14 +109,10 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
   deleteCommentCall({
     int? id,
     String? comment_user_id,
-    String? project_id,
-    String? task_id,
   }) {
     deleteCommentUsecase!
         .call(DeleteCommentParams(
       id: id ?? 0,
-      project_id: project_id ?? "",
-      task_id: task_id ?? "",
       comment_user_id: comment_user_id ?? "",
     ))
         .listen((data) {
@@ -140,16 +125,10 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
   }
 
   getCommentCall({
-    int? id,
     String? comment_user_id,
-    String? project_id,
-    String? task_id,
   }) {
     getCommentUsecase!
         .call(GetCommentParams(
-      id: id ?? 0,
-      project_id: project_id ?? "",
-      task_id: task_id ?? "",
       comment_user_id: comment_user_id ?? "",
     ))
         .listen((data) {

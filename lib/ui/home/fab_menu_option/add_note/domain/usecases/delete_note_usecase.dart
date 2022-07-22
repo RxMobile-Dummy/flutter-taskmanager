@@ -3,6 +3,9 @@ import 'package:equatable/equatable.dart';
 import 'package:task_management/features/login/data/model/forgot_password_model.dart';
 import 'package:task_management/features/login/data/model/reset_passward_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/add_note_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/delete_note_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/get_note_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/update_note_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/domain/repositories/add_note_repositories.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
 
@@ -11,37 +14,23 @@ import '../../../../../../core/usecase.dart';
 
 
 
-class AddNoteUsecase extends UseCase<AddNotesModel, AddNotesParams> {
+class DeleteNoteUsecase extends UseCase<DeleteNoteModel,DeleteNoteParams> {
   final AddNoteRepositories? addNoteRepositories;
 
-  AddNoteUsecase({this.addNoteRepositories});
+  DeleteNoteUsecase({this.addNoteRepositories});
 
   @override
-  Stream<Either<Failure, AddNotesModel>> call(AddNotesParams params) {
-    return addNoteRepositories!.addNoteCall(params);
+  Stream<Either<Failure, DeleteNoteModel>> call(DeleteNoteParams params) {
+    return addNoteRepositories!.deleteNoteCall(params);
   }
 
 }
 
-class AddNotesParams extends Equatable {
-  String project_id;
-  String task_id;
-  String title;
-  String description;
+class DeleteNoteParams extends Equatable {
+  int id;
 
-AddNotesParams({required this.description,required this.project_id,required this.title,required this.task_id});
-
+  DeleteNoteParams({required this.id,});
   @override
   List<Object> get props => [id];
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-
-    data['project_id'] = this.project_id;
-    data['task_id'] = this.task_id;
-    data['title'] = this.title;
-    data['description'] = this.description;
-
-    return data;
-  }
 }
