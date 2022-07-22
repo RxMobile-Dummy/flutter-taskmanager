@@ -27,7 +27,10 @@ class _HomeState extends State<Home> {
     child: Project(),
   );
  /* Project();*/
-  Widget quickNoteWidget = QuickNotes();
+  Widget quickNoteWidget = BlocProvider<AddNoteBloc>(
+    create: (context) => Sl.Sl<AddNoteBloc>(),
+    child:  QuickNotes(),
+  );
   Widget profileWidget = Profile();
   Widget? selectedWidget;
   int menuIndex = 0;
@@ -37,7 +40,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    myTask = MyTask();
+    myTask =  BlocProvider<AddTaskBloc>(
+      create: (context) => Sl.Sl<AddTaskBloc>(),
+      child:  MyTask(),
+    );
     selectedWidget = myTask;
   }
 

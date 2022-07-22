@@ -47,20 +47,10 @@ class _ProjectState extends State<Project> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      var id = prefs.getString('id');
-      print(id);
-      Future.delayed(Duration()).then((_) {
-        ProgressDialog.showLoadingDialog(context);
-        BlocProvider.of<ProjectBloc>(context).add(
-            GetAllProjectsEvent(
-                id: int.parse(id ?? ""),
-            ));
-        return "";
-      });
-    });
+   /* WidgetsBinding.instance.addPostFrameCallback((_) async {
 
+    });*/
+    _getProject();
   }
 
   @override
@@ -94,6 +84,7 @@ class _ProjectState extends State<Project> {
             ProgressDialog.hideLoadingDialog(context);
             DeleteProjectModel? model = state.model;
             print(model!.message??"");
+            _getProject();
           }else if (state is AddProjectState) {
             ProgressDialog.hideLoadingDialog(context);
             AddProjectModel? model = state.model;
@@ -101,11 +92,13 @@ class _ProjectState extends State<Project> {
             prefs.setString('project_id', model?.data?.id.toString() ?? "");*/
             print(model!.message??"");
             Navigator.of(context).pop();
+            _getProject();
           }else if (state is UpdateProjectState) {
             ProgressDialog.hideLoadingDialog(context);
             UpdateProjectModel? model = state.model;
             print(model!.message??"");
             Navigator.of(context).pop();
+            _getProject();
           }else if (state is StateErrorGeneral) {
             ProgressDialog.hideLoadingDialog(context);
           }
@@ -506,6 +499,20 @@ class _ProjectState extends State<Project> {
       BlocProvider.of<ProjectBloc>(context).add(
           DeleteProjectEvent(
             id: id ?? 0,
+          ));
+      return "";
+    });
+  }
+
+  Future<String> _getProject() async {
+     SharedPreferences prefs = await SharedPreferences.getInstance();
+    var id = prefs.getString('id');
+    print(id);
+     return Future.delayed(Duration()).then((_) {
+      ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<ProjectBloc>(context).add(
+          GetAllProjectsEvent(
+            id: int.parse(id ?? ""),
           ));
       return "";
     });

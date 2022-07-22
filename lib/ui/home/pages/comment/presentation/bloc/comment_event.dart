@@ -6,53 +6,40 @@ import 'package:task_management/ui/home/pages/comment/data/model/update_comment_
 import '../../../../../../core/base/base_bloc.dart';
 
 class AddCommentEvent extends BaseEvent {
-  String comment_user_id;
-  String project_id;
-  String task_id;
+  int comment_user_id;
   String description;
+  List<String> files;
 
 
-  AddCommentEvent({required this.project_id,required this.description,required this.task_id,required this.comment_user_id});
+  AddCommentEvent({required this.description,required this.files,required this.comment_user_id});
 }
 
 class UpdateCommentEvent extends BaseEvent {
   int id;
   String comment_user_id;
-  String project_id;
   String task_id;
   String description;
 
 
   UpdateCommentEvent({
-    required this.id,
-    required this.project_id,required this.description,required this.task_id,required this.comment_user_id});
+    required this.id,required this.description,required this.task_id,required this.comment_user_id});
 }
 
 class DeleteCommentEvent extends BaseEvent {
   int id;
   String comment_user_id;
-  String project_id;
-  String task_id;
 
 
   DeleteCommentEvent({
     required this.id,
-    required this.project_id,
-    required this.task_id,
     required this.comment_user_id,});
 }
 
 class GetCommentEvent extends BaseEvent {
-  int id;
   String comment_user_id;
-  String project_id;
-  String task_id;
 
 
   GetCommentEvent({
-    required this.id,
-    required this.project_id,
-    required this.task_id,
     required this.comment_user_id,});
 }
 

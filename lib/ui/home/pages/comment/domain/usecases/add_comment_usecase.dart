@@ -24,16 +24,14 @@ class AddCommentUsecase extends UseCase<AddCommentModel, AddCommentParams> {
 }
 
 class AddCommentParams extends Equatable {
-  String comment_user_id;
-  String project_id;
-  String task_id;
+  int comment_user_id;
   String description;
+  List<String>? files;
 
   AddCommentParams({
     required this.comment_user_id,
-    required this.task_id,
     required this.description,
-    required this.project_id,
+    this.files,
   });
 
   @override
@@ -43,9 +41,8 @@ class AddCommentParams extends Equatable {
     final Map<String, dynamic> data = new Map<String, dynamic>();
 
     data['comment_user_id'] = this.comment_user_id;
-    data['task_id'] = this.task_id;
     data['description'] = this.description;
-    data['project_id'] = this.project_id;
+    data['files'] = this.files;
 
     return data;
   }

@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import 'package:task_management/widget/task_list.dart';
 
 
+import '../../../core/base/base_bloc.dart';
+import '../../../custom/progress_bar.dart';
 import '../../../utils/style.dart';
 import '../../../widget/home_appbar.dart';
+import '../fab_menu_option/add_task/data/model/delete_task_model.dart';
+import '../fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
 import '../month_page.dart';
 import '../today_page.dart';
 
@@ -20,6 +25,7 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
   var todayPage =  TodayPage();
   var monthPage = MonthPage();
   int selectedTaskValue = 3;
+  GetTaskModel getTaskModel = GetTaskModel();
 
   @override
   void initState() {
@@ -107,17 +113,38 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
           ),
         ),
       ).build(),
-      body: Container(
-        child: PageView(
-          controller: pageController,
-          onPageChanged: (page) {
-            setState(() {
-              tabController.index = page;
-            });
+      body: buildWidget()/*BlocListener<AddTaskBloc, BaseState>(
+          listener: (context, state) {
+            if (state is StateOnSuccess) {
+              ProgressDialog.hideLoadingDialog(context);
+            } else if (state is GetTaskState) {
+              ProgressDialog.hideLoadingDialog(context);
+              getTaskModel = state.model!;
+              print(getTaskModel.message??"");
+              Navigator.of(context).pop();
+            }else if (state is StateErrorGeneral) {
+              ProgressDialog.hideLoadingDialog(context);
+            }
           },
-          children: [
-            todayPage, monthPage],
-        ),
+          bloc: BlocProvider.of<AddTaskBloc>(context),
+          child:  BlocBuilder<AddTaskBloc, BaseState>(builder: (context, state) {
+            return buildWidget();
+          })
+      ),*/
+    );
+  }
+
+  Widget buildWidget(){
+    return Container(
+      child: PageView(
+        controller: pageController,
+        onPageChanged: (page) {
+          setState(() {
+            tabController.index = page;
+          });
+        },
+        children: [
+          todayPage, monthPage],
       ),
     );
   }

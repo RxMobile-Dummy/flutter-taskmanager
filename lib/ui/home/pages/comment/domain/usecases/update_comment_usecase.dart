@@ -27,7 +27,6 @@ class UpdateCommentUsecase extends UseCase<UpdateCommentModel, UpdateCommentPara
 class UpdateCommentParams extends Equatable {
   int id;
   String comment_user_id;
-  String project_id;
   String task_id;
   String description;
 
@@ -36,7 +35,6 @@ class UpdateCommentParams extends Equatable {
     required this.comment_user_id,
     required this.task_id,
     required this.description,
-    required this.project_id,
   });
 
   @override
@@ -49,7 +47,6 @@ class UpdateCommentParams extends Equatable {
     data['comment_user_id'] = this.comment_user_id;
     data['task_id'] = this.task_id;
     data['description'] = this.description;
-    data['project_id'] = this.project_id;
 
     return data;
   }
