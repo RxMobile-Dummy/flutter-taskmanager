@@ -75,7 +75,8 @@ DeleteTaskEvent({required this.id});
 }
 
 class GetTaskEvent extends BaseEvent {
-  GetTaskEvent();
+  String date;
+  GetTaskEvent({required this.date});
 }
 
 

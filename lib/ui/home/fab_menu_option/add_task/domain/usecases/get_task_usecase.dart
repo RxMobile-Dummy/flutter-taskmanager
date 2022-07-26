@@ -27,7 +27,18 @@ class GetTaskUsecase extends UseCase<GetTaskModel,GetTaskParams> {
 }
 
 class GetTaskParams extends Equatable {
+  String date;
+
+  GetTaskParams({required this.date});
+
   @override
   List<Object> get props => [id];
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+
+    data['date'] = this.date;
+    return data;
+  }
 
 }

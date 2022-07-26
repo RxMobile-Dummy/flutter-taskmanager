@@ -42,7 +42,7 @@ class _TaskListState extends  State<TaskList> {
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddTaskBloc>(context).add(
-          GetTaskEvent());
+          GetTaskEvent(date: ""));
       return "";
     });
   }
