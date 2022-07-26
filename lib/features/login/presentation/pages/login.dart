@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -52,6 +54,12 @@ class _LoginState extends State<Login> {
             prefs.setString('access', model.data!.authenticationToken!.access ?? "");
             prefs.setString('refresh', model.data!.authenticationToken!.refresh ?? "");
             prefs.setString('id', model.data?.id!.toString() ?? "");
+            String user = jsonEncode(model.data?.toJson());
+            prefs.setString('userData', user);
+            /*Map json = jsonDecode(prefs.getString('userData') ?? "");
+            print(json);
+            var user1 = model.data;
+            print(user1);*/
             Get.off(Home());
           } /*else if (state is ForgotPasswordStatus) {
             ProgressDialog.hideLoadingDialog(context);

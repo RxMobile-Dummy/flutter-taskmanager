@@ -42,7 +42,7 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     map['start_date'] = params.start_date;
     map['end_date'] = params.end_date;
     final response = await _apiClient.addTask(map);
-    var data ;
+    var data;
     if(response != null ){
       data =response;
       return data;
@@ -62,7 +62,7 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     var map = new HashMap<String, dynamic>();
     map['id'] = params.id1;
     final response = await _apiClient.deleteTask(map);
-    var data ;
+    var data;
     if(response != null ){
       data =response;
       return data;
@@ -94,7 +94,7 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     map['start_date'] = params.start_date;
     map['end_date'] = params.end_date;
     final response = await _apiClient.updateTask(map);
-    var data ;
+    var data;
     if(response != null ){
       data =response;
       return data;
@@ -115,7 +115,7 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     map['project_id'] = params.project_id;
     map['assignee_ids'] = params.assignee_ids;
     final response = await _apiClient.inviteProjectAssign(map);
-    var data ;
+    var data;
     if(response != null ){
       data =response;
       return data;

@@ -31,7 +31,15 @@ class _HomeState extends State<Home> {
     create: (context) => Sl.Sl<AddNoteBloc>(),
     child:  QuickNotes(),
   );
-  Widget profileWidget = Profile();
+  Widget profileWidget =  MultiBlocProvider(
+    providers: [
+      BlocProvider<AddNoteBloc>(
+        create: (context) => Sl.Sl<AddNoteBloc>(),
+      ),
+      BlocProvider<AddTaskBloc>(
+        create: (context) => Sl.Sl<AddTaskBloc>(),
+      ),
+    ], child: Profile(),);
   Widget? selectedWidget;
   int menuIndex = 0;
   GlobalKey keyFab = GlobalKey();
