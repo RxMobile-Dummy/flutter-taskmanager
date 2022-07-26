@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_management/features/login/domain/usecases/forgot_password_uasecase.dart';
+import 'package:task_management/features/login/domain/usecases/get_user_role_usecase.dart';
 import 'package:task_management/features/login/domain/usecases/reset_passward_usecase.dart';
 import 'package:task_management/features/login/domain/usecases/sign_up_usecase.dart';
 
@@ -20,17 +21,20 @@ class LoginBloc extends Bloc<BaseEvent, BaseState> {
   SignUpUsecase? signUpUsecase;
   ForgotPasswardUsecase? forgotPasswardUsecase;
   ResetPasswardUsecase? resetPasswardUsecase;
+  GetUserRoleUsecase? getUserRoleUsecase;
 
 
   LoginBloc(
-      {required this.loginCase,this.forgotPasswardUsecase,this.resetPasswardUsecase,this.signUpUsecase}) : super(StateLoading()) {
+      {required this.getUserRoleUsecase,required this.loginCase,this.forgotPasswardUsecase,this.resetPasswardUsecase,this.signUpUsecase}) : super(StateLoading()) {
     on<BaseEvent>((event, emit) {
       if (event is EventRequest) {
     } else if (event is PasswordDoesNotMatch) {
       //yield PasswordDoesNotMatchState(Strings.kPasswordDoesNotMatch);
     } else if (event is LoginEvent) {
     loginCall(event.email ?? "", event.password ?? "");
-    } else if (event is SignUpEvent) {
+    }  else if (event is GetUserRoleEvent) {
+        getUserRoleCall();
+      }else if (event is SignUpEvent) {
         signUpCall(
           role: event.role,
           password: event.password,
@@ -57,6 +61,8 @@ class LoginBloc extends Bloc<BaseEvent, BaseState> {
         emit(ResetPasswordStatus(model: event.model));
       }else if (event is SignUpSuccessEvent){
         emit(SignUpState(model: event.model));
+      }else if (event is GetUserRoleSuccessEvent){
+        emit(GetUserRoleState(model: event.model));
       }
     });
   }
@@ -95,6 +101,18 @@ class LoginBloc extends Bloc<BaseEvent, BaseState> {
         add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
        add(LoginSuccessEvent(model: onSuccess));
+      });
+    });
+  }
+
+  getUserRoleCall() {
+    getUserRoleUsecase!
+        .call(GetUserRoleParams())
+        .listen((data) {
+      data.fold((onError) {
+        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+      }, (onSuccess) {
+        add(GetUserRoleSuccessEvent(model: onSuccess));
       });
     });
   }

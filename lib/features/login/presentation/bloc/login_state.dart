@@ -1,6 +1,7 @@
 
 
 import 'package:task_management/features/login/data/model/forgot_password_model.dart';
+import 'package:task_management/features/login/data/model/get_user_role_model.dart';
 import 'package:task_management/features/login/data/model/sign_up_model.dart';
 
 import '../../../../core/base/base_bloc.dart';
@@ -17,6 +18,12 @@ class SignUpState extends BaseState {
   SignUpModel? model;
 
   SignUpState({this.model});
+}
+
+class GetUserRoleState extends BaseState {
+  GetUserRoleModel? model;
+
+  GetUserRoleState({this.model});
 }
 
 class ForgotPasswordStatus extends BaseState {

@@ -1,22 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_management/features/login/data/model/forgot_password_model.dart';
+import 'package:task_management/features/login/data/model/get_user_role_model.dart';
 import 'package:task_management/features/login/data/model/sign_up_model.dart';
 
 import '../../../../core/base/base_bloc.dart';
 import '../../../../custom/progress_bar.dart';
-import '../../../../ui/forgot_password.dart';
-import '../../../../ui/home/home.dart';
-import '../../../../utils/colors.dart';
-import '../../../../utils/style.dart';
 import '../../../../widget/button.dart';
 import '../../../../widget/decoration.dart';
 import '../../../../widget/rounded_corner_page.dart';
 import '../../../../widget/textfield.dart';
-import '../../data/model/login_model.dart';
 import '../bloc/login_bloc.dart';
 import '../bloc/login_event.dart';
 import '../bloc/login_state.dart';
@@ -42,6 +36,18 @@ class _SignUpState extends State<SignUp> {
   TextEditingController password = TextEditingController();
   TextEditingController role = TextEditingController();
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  GetUserRoleModel getUserRoleModel = GetUserRoleModel();
+  List<String> userRoleList = [];
+  String? _selectedUserRole;
+  String? userRole;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _getUserRole();
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,13 +64,20 @@ class _SignUpState extends State<SignUp> {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setString('id', model.data!.id!.toString());
               prefs.setString('role', model.data!.role ?? "");
-              Get.off(Login());
-            } /*else if (state is ForgotPasswordStatus) {
+              Navigator.push(
+                context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                create: (context) => Sl.Sl<LoginBloc>(),
+                child: Login(),
+              )),);
+            //  Get.off(Login());
+            } else if (state is GetUserRoleState) {
             ProgressDialog.hideLoadingDialog(context);
-            ForgotPasswordModel? model = state.model;
-            print(model!.message??"");
-            Get.off(Home());
-          }*/else if (state is StateErrorGeneral) {
+            getUserRoleModel = state.model!;
+            for(int i=0;i<getUserRoleModel.data!.length;i++){
+              userRoleList.add(getUserRoleModel.data![i].userRole ?? "");
+            }
+            print(getUserRoleModel.message??"");
+          }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
             }
           },
@@ -159,21 +172,61 @@ class _SignUpState extends State<SignUp> {
                 const SizedBox(
                   height: 24,
                 ),
-                CustomTextField(
+           Padding(
+             padding: EdgeInsets.symmetric(horizontal: 10),
+             child: Row(
+               children: [
+                 Expanded(
+                   child: DropdownButtonFormField(
+                     isExpanded: true,
+                     decoration: const InputDecoration(
+                       border: OutlineInputBorder(),
+                     ),
+                     validator: (value) {
+                       if (value == null || value == "") {
+                         return 'Please Select User role.';
+                       }
+                       return null;
+                     },
+                     borderRadius: BorderRadius.circular(5),
+                     hint: const Text('Please choose a Role'), // Not necessary for Option 1
+                     value: _selectedUserRole,
+                     onChanged: (String? newValue) {
+                       setState(() {
+                         _selectedUserRole = newValue;
+                       });
+                       for(int i=0;i<getUserRoleModel.data!.length;i++){
+                         if(_selectedUserRole == getUserRoleModel.data![i].userRole){
+                           userRole = getUserRoleModel.data![i].id!.toString();
+                         }
+                       }
+                     },
+                     items: userRoleList.map((userRole) {
+                       return DropdownMenuItem(
+                         child: Text(userRole),
+                         value: userRole,
+                       );
+                     }).toList(),
+                   ),
+                 )
+               ],
+             ),
+           ),
+                /*CustomTextField(
                   key: Key("role"),
                   label: "Role",
                   hint: "Enter role",
                   errorMessage: "Please Enter role",
                   textEditingController: role,
                   textInputType: TextInputType.name,
-                ),
+                ),*/
                 Button(
                   "Sign Up",
                   onPress: () {
                     if(_formKey.currentState!.validate()){
                       _formKey.currentState?.save();
                       _signUpUser(
-                        role: role.text,
+                        role: userRole,
                         password: password.text,
                         mobile: "+91${mobile.text}",
                         lastName: lastName.text,
@@ -212,6 +265,14 @@ class _SignUpState extends State<SignUp> {
             password: password?.trim(),
             role: role?.trim(),
           ));
+      return "";
+    });
+  }
+  Future<String> _getUserRole() {
+    return Future.delayed(Duration()).then((_) {
+      ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<LoginBloc>(context).add(
+          GetUserRoleEvent());
       return "";
     });
   }

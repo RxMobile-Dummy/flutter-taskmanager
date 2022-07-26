@@ -2,10 +2,12 @@ import 'dart:collection';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:task_management/features/login/data/model/forgot_password_model.dart';
+import 'package:task_management/features/login/data/model/get_user_role_model.dart';
 import 'package:task_management/features/login/data/model/login_model.dart';
 import 'package:task_management/features/login/data/model/reset_passward_model.dart';
 import 'package:task_management/features/login/data/model/sign_up_model.dart';
 import 'package:task_management/features/login/domain/usecases/forgot_password_uasecase.dart';
+import 'package:task_management/features/login/domain/usecases/get_user_role_usecase.dart';
 import 'package:task_management/features/login/domain/usecases/reset_passward_usecase.dart';
 import 'package:task_management/features/login/domain/usecases/sign_up_usecase.dart';
 import '../../../../core/api_call/baseClient.dart';
@@ -102,6 +104,24 @@ class LocalDataSourceImpl implements LocalDataSource {
       // print(data['token']);
       return data;
       print('Login successfully');
+    }else {
+      print('failed');
+    }
+    return data;
+  }
+
+  @override
+  Future<GetUserRoleModel> getUserRoleCall(GetUserRoleParams params) async {
+    /* Dio dio = new Dio();
+    dio.options.headers['Accept'] = 'application/json';
+    dio.options.headers['Authorization'] = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTc4ODMwOTgsImVtYWlsIjoibWFuc2hhLmNoYXdsYUByYWRpeHdlYi5jb20iLCJtb2JpbGVfbnVtYmVyIjoiKzkxNzAzMDgyMzU5MiJ9.cRHAAuz7ys0mp_ThHzN0_iFC1b-Jbz0B0t6HoylI35o';
+    dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
+    var restClient = ApiClient(dio);*/
+    final response = await _apiClient.getUserRole();
+    var data ;
+    if(response != null ){
+      data =response;
+      return data;
     }else {
       print('failed');
     }

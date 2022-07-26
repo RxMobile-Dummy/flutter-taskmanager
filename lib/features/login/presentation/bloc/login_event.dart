@@ -6,11 +6,17 @@ import 'package:task_management/features/login/data/model/reset_passward_model.d
 import 'package:task_management/features/login/data/model/sign_up_model.dart';
 
 import '../../../../core/base/base_bloc.dart';
+import '../../data/model/get_user_role_model.dart';
 
 class LoginEvent extends BaseEvent {
   String? email, password;
 
   LoginEvent({this.password, this.email});
+}
+
+class GetUserRoleEvent extends BaseEvent {
+
+  GetUserRoleEvent();
 }
 
 class SignUpEvent extends BaseEvent {
@@ -22,6 +28,11 @@ class LoginSuccessEvent extends BaseEvent {
   LoginModel? model;
 
   LoginSuccessEvent({this.model});
+}
+class GetUserRoleSuccessEvent extends BaseEvent {
+  GetUserRoleModel? model;
+
+  GetUserRoleSuccessEvent({this.model});
 }
 
 class SignUpSuccessEvent extends BaseEvent {
