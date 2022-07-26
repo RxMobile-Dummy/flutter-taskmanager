@@ -132,7 +132,9 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     // dio.options.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
     // dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
     // var restClient = ApiClient(dio);
-    final response = await _apiClient.getTask();
+    var map = HashMap<String, dynamic>();
+    map['date'] = params.date;
+    final response = await _apiClient.getTask(map);
     var data ;
     if(response != null ){
       data =response;

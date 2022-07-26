@@ -62,7 +62,7 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
       }else if(event is DeleteTaskEvent){
         deleteTskCall(id: event.id);
       }else if(event is GetTaskEvent){
-        getTaskCall();
+        getTaskCall(date: event.date);
       }else if(event is InviteProjectAssignEvent){
         inviteProjectAssignCall(
           assignee_ids: event.assignee_ids,
@@ -171,9 +171,9 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
     });
   }
 
-  getTaskCall() {
+  getTaskCall({String? date}) {
     getTaskUsecase!
-        .call(GetTaskParams())
+        .call(GetTaskParams(date: date ?? ""))
         .listen((data) {
       data.fold((onError) {
         add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));

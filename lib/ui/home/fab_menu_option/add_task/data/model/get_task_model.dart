@@ -34,7 +34,7 @@ class Data {
   String? name;
   String? comment;
   String? description;
-  String? taskStatus;
+  bool? isCompleted;
   String? priority;
   String? createdAt;
   String? updatedAt;
@@ -52,7 +52,7 @@ class Data {
         this.name,
         this.comment,
         this.description,
-        this.taskStatus,
+        this.isCompleted,
         this.priority,
         this.createdAt,
         this.updatedAt,
@@ -70,7 +70,7 @@ class Data {
     name = json['name'];
     comment = json['comment'];
     description = json['description'];
-    taskStatus = json['task_status'];
+    isCompleted = json['isCompleted'];
     priority = json['priority'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
@@ -90,7 +90,7 @@ class Data {
     data['name'] = this.name;
     data['comment'] = this.comment;
     data['description'] = this.description;
-    data['task_status'] = this.taskStatus;
+    data['isCompleted'] = this.isCompleted;
     data['priority'] = this.priority;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;

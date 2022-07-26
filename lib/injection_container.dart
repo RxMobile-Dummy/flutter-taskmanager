@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/core/api_call/baseClient.dart';
 import 'package:task_management/features/login/domain/repositories/login_repositories.dart';
 import 'package:task_management/features/login/domain/usecases/forgot_password_uasecase.dart';
+import 'package:task_management/features/login/domain/usecases/get_user_role_usecase.dart';
 import 'package:task_management/features/login/domain/usecases/reset_passward_usecase.dart';
 import 'package:task_management/features/login/domain/usecases/sign_up_usecase.dart';
 import 'package:task_management/features/login/presentation/bloc/login_bloc.dart';
@@ -65,6 +66,7 @@ Future<void> init() async {
 
   // bloc
   Sl.registerFactory(() => LoginBloc(
+    getUserRoleUsecase: Sl.call(),
       loginCase: Sl.call(),
       forgotPasswardUsecase: Sl.call(),
       resetPasswardUsecase: Sl.call(),
@@ -105,6 +107,7 @@ Future<void> init() async {
   Sl.registerLazySingleton(() => GetNoteUsecase(addNoteRepositories: Sl()));
   Sl.registerLazySingleton(() => UpdateNoteUsecase(addNoteRepositories: Sl()));
   Sl.registerLazySingleton(() => DeleteNoteUsecase(addNoteRepositories: Sl()));
+  Sl.registerLazySingleton(() => GetUserRoleUsecase(loginRepositories: Sl()));
   Sl.registerLazySingleton(
       () => InviteProjectAssignUsecase(addTaskRepositories: Sl()));
   Sl.registerLazySingleton(
@@ -177,7 +180,7 @@ Future<Dio> createDioClient() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var authToken = prefs.getString('access');
   Map<String, dynamic> headers = {};
-  if (authToken != null) {
+  if (authToken != null || authToken != "") {
     headers["Accept"] = 'application/json';
     headers["Authorization"] = authToken;
   }
@@ -203,7 +206,7 @@ Future<Dio> createDioClient() async {
           try {
             await refreshTokenCall();
             var authToken = prefs.getString('access');
-            if (authToken != null) {
+            if (authToken != null || authToken != "") {
               headers["Accept"] = 'application/json';
               headers["Authorization"] = authToken;
               dio.options.headers = headers;
