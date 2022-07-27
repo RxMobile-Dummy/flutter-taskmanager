@@ -61,7 +61,9 @@ class _TaskDetailsState extends State<TaskDetails> {
             } else if (state is DeleteTaskState) {
               ProgressDialog.hideLoadingDialog(context);
               DeleteTaskModel? model = state.model;
-              print(model!.message??"");
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(model!.message??""),
+              ));
               Navigator.of(context).pop();
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
@@ -200,7 +202,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                       children: [
                         Transform.rotate(
                           angle: 2.5,
-                          child: Icon(
+                          child: const Icon(
                             Icons.insert_link,
                             color: Colors.grey,
                           ),
@@ -212,12 +214,12 @@ class _TaskDetailsState extends State<TaskDetails> {
                             title("Tag"),
                             sized_16(size: 10.0),
                             Container(
-                              child: Text("Personal"),
+                              child: const Text("Personal"),
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(4),
                                   border: Border.all(color: Colors.blue.shade50),
                                   color: Colors.white),
-                              padding: EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(8),
                             )
                           ],
                         ),
@@ -231,24 +233,32 @@ class _TaskDetailsState extends State<TaskDetails> {
                             ProgressDialog.hideLoadingDialog(context);
                            // GetCommentModel? model = state.model;
                             getCommentModel = state.model!;
-                            print(getCommentModel.message??"");
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(getCommentModel.message??""),
+                            ));
                            // Navigator.of(context).pop();
                           }else if (state is AddCommentState) {
                             ProgressDialog.hideLoadingDialog(context);
                             AddCommentModel? model = state.model;
-                            print(model!.message??"");
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(model!.message??""),
+                            ));
                             await _getComment(comment_user_id: authToken);
                             //Navigator.of(context).pop();
                           }else if (state is UpdateCommentState) {
                             ProgressDialog.hideLoadingDialog(context);
                             UpdateCommentModel? model = state.model;
-                            print(model!.message??"");
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(model!.message??""),
+                            ));
                             Navigator.of(context).pop();
                             await _getComment(comment_user_id: authToken);
                           }else if (state is DeleteCommentState) {
                             ProgressDialog.hideLoadingDialog(context);
                             DeleteCommentModel? model = state.model;
-                            print(model!.message??"");
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(model!.message??""),
+                            ));
                             await _getComment(comment_user_id: authToken);
                            // Navigator.of(context).pop();
                           }else if (state is StateErrorGeneral) {
@@ -289,7 +299,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                       alignment: Alignment.center,
                                       children: [
                                         Container(
-                                          margin: EdgeInsets.only(top: 8),
+                                          margin: const EdgeInsets.only(top: 8),
                                           alignment: Alignment.topCenter,
                                           child: Transform.rotate(
                                             angle: isCommentDisplay ? 3 : 0,
@@ -301,7 +311,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                         ),
                                         Transform.rotate(
                                           angle: isCommentDisplay ? 3 : 0,
-                                          child: Icon(
+                                          child: const Icon(
                                             Icons.keyboard_arrow_down,
                                             color: Colors.grey,
                                           ),
@@ -328,7 +338,7 @@ class _TaskDetailsState extends State<TaskDetails> {
         child: Column(
           children: [
             Container(
-              margin: EdgeInsets.only(left: 0, right: 0, top: 16),
+              margin: const EdgeInsets.only(left: 0, right: 0, top: 16),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(4),
@@ -350,7 +360,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                   ),
                    Container(
           color: Colors.grey.shade100,
-          padding: EdgeInsets.only(
+          padding: const EdgeInsets.only(
               left: 16, top: 10, right: 16, bottom: 10),
           child: Row(
             children: [
@@ -373,7 +383,6 @@ class _TaskDetailsState extends State<TaskDetails> {
                 onTap: () async {
                    SharedPreferences prefs = await SharedPreferences.getInstance();
                    var authToken = prefs.getString('id');
-                  // var token = prefs.getString('access');
                    print(authToken);
                   _addComment(
                     comment_user_id: authToken,
@@ -451,7 +460,7 @@ class _TaskDetailsState extends State<TaskDetails> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                margin: EdgeInsets.only(left: 0, top: 8),
+                margin: const EdgeInsets.only(left: 0, top: 8),
                 child: Text(
                   getCommentModel.data![index].description ?? "Lorem ipsum dolor sit amet,consectetur\nadipiscing.",
                   style:
@@ -459,7 +468,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(left: 0, top: 8),
+                margin: const EdgeInsets.only(left: 0, top: 8),
                 child:Row(
                   children: [
                     GestureDetector(

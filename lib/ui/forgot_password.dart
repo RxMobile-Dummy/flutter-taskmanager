@@ -34,7 +34,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             } if (state is ForgotPasswordStatus) {
               ProgressDialog.hideLoadingDialog(context);
               ForgotPasswordModel? model = state.model;
-              print(model!.message??"");
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(model!.message??""),
+              ));
               Navigator.push(
                 context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
                 create: (context) => Sl.Sl<LoginBloc>(),

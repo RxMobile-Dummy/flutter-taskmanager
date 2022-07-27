@@ -78,25 +78,33 @@ class _ProjectState extends State<Project> {
             /*for(var i=0;i< getAllProjectsModel.data!.length;i++){
               listTitle.add(getAllProjectsModel.data![i].name ?? "");
             }*/
-            print(getAllProjectsModel.message??"");
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(getAllProjectsModel.message??""),
+            ));
            // Navigator.of(context).pop();
           } else if (state is DeleteProjectState) {
             ProgressDialog.hideLoadingDialog(context);
             DeleteProjectModel? model = state.model;
-            print(model!.message??"");
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(model!.message??""),
+            ));
             _getProject();
           }else if (state is AddProjectState) {
             ProgressDialog.hideLoadingDialog(context);
             AddProjectModel? model = state.model;
            /* SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.setString('project_id', model?.data?.id.toString() ?? "");*/
-            print(model!.message??"");
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(model!.message??""),
+            ));
             Navigator.of(context).pop();
             _getProject();
           }else if (state is UpdateProjectState) {
             ProgressDialog.hideLoadingDialog(context);
             UpdateProjectModel? model = state.model;
-            print(model!.message??"");
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(model!.message??""),
+            ));
             Navigator.of(context).pop();
             _getProject();
           }else if (state is StateErrorGeneral) {

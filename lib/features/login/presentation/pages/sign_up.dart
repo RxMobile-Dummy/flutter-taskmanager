@@ -60,7 +60,9 @@ class _SignUpState extends State<SignUp> {
             }else if (state is SignUpState) {
               ProgressDialog.hideLoadingDialog(context);
               SignUpModel? model = state.model;
-              print(model!.message??"");
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(model!.message??""),
+              ));
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setString('id', model.data!.id!.toString());
               prefs.setString('role', model.data!.role ?? "");

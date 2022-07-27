@@ -34,7 +34,9 @@ class _ResetPasswordState extends State<ResetPassword> {
             } if (state is ResetPasswordStatus) {
               ProgressDialog.hideLoadingDialog(context);
               ResetPasswardModel? model = state.model;
-              print(model!.message??"");
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(model!.message??""),
+              ));
               Get.to(ResetSuccess());
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
