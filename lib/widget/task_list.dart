@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/pages/add_task.dart';
 
 import '../core/base/base_bloc.dart';
 import '../custom/progress_bar.dart';
@@ -18,82 +19,114 @@ import '../utils/colors.dart';
 import '../utils/style.dart';
 import 'package:task_management/injection_container.dart' as Sl;
 
-
 class TaskList extends StatefulWidget {
+  bool isFilterApply;
+  bool isCompleted;
+
+  TaskList({required this.isCompleted, required this.isFilterApply});
+
   @override
   _TaskListState createState() => _TaskListState();
 }
-class _TaskListState extends  State<TaskList> {
-  GetTaskModel getTaskModel = GetTaskModel();
+
+class _TaskListState extends State<TaskList> {
+  // GetTaskModel getTaskModel = GetTaskModel();
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController commentController = TextEditingController();
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-     await _getTask();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   await _getTask(
+    //       isCompleted: widget.isCompleted, isFilterApply: widget.isFilterApply);
+    // });
     super.initState();
   }
 
-  Future<String> _getTask() {
-    //loginBloc = BlocProvider.of<LoginBloc>(context);
-    return Future.delayed(Duration()).then((_) {
-      ProgressDialog.showLoadingDialog(context);
-      BlocProvider.of<AddTaskBloc>(context).add(
-          GetTaskEvent(date: ""));
-      return "";
-    });
-  }
+  // Future<String> _getTask({bool? isCompleted, bool isFilterApply = false}) {
+  //   return Future.delayed(Duration()).then((_) {
+  //     ProgressDialog.showLoadingDialog(context);
+  //     BlocProvider.of<AddTaskBloc>(context).add(isFilterApply
+  //         ? GetTaskEvent(date: "", isCompleted: isCompleted)
+  //         : GetTaskEvent(date: ""));
+  //     return "";
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AddTaskBloc, BaseState>(
-        listener: (context, state) async {
-          if (state is StateOnSuccess) {
-            ProgressDialog.hideLoadingDialog(context);
-          } else if (state is GetTaskState) {
-            ProgressDialog.hideLoadingDialog(context);
-            getTaskModel = state.model!;
-            print(getTaskModel.message??"");
-           // Navigator.of(context).pop();
-          }else if (state is DeleteTaskState) {
-            ProgressDialog.hideLoadingDialog(context);
-            DeleteTaskModel? model = state.model;
-            print(model!.message??"");
-           // Navigator.of(context).pop();
-            await _getTask();
-          }else if (state is StateErrorGeneral) {
-            ProgressDialog.hideLoadingDialog(context);
+    return BlocBuilder<AddTaskBloc, BaseState>(
+      bloc: BlocProvider.of<AddTaskBloc>(context),
+      builder: (context, state) {
+        print("dataasdasdasd");
+        if (state is GetTaskState) {
+          if (state.model?.data != null &&
+              (state.model?.data?.isNotEmpty ?? false)) {
+            return buildWidget(state.model?.data);
           }
-        },
-        bloc: BlocProvider.of<AddTaskBloc>(context),
-        child:  BlocBuilder<AddTaskBloc, BaseState>(builder: (context, state) {
-          return (getTaskModel.data != null && getTaskModel.data!.isNotEmpty) ? buildWidget()
-         : Center(
-            child: Text(
-              "No Task found for this user",
-              style: CustomTextStyle.styleSemiBold
-                  .copyWith(color: CustomColors.colorBlue, fontSize: 18),
-            ),
-          );
-        })
+        }
+        return Center(
+          child: Text(
+            "No Task found for this user",
+            style: CustomTextStyle.styleSemiBold
+                .copyWith(color: CustomColors.colorBlue, fontSize: 18),
+          ),
+        );
+      },
     );
+    //_getTask(isCompleted: widget.isCompleted,isFilterApply: widget.isFilterApply);
+    //_getTask();
+    /*return BlocListener<AddTaskBloc, BaseState>(
+        listener: (context, state) async {
+      debugPrint("Listened");
+      if (state is StateOnSuccess) {
+        ProgressDialog.hideLoadingDialog(context);
+      } else if (state is GetTaskState) {
+        ProgressDialog.hideLoadingDialog(context);
+        getTaskModel = state.model!;
+        print(getTaskModel.message ?? "");
+        // Navigator.of(context).pop();
+      } else if (state is DeleteTaskState) {
+        ProgressDialog.hideLoadingDialog(context);
+        DeleteTaskModel? model = state.model;
+        print(model!.message ?? "");
+        // Navigator.of(context).pop();
+        // await _getTask();
+      } else if (state is StateErrorGeneral) {
+        ProgressDialog.hideLoadingDialog(context);
+      }
+    },
+        //bloc: BlocProvider.of<AddTaskBloc>(context),
+        child: BlocBuilder<AddTaskBloc, BaseState>(builder: (context, state) {
+      if (state is GetTaskState) {
+        if (state.model?.data != null && (state.model?.data?.isNotEmpty ?? false)) {
+          return buildWidget(state.model?.data);
+        }
+      }
+      return Center(
+        child: Text(
+          "No Task found for this user",
+          style: CustomTextStyle.styleSemiBold
+              .copyWith(color: CustomColors.colorBlue, fontSize: 18),
+        ),
+      );
+    }));*/
   }
 
-  Widget buildWidget(){
+  Widget buildWidget(List<Data>? list) {
     return Container(
       color: Colors.grey.shade100,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListView.builder(
         padding: const EdgeInsets.only(bottom: 72),
         itemBuilder: (context, index) {
-         /* if (index % 6 == 0) {
+          /* if (index % 6 == 0) {
             return headerItem();
           }*/
-          return contentItem(index, index % 2 == 0,context);
+          return contentItem(index, context, list!);
         },
-        itemCount: /*12*/ getTaskModel.data?.length,
+        itemCount: /*12*/ list?.length ?? 0,
       ),
     );
   }
@@ -109,19 +142,25 @@ class _TaskListState extends  State<TaskList> {
     );
   }
 
-  contentItem(index, bool isRejected,BuildContext context) {
+  contentItem(index, BuildContext context, List<Data> list) {
+    var getTaskModel = list[index];
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         Navigator.push(
-          context,MaterialPageRoute(builder: (context) => MultiBlocProvider(
-            providers: [
-              BlocProvider<AddTaskBloc>(
-                create: (context) => Sl.Sl<AddTaskBloc>(),
-              ),
-              BlocProvider<CommentBloc>(
-                create: (context) => Sl.Sl<CommentBloc>(),
-              ),
-            ], child: TaskDetails(),)),);
+          context,
+          MaterialPageRoute(
+              builder: (context) => MultiBlocProvider(
+                    providers: [
+                      BlocProvider<AddTaskBloc>(
+                        create: (context) => Sl.Sl<AddTaskBloc>(),
+                      ),
+                      BlocProvider<CommentBloc>(
+                        create: (context) => Sl.Sl<CommentBloc>(),
+                      ),
+                    ],
+                    child: TaskDetails(),
+                  )),
+        );
         //Get.to(TaskDetails());
       },
       child: Container(
@@ -145,41 +184,52 @@ class _TaskListState extends  State<TaskList> {
             ),
             IconSlideAction(
               onTap: () {},
-              color: isRejected ? CustomColors.colorRed : CustomColors.colorBlue,
+              color: getTaskModel.isCompleted ?? false
+                  ? CustomColors.colorRed
+                  : CustomColors.colorBlue,
               iconWidget: Container(
-                child:  IconButton(
+                child: IconButton(
                   onPressed: () {
-                    titleController.text = getTaskModel.data![index].name ?? "";
-                    descriptionController.text = getTaskModel.data![index].description ?? "";
-                    commentController.text = getTaskModel.data![index].comment ?? "";
+                    titleController.text = getTaskModel.name ?? "";
+                    descriptionController.text = getTaskModel.description ?? "";
+                    commentController.text = getTaskModel.comment ?? "";
                     Navigator.push(
-                      context,MaterialPageRoute(builder: (context) =>BlocProvider<AddTaskBloc>(
-                      create: (context) => Sl.Sl<AddTaskBloc>(),
-                      child: UpdateTask(
-                        titleController: titleController,
-                        commentController: commentController,
-                        descriptionController: descriptionController,
-                        taskId: getTaskModel.data![index].id ?? 0,
-                      ),
-                    )),);
-                  }, icon: const Icon(
-                  Icons.edit,
-                  color: Colors.white,
-                ),),
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => BlocProvider<AddTaskBloc>(
+                                create: (context) => Sl.Sl<AddTaskBloc>(),
+                                child: UpdateTask(
+                                  titleController: titleController,
+                                  commentController: commentController,
+                                  descriptionController: descriptionController,
+                                  taskId: getTaskModel.id ?? 0,
+                                ),
+                              )),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.edit,
+                    color: Colors.white,
+                  ),
+                ),
               ),
               caption: "Edit",
             ),
             IconSlideAction(
               onTap: () {},
-              color: isRejected ? CustomColors.colorRed : CustomColors.colorBlue,
+              color: getTaskModel.isCompleted ?? false
+                  ? CustomColors.colorRed
+                  : CustomColors.colorBlue,
               iconWidget: Container(
-                child:  IconButton(
-                onPressed: () {
-                  _deleteTask(id: getTaskModel.data![index].id,context: context);
-                }, icon: const Icon(
-                  Icons.delete,
-                  color: Colors.white,
-                ),),
+                child: IconButton(
+                  onPressed: () {
+                    _deleteTask(id: getTaskModel.id, context: context);
+                  },
+                  icon: const Icon(
+                    Icons.delete,
+                    color: Colors.white,
+                  ),
+                ),
               ),
               caption: "Delete",
             ),
@@ -193,16 +243,16 @@ class _TaskListState extends  State<TaskList> {
                   width: 16,
                   height: 16,
                   alignment: Alignment.center,
-                  child: isRejected
+                  child: getTaskModel.isCompleted ?? false
                       ? const Icon(
-                          Icons.check_circle,
-                          size: 18,
+                          Icons.radio_button_unchecked,
                           color: Colors.red,
+                          size: 18,
                         )
                       : const Icon(
-                          Icons.radio_button_unchecked,
-                          color: Colors.blue,
+                          Icons.check_circle,
                           size: 18,
+                          color: Colors.blue,
                         ),
                 ),
                 Expanded(
@@ -214,16 +264,21 @@ class _TaskListState extends  State<TaskList> {
                           Text(
                             "Title: ",
                             style: CustomTextStyle.styleSemiBold.copyWith(
-                                color: isRejected ? Colors.grey : Colors.black,
-                                decoration: isRejected
+                                color: getTaskModel.isCompleted ?? false
+                                    ? Colors.grey
+                                    : Colors.black,
+                                decoration: getTaskModel.isCompleted ?? false
                                     ? TextDecoration.lineThrough
                                     : TextDecoration.none),
                           ),
                           Text(
-                            getTaskModel.data![index].name ?? ""/*"Go fishing with Stephen"*/,
+                            getTaskModel.name ??
+                                "" /*"Go fishing with Stephen"*/,
                             style: CustomTextStyle.styleSemiBold.copyWith(
-                                color: isRejected ? Colors.grey : Colors.black,
-                                decoration: isRejected
+                                color: getTaskModel.isCompleted ?? false
+                                    ? Colors.grey
+                                    : Colors.black,
+                                decoration: getTaskModel.isCompleted ?? false
                                     ? TextDecoration.lineThrough
                                     : TextDecoration.none),
                           ),
@@ -237,16 +292,21 @@ class _TaskListState extends  State<TaskList> {
                           Text(
                             "Description: ",
                             style: CustomTextStyle.styleSemiBold.copyWith(
-                                color: isRejected ? Colors.grey : Colors.black,
-                                decoration: isRejected
+                                color: getTaskModel.isCompleted ?? false
+                                    ? Colors.grey
+                                    : Colors.black,
+                                decoration: getTaskModel.isCompleted ?? false
                                     ? TextDecoration.lineThrough
                                     : TextDecoration.none),
                           ),
                           Text(
-                            getTaskModel.data![index].description ?? ""/*"Go fishing with Stephen"*/,
+                            getTaskModel.description ??
+                                "" /*"Go fishing with Stephen"*/,
                             style: CustomTextStyle.styleSemiBold.copyWith(
-                                color: isRejected ? Colors.grey : Colors.black,
-                                decoration: isRejected
+                                color: getTaskModel.isCompleted ?? false
+                                    ? Colors.grey
+                                    : Colors.black,
+                                decoration: getTaskModel.isCompleted ?? false
                                     ? TextDecoration.lineThrough
                                     : TextDecoration.none),
                           ),
@@ -260,16 +320,21 @@ class _TaskListState extends  State<TaskList> {
                           Text(
                             "Comment: ",
                             style: CustomTextStyle.styleSemiBold.copyWith(
-                                color: isRejected ? Colors.grey : Colors.black,
-                                decoration: isRejected
+                                color: getTaskModel.isCompleted ?? false
+                                    ? Colors.grey
+                                    : Colors.black,
+                                decoration: getTaskModel.isCompleted ?? false
                                     ? TextDecoration.lineThrough
                                     : TextDecoration.none),
                           ),
                           Text(
-                            getTaskModel.data![index].comment ?? ""/*"Go fishing with Stephen"*/,
+                            getTaskModel.comment ??
+                                "" /*"Go fishing with Stephen"*/,
                             style: CustomTextStyle.styleSemiBold.copyWith(
-                                color: isRejected ? Colors.grey : Colors.black,
-                                decoration: isRejected
+                                color: getTaskModel.isCompleted ?? false
+                                    ? Colors.grey
+                                    : Colors.black,
+                                decoration: getTaskModel.isCompleted ?? false
                                     ? TextDecoration.lineThrough
                                     : TextDecoration.none),
                           ),
@@ -282,7 +347,7 @@ class _TaskListState extends  State<TaskList> {
                         "09:00 AM",
                         style: CustomTextStyle.styleMedium.copyWith(
                             color: Colors.grey,
-                            decoration: isRejected
+                            decoration: getTaskModel.isCompleted ?? false
                                 ? TextDecoration.lineThrough
                                 : TextDecoration.none,
                             fontSize: 12),
@@ -293,8 +358,9 @@ class _TaskListState extends  State<TaskList> {
                 Container(
                   height: 20,
                   width: 4,
-                  color:
-                      isRejected ? CustomColors.colorRed : CustomColors.colorBlue,
+                  color: getTaskModel.isCompleted ?? false
+                      ? CustomColors.colorRed
+                      : CustomColors.colorBlue,
                 )
               ],
             ),
@@ -308,11 +374,8 @@ class _TaskListState extends  State<TaskList> {
     //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
-      BlocProvider.of<AddTaskBloc>(context).add(
-          DeleteTaskEvent(id: id ?? 0 ));
+      BlocProvider.of<AddTaskBloc>(context).add(DeleteTaskEvent(id: id ?? 0));
       return "";
     });
   }
-
-
 }

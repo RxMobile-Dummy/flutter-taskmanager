@@ -10,8 +10,10 @@ import 'package:task_management/injection_container.dart' as Sl;
 
 class MonthPage extends StatefulWidget {
   var dateSelectionHandler;
+  bool isFilterApply;
+  bool isCompleted;
 
-  MonthPage({Key? key, this.dateSelectionHandler}) : super(key: key);
+  MonthPage({this.dateSelectionHandler,required this.isCompleted,required this.isFilterApply});
 
   @override
   _MonthPageState createState() => _MonthPageState();
@@ -88,10 +90,9 @@ class _MonthPageState extends State<MonthPage> {
             ),
           ),
           Expanded(
-            child: BlocProvider<AddTaskBloc>(
-              create: (context) => Sl.Sl<AddTaskBloc>(),
-              child: TaskList(),
-            ), /*TaskList(),*/
+            child: TaskList(
+                isFilterApply: widget.isFilterApply,
+                isCompleted: widget.isCompleted), /*TaskList(),*/
           )
         ],
       ),

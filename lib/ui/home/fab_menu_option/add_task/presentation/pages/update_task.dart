@@ -254,6 +254,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                       assignee_id: "",
                       description: widget.descriptionController.text,
                       name: widget.titleController.text,
+                      isCompleted: true,
                     );
                   },
                 ),
@@ -279,6 +280,7 @@ class _UpdateTaskState extends State<UpdateTask> {
     String? task_status,
     String? end_date,
     String? start_date,
+    bool? isCompleted,
   }) {
     //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(Duration()).then((_) {
@@ -298,7 +300,7 @@ class _UpdateTaskState extends State<UpdateTask> {
             task_status: task_status ?? "",
             end_date: end_date ?? "",
             start_date: start_date ?? "",
-
+            isCompleted:  isCompleted ?? false,
           ));
       return "";
     });
