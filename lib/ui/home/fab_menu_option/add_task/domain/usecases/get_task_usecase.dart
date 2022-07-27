@@ -28,8 +28,9 @@ class GetTaskUsecase extends UseCase<GetTaskModel,GetTaskParams> {
 
 class GetTaskParams extends Equatable {
   String date;
+  bool? isCompleted;
 
-  GetTaskParams({required this.date});
+  GetTaskParams({required this.date,this.isCompleted});
 
   @override
   List<Object> get props => [id];
@@ -38,6 +39,7 @@ class GetTaskParams extends Equatable {
     final Map<String, dynamic> data = new Map<String, dynamic>();
 
     data['date'] = this.date;
+    data['isCompleted'] = this.isCompleted;
     return data;
   }
 

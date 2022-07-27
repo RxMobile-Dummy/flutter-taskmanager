@@ -38,6 +38,7 @@ class UpdateTaskParams extends Equatable {
   String tag_id;
   String start_date;
   String end_date;
+  bool isCompleted;
 
   UpdateTaskParams({
     required this.id,
@@ -53,6 +54,7 @@ class UpdateTaskParams extends Equatable {
     required this.reviewer_id,
     required this.tag_id,
     required this.task_status,
+    required this.isCompleted,
   });
 
   @override

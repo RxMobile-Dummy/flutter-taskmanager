@@ -51,6 +51,7 @@ class UpdateTaskEvent extends BaseEvent {
   String tag_id;
   String start_date;
   String end_date;
+  bool isCompleted;
 
   UpdateTaskEvent({
     required this.id,
@@ -66,6 +67,7 @@ class UpdateTaskEvent extends BaseEvent {
     required this.end_date,
     required this.name,
     required this.project_id,
+    required this.isCompleted,
   });
 }
 
@@ -76,7 +78,8 @@ DeleteTaskEvent({required this.id});
 
 class GetTaskEvent extends BaseEvent {
   String date;
-  GetTaskEvent({required this.date});
+  bool? isCompleted;
+  GetTaskEvent({required this.date,this.isCompleted});
 }
 
 

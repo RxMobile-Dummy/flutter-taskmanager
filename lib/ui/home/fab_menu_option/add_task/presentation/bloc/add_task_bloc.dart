@@ -1,4 +1,3 @@
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_management/features/login/domain/usecases/forgot_password_uasecase.dart';
 import 'package:task_management/features/login/domain/usecases/reset_passward_usecase.dart';
@@ -14,18 +13,20 @@ import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/base/base_bloc.dart';
 import '../../../../../../core/failure/failure.dart';
 
-
 class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
-
   AddTaskUsecase? addTaskUsecase;
   UpdateTaskUsecase? updateTaskUsecase;
   DeleteTaskUsecase? deleteTaskUsecase;
   GetTaskUsecase? getTaskUsecase;
   InviteProjectAssignUsecase? inviteProjectAssignUsecase;
 
-
   AddTaskBloc(
-      {required this.getTaskUsecase,required this.addTaskUsecase,required this.deleteTaskUsecase,required this.updateTaskUsecase,required this.inviteProjectAssignUsecase}) : super(StateLoading()) {
+      {required this.getTaskUsecase,
+      required this.addTaskUsecase,
+      required this.deleteTaskUsecase,
+      required this.updateTaskUsecase,
+      required this.inviteProjectAssignUsecase})
+      : super(StateLoading()) {
     on<BaseEvent>((event, emit) {
       if (event is EventRequest) {
       } else if (event is AddTaskEvent) {
@@ -43,7 +44,7 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
           endDate: event.end_date,
           startDate: event.start_date,
         );
-      }else if (event is UpdateTaskEvent) {
+      } else if (event is UpdateTaskEvent) {
         updateTskCall(
           id: event.id,
           task_status: event.task_status,
@@ -58,47 +59,48 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
           name: event.name,
           endDate: event.end_date,
           startDate: event.start_date,
+          isCompleted: event.isCompleted,
         );
-      }else if(event is DeleteTaskEvent){
+      } else if (event is DeleteTaskEvent) {
         deleteTskCall(id: event.id);
-      }else if(event is GetTaskEvent){
-        getTaskCall(date: event.date);
-      }else if(event is InviteProjectAssignEvent){
+      } else if (event is GetTaskEvent) {
+        getTaskCall(date: event.date, isCompleted: event.isCompleted);
+      } else if (event is InviteProjectAssignEvent) {
         inviteProjectAssignCall(
           assignee_ids: event.assignee_ids,
           project_id: event.project_id,
         );
-      }else if (event is AddTaskSuccessEvent){
+      } else if (event is AddTaskSuccessEvent) {
         emit(AddTaskState(model: event.model));
-      }else if (event is DeleteTaskSuccessEvent){
+      } else if (event is DeleteTaskSuccessEvent) {
         emit(DeleteTaskState(model: event.model));
-      }else if (event is UpdateTaskSuccessEvent){
+      } else if (event is UpdateTaskSuccessEvent) {
         emit(UpdateTaskState(model: event.model));
-      }else if (event is InviteProjectAssignSuccessEvent){
+      } else if (event is InviteProjectAssignSuccessEvent) {
         emit(InviteProjectAssignState(model: event.model));
-      }else if (event is GetTaskSuccessEvent){
+      } else if (event is GetTaskSuccessEvent) {
         emit(GetTaskState(model: event.model));
       }
     });
   }
 
-
   addTskCall({
     String? name,
     String? startDate,
-  String? endDate,
-  String? description,
-  String? assignee_id,
-  String? comment,
-  String? is_private,
-  String? priority,
-  String? project_id,
-  String? reviewer_id,
-  String? tag_id,
-  String? task_status,}) {
+    String? endDate,
+    String? description,
+    String? assignee_id,
+    String? comment,
+    String? is_private,
+    String? priority,
+    String? project_id,
+    String? reviewer_id,
+    String? tag_id,
+    String? task_status,
+  }) {
     addTaskUsecase!
         .call(AddTaskParams(
-    name: name ?? "",
+      name: name ?? "",
       start_date: startDate ?? "",
       end_date: endDate ?? "",
       description: description ?? "",
@@ -120,20 +122,21 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
     });
   }
 
-  updateTskCall({
-    int? id,
-    String? name,
-    String? startDate,
-    String? endDate,
-    String? description,
-    String? assignee_id,
-    String? comment,
-    String? is_private,
-    String? priority,
-    String? project_id,
-    String? reviewer_id,
-    String? tag_id,
-    String? task_status,}) {
+  updateTskCall(
+      {int? id,
+      String? name,
+      String? startDate,
+      String? endDate,
+      String? description,
+      String? assignee_id,
+      String? comment,
+      String? is_private,
+      String? priority,
+      String? project_id,
+      String? reviewer_id,
+      String? tag_id,
+      String? task_status,
+      bool? isCompleted}) {
     updateTaskUsecase!
         .call(UpdateTaskParams(
       id: id ?? 0,
@@ -149,6 +152,7 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
       reviewer_id: reviewer_id ?? "",
       tag_id: tag_id ?? "",
       task_status: task_status ?? "",
+      isCompleted: isCompleted ?? false,
     ))
         .listen((data) {
       data.fold((onError) {
@@ -160,9 +164,7 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
   }
 
   deleteTskCall({int? id}) {
-    deleteTaskUsecase!
-        .call(DeleteTaskParams(id1: id ?? 0 ))
-        .listen((data) {
+    deleteTaskUsecase!.call(DeleteTaskParams(id1: id ?? 0)).listen((data) {
       data.fold((onError) {
         add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
@@ -171,9 +173,10 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
     });
   }
 
-  getTaskCall({String? date}) {
+  getTaskCall({String? date, bool? isCompleted}) {
+    emit(Uninitialized());
     getTaskUsecase!
-        .call(GetTaskParams(date: date ?? ""))
+        .call(GetTaskParams(date: date ?? "", isCompleted: isCompleted))
         .listen((data) {
       data.fold((onError) {
         add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
@@ -183,12 +186,10 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
     });
   }
 
-  inviteProjectAssignCall({String? project_id,String? assignee_ids}) {
+  inviteProjectAssignCall({String? project_id, String? assignee_ids}) {
     inviteProjectAssignUsecase!
         .call(InviteProjectAssignParams(
-      project_id: project_id ?? "",
-      assignee_ids: assignee_ids ?? ""
-    ))
+            project_id: project_id ?? "", assignee_ids: assignee_ids ?? ""))
         .listen((data) {
       data.fold((onError) {
         add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
@@ -209,5 +210,4 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
       }
     }
   }
-
 }

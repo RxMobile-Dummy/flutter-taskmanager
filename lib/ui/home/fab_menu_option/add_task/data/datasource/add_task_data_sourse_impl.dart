@@ -23,7 +23,7 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
 
   @override
   Future<AddTaskModel> addTaskCall(AddTaskParams params) async {
-   /* Dio dio = new Dio();
+    /* Dio dio = new Dio();
     dio.options.headers['Accept'] = 'application/json';
     dio.options.headers['Authorization'] = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
     dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
@@ -43,10 +43,10 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     map['end_date'] = params.end_date;
     final response = await _apiClient.addTask(map);
     var data;
-    if(response != null ){
-      data =response;
+    if (response != null) {
+      data = response;
       return data;
-    }else {
+    } else {
       print('failed');
     }
     return data;
@@ -63,10 +63,10 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     map['id'] = params.id1;
     final response = await _apiClient.deleteTask(map);
     var data;
-    if(response != null ){
-      data =response;
+    if (response != null) {
+      data = response;
       return data;
-    }else {
+    } else {
       print('failed');
     }
     return data;
@@ -79,8 +79,8 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     dio.options.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
     dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
     var restClient = ApiClient(dio);*/
-    var map =  HashMap<String, dynamic>();
-    map['id']= params.id;
+    var map = HashMap<String, dynamic>();
+    map['id'] = params.id;
     map['project_id'] = params.project_id;
     map['name'] = params.name;
     map['comment'] = params.comment;
@@ -93,19 +93,21 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     map['tag_id'] = params.tag_id;
     map['start_date'] = params.start_date;
     map['end_date'] = params.end_date;
+    map['isCompleted'] = params.isCompleted;
     final response = await _apiClient.updateTask(map);
     var data;
-    if(response != null ){
-      data =response;
+    if (response != null) {
+      data = response;
       return data;
-    }else {
+    } else {
       print('failed');
     }
     return data;
   }
 
   @override
-  Future<InviteProjectAssignModel> inviteProjectAssignCall(InviteProjectAssignParams params) async {
+  Future<InviteProjectAssignModel> inviteProjectAssignCall(
+      InviteProjectAssignParams params) async {
     // Dio dio = new Dio();
     // dio.options.headers['Accept'] = 'application/json';
     // dio.options.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
@@ -116,10 +118,10 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     map['assignee_ids'] = params.assignee_ids;
     final response = await _apiClient.inviteProjectAssign(map);
     var data;
-    if(response != null ){
-      data =response;
+    if (response != null) {
+      data = response;
       return data;
-    }else {
+    } else {
       print('failed');
     }
     return data;
@@ -134,15 +136,17 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     // var restClient = ApiClient(dio);
     var map = HashMap<String, dynamic>();
     map['date'] = params.date;
+    if (params.isCompleted != null) {
+      map['isCompleted'] = params.isCompleted;
+    }
     final response = await _apiClient.getTask(map);
-    var data ;
-    if(response != null ){
-      data =response;
+    var data;
+    if (response != null) {
+      data = response;
       return data;
-    }else {
+    } else {
       print('failed');
     }
     return data;
   }
-
 }
