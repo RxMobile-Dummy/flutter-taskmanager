@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 import '../../utils/calendar.dart';
 import '../../utils/colors.dart';
@@ -12,8 +13,9 @@ class MonthPage extends StatefulWidget {
   var dateSelectionHandler;
   bool isFilterApply;
   bool isCompleted;
+  final void Function(String) callback;
 
-  MonthPage({this.dateSelectionHandler,required this.isCompleted,required this.isFilterApply});
+  MonthPage({required this.callback,this.dateSelectionHandler,required this.isCompleted,required this.isFilterApply});
 
   @override
   _MonthPageState createState() => _MonthPageState();
@@ -21,11 +23,22 @@ class MonthPage extends StatefulWidget {
 
 class _MonthPageState extends State<MonthPage> {
   bool isExpanded = false;
+  String? date1;
 
   final Map<DateTime, List> _events = {};
    int? day;
   int currentMonth = DateTime.now().month;
 
+  getFormatedDate(date) {
+    var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+    var inputDate = inputFormat.parse(date);
+    var outputFormat = DateFormat('dd/MM/yyyy');
+    print(outputFormat.format(inputDate));
+    date1 = outputFormat.format(inputDate).toString();
+    return outputFormat.format(inputDate);
+  }
+
+  void getDate(String date) { widget.callback(date); }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -37,13 +50,16 @@ class _MonthPageState extends State<MonthPage> {
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
             child: Calendar(
               startOnMonday: false,
-              weekDays: ["M", "T", "W", "T", "F", "S", "S"],
+              weekDays: const ["M", "T", "W", "T", "F", "S", "S"],
               events: _events,
               onRangeSelected: (range) =>
                   print("Range is ${range.from}, ${range.to}"),
               onDateSelected: (date) {
                 setState(() {
                   day = date.day;
+                  getFormatedDate(date.toString());
+                  getDate(date1 ?? "");
+                  print(date1);
                 });
               },
               isExpandable: true,
@@ -93,7 +109,7 @@ class _MonthPageState extends State<MonthPage> {
             child: TaskList(
                 isFilterApply: widget.isFilterApply,
                 isCompleted: widget.isCompleted), /*TaskList(),*/
-          )
+          ),
         ],
       ),
     );

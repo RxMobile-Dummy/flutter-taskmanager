@@ -34,6 +34,8 @@ class _TaskListState extends State<TaskList> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController commentController = TextEditingController();
+  TextEditingController startDate = TextEditingController();
+  TextEditingController endDate = TextEditingController();
 
   @override
   void initState() {
@@ -171,7 +173,7 @@ class _TaskListState extends State<TaskList> {
             boxShadow: [
               BoxShadow(
                   color: Colors.grey.shade100,
-                  offset: Offset(0, 100),
+                  offset: const Offset(0, 100),
                   blurRadius: 1,
                   spreadRadius: 100)
             ]),
@@ -193,6 +195,8 @@ class _TaskListState extends State<TaskList> {
                     titleController.text = getTaskModel.name ?? "";
                     descriptionController.text = getTaskModel.description ?? "";
                     commentController.text = getTaskModel.comment ?? "";
+                    startDate.text = getTaskModel.startDate ?? "";
+                    endDate.text = getTaskModel.endDate ?? "";
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -203,6 +207,8 @@ class _TaskListState extends State<TaskList> {
                                   commentController: commentController,
                                   descriptionController: descriptionController,
                                   taskId: getTaskModel.id ?? 0,
+                                  endDate: startDate,
+                                  startDate: startDate,
                                 ),
                               )),
                     );
@@ -371,7 +377,6 @@ class _TaskListState extends State<TaskList> {
   }
 
   Future<String> _deleteTask({int? id, required BuildContext context}) {
-    //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddTaskBloc>(context).add(DeleteTaskEvent(id: id ?? 0));

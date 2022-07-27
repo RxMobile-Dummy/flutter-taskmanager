@@ -49,7 +49,9 @@ class _LoginState extends State<Login> {
           }else if (state is LoginState) {
             ProgressDialog.hideLoadingDialog(context);
             LoginModel? model = state.model;
-            print(model!.message??"");
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(model!.message??""),
+            ));
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.setString('access', model.data!.authenticationToken!.access ?? "");
             prefs.setString('refresh', model.data!.authenticationToken!.refresh ?? "");

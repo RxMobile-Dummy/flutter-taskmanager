@@ -42,20 +42,24 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
     super.initState();
   }
 
-  getFormatedDate(_date) {
+  getFormatedDate(date) {
     var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
-    var inputDate = inputFormat.parse(_date);
+    var inputDate = inputFormat.parse(date);
     var outputFormat = DateFormat('dd/MM/yyyy');
     print(outputFormat.format(inputDate));
     return outputFormat.format(inputDate);
   }
   
   
-  Future<String> _getTask({bool? isCompleted}) {
+  Future<String> _getTask({bool? isCompleted,String? getDate}) {
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddTaskBloc>(context).add(
-          GetTaskEvent(date: ""/*getFormatedDate(DateTime.now().toString())*/,isCompleted: isCompleted));
+          GetTaskEvent(
+              date: (getDate == null || getDate == "")
+                  ? getFormatedDate(DateTime.now().toString())
+              : getDate,
+              isCompleted: isCompleted));
       return "";
     });
   }
@@ -75,7 +79,6 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                   ProgressDialog.hideLoadingDialog(context);
                   getTaskModel = state.model!;
                   print(getTaskModel.message??"");
-                 // Navigator.of(context).pop();
                 }else if (state is StateErrorGeneral) {
                   ProgressDialog.hideLoadingDialog(context);
                 }
@@ -193,6 +196,10 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
     );
   }
 
+  getDateCallBack(String date)async{
+    await _getTask(getDate: date);
+  }
+
   Widget buildWidget(){
     return Container(
       child: PageView(
@@ -204,7 +211,7 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
         },
         children: [
           TodayPage(isCompleted: isCompleted,isFilterApply: isFilterApply),
-          MonthPage(isCompleted: isCompleted,isFilterApply: isFilterApply,),],
+          MonthPage(isCompleted: isCompleted,isFilterApply: isFilterApply,callback: getDateCallBack),],
       ),
     );
   }

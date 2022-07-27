@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
@@ -27,6 +28,8 @@ class _AddNoteState extends State<AddTask> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController commentController = TextEditingController();
+  TextEditingController startDate = TextEditingController();
+  TextEditingController endDate = TextEditingController();
   List<Color> listColors = [
     CustomColors.colorPurple,
     CustomColors.colorBlue,
@@ -38,6 +41,13 @@ class _AddNoteState extends State<AddTask> {
   Color? selectedColors;
 
   @override
+  void initState() {
+    startDate.text = "";
+    endDate.text = "";
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body:BlocListener<AddTaskBloc, BaseState>(
@@ -47,7 +57,9 @@ class _AddNoteState extends State<AddTask> {
             } else if (state is AddTaskState) {
               ProgressDialog.hideLoadingDialog(context);
               AddTaskModel? model = state.model;
-              print(model!.message??"");
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(model!.message??""),
+              ));
               Navigator.of(context).pop();
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
@@ -190,7 +202,7 @@ Widget buildWidget(){
                     ],
                   ),
                 ),
-                Container(
+               /* Container(
                     width: double.infinity,
                     margin: EdgeInsets.only(top: 24),
                     color: Colors.grey.shade200,
@@ -217,29 +229,96 @@ Widget buildWidget(){
                               borderRadius: BorderRadius.circular(100)),
                         )
                       ],
-                    )),
-                Container(
+                    )),*/
+               /* Container(
                   margin: EdgeInsets.only(left: 16, top: 24),
                   child: Text(
                     "Add Member",
                     style: CustomTextStyle.styleBold
                         .copyWith(color: Colors.grey),
                   ),
-                ),
+                ),*/
                 Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 25),
+                    child: Center(
+                        child: TextField(
+                          controller: startDate,
+                          decoration:  InputDecoration(
+                              icon: const Icon(Icons.calendar_today,color: CustomColors.colorBlue,),
+                              labelText: "Enter Start Date",
+                            labelStyle: CustomTextStyle.styleSemiBold,
+                          ),
+                          readOnly: true,
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(1950),
+                                //DateTime.now() - not to allow to choose before today.
+                                lastDate: DateTime(2100));
+
+                            if (pickedDate != null) {
+                              print(
+                                  pickedDate);
+                              String formattedDate =
+                              DateFormat('dd/MM/yyyy').format(pickedDate);
+                              print(
+                                  formattedDate);
+                              setState(() {
+                                startDate.text =
+                                    formattedDate;
+                              });
+                            } else {}
+                          },
+                        ))),
+                Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 25),
+                    //height: MediaQuery.of(context).size.width / 3,
+                    child: Center(
+                        child: TextField(
+                          controller: endDate,
+                          decoration:  InputDecoration(
+                              icon: const Icon(Icons.calendar_today,color: CustomColors.colorBlue,),
+                              labelText: "Enter End Date",
+                            labelStyle: CustomTextStyle.styleSemiBold,
+                          ),
+                          readOnly: true,
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(1950),
+                                //DateTime.now() - not to allow to choose before today.
+                                lastDate: DateTime(2100));
+
+                            if (pickedDate != null) {
+                              print(
+                                  pickedDate);
+                              String formattedDate =
+                              DateFormat('dd/MM/yyyy').format(pickedDate);
+                              print(
+                                  formattedDate);
+                              setState(() {
+                                endDate.text =
+                                    formattedDate;
+                              });
+                            } else {}
+                          },
+                        ))),
+             /*   Container(
                   margin: EdgeInsets.only(left: 16, top: 16),
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
                       color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(100)),
                   child: Text("Anyone"),
-                ),
+                ),*/
                 Button(
                   "Add Task",
                   onPress: () {
                     _addTask(
-                      start_date: "2012-09-04 06:00",
-                      end_date: "2012-09-04 06:00",
+                      start_date: startDate.text.toString(),
+                      end_date: endDate.text.toString(),
                       task_status: "",
                       tag_id: "",
                       reviewer_id: "",
@@ -260,6 +339,14 @@ Widget buildWidget(){
       ),
     );
 }
+
+  getFormatedDate(_date) {
+    var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+    var inputDate = inputFormat.parse(_date);
+    var outputFormat = DateFormat('dd/MM/yyyy');
+    print(outputFormat.format(inputDate));
+    return outputFormat.format(inputDate);
+  }
 
   Future<String> _addTask({
   String? name,

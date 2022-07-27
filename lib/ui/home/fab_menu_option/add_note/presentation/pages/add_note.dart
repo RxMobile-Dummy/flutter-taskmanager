@@ -48,12 +48,9 @@ class _AddNoteState extends State<AddNote> {
             }else if (state is AddNoteState) {
               ProgressDialog.hideLoadingDialog(context);
               AddNotesModel? model = state.model;
-              print(model!.message??"");
-            /*  Navigator.push(
-                context,MaterialPageRoute(builder: (context) =>BlocProvider<AddNoteBloc>(
-                create: (context) => Sl.Sl<AddNoteBloc>(),
-                child: QuickNotes(),
-              )),);*/
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(model!.message??""),
+              ));
               Navigator.of(context).pop();
               //_getNote();
             }else if (state is StateErrorGeneral) {

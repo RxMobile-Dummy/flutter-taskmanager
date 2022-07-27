@@ -7,6 +7,7 @@ import 'package:task_management/ui/home/pages/my_task.dart';
 import 'package:task_management/ui/home/pages/profile.dart';
 import 'package:task_management/ui/home/pages/Project/presentation/pages/project.dart';
 import 'package:task_management/ui/home/pages/quick_notes.dart';
+import 'package:task_management/ui/home/pages/user_status/presentation/bloc/user_status_bloc.dart';
 
 import '../../utils/style.dart';
 import 'fab_menu_option/add_check_list.dart';
@@ -31,7 +32,7 @@ class _HomeState extends State<Home> {
     create: (context) => Sl.Sl<AddNoteBloc>(),
     child:  QuickNotes(),
   );
-  Widget profileWidget =  MultiBlocProvider(
+  /*Widget profileWidget =  MultiBlocProvider(
     providers: [
       BlocProvider<AddNoteBloc>(
         create: (context) => Sl.Sl<AddNoteBloc>(),
@@ -39,7 +40,10 @@ class _HomeState extends State<Home> {
       BlocProvider<AddTaskBloc>(
         create: (context) => Sl.Sl<AddTaskBloc>(),
       ),
-    ], child: Profile(),);
+      BlocProvider<UserStatusBloc>(
+        create: (context) => Sl.Sl<UserStatusBloc>(),
+      ),
+    ], child: Profile(),);*/
   Widget? selectedWidget;
   int menuIndex = 0;
   GlobalKey keyFab = GlobalKey();
@@ -201,10 +205,10 @@ class _HomeState extends State<Home> {
       selectedWidget = quickNoteWidget;
       setState(() {});
     } else {
-      if (selectedWidget != profileWidget) {
+      /*if (selectedWidget != profileWidget) {
         selectedWidget = profileWidget;
         setState(() {});
-      }
+      }*/
     }
   }
 }

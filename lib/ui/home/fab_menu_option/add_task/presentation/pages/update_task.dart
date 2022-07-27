@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
@@ -22,13 +23,16 @@ class UpdateTask extends StatefulWidget {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController commentController = TextEditingController();
+  TextEditingController startDate = TextEditingController();
+  TextEditingController endDate = TextEditingController();
   int taskId;
-  UpdateTask({required this.taskId,required this.commentController,required this.descriptionController,required this.titleController});
+  UpdateTask({required this.endDate,required this.startDate,required this.taskId,required this.commentController,required this.descriptionController,required this.titleController});
   @override
   _UpdateTaskState createState() => _UpdateTaskState();
 }
 
 class _UpdateTaskState extends State<UpdateTask> {
+
   List<Color> listColors = [
     CustomColors.colorPurple,
     CustomColors.colorBlue,
@@ -40,6 +44,11 @@ class _UpdateTaskState extends State<UpdateTask> {
   Color? selectedColors;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body:BlocListener<AddTaskBloc, BaseState>(
@@ -49,7 +58,9 @@ class _UpdateTaskState extends State<UpdateTask> {
             } else if (state is UpdateTaskState) {
               ProgressDialog.hideLoadingDialog(context);
               AddTaskModel? model = state.model;
-              print(model!.message??"");
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(model!.message??""),
+              ));
               Navigator.of(context).pop();
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
@@ -192,7 +203,69 @@ class _UpdateTaskState extends State<UpdateTask> {
                     ],
                   ),
                 ),
-                Container(
+          Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 25),
+              child: Center(
+                  child: TextField(
+                    controller: widget.startDate,
+                    decoration:  InputDecoration(
+                        icon: const Icon(Icons.calendar_today,color: CustomColors.colorBlue,),
+                        labelText: "Enter Start Date",
+                      labelStyle: CustomTextStyle.styleSemiBold,
+                    ),
+                    readOnly: true,
+                    onTap: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(1950),
+                          lastDate: DateTime(2100));
+                      if (pickedDate != null) {
+                        print(pickedDate);
+                        String formattedDate =
+                        DateFormat('dd/MM/yyyy').format(pickedDate);
+                        print(formattedDate);
+                        setState(() {
+                          widget.startDate.text = formattedDate;
+                        });
+                      } else {}
+                    },
+                  ))),
+          Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 25),
+              //height: MediaQuery.of(context).size.width / 3,
+              child: Center(
+                  child: TextField(
+                    controller: widget.endDate,
+                    decoration:  InputDecoration(
+                        icon: const Icon(Icons.calendar_today,color: CustomColors.colorBlue,),
+                        labelText: "Enter End Date",
+                      labelStyle: CustomTextStyle.styleSemiBold,
+                    ),
+                    readOnly: true,
+                    onTap: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(1950),
+                          //DateTime.now() - not to allow to choose before today.
+                          lastDate: DateTime(2100));
+
+                      if (pickedDate != null) {
+                        print(
+                            pickedDate);
+                        String formattedDate =
+                        DateFormat('dd/MM/yyyy').format(pickedDate);
+                        print(
+                            formattedDate);
+                        setState(() {
+                          widget.endDate.text =
+                              formattedDate;
+                        });
+                      } else {}
+                    },
+                  ))),
+             /*   Container(
                     width: double.infinity,
                     margin: EdgeInsets.only(top: 24),
                     color: Colors.grey.shade200,
@@ -219,8 +292,8 @@ class _UpdateTaskState extends State<UpdateTask> {
                               borderRadius: BorderRadius.circular(100)),
                         )
                       ],
-                    )),
-                Container(
+                    )),*/
+         /*       Container(
                   margin: EdgeInsets.only(left: 16, top: 24),
                   child: Text(
                     "Add Member",
@@ -235,15 +308,15 @@ class _UpdateTaskState extends State<UpdateTask> {
                       color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(100)),
                   child: Text("Anyone"),
-                ),
+                ),*/
                 Button(
                   "Update Task",
                   onPress: () {
                     _updateTask(
                       context,
                       id: widget.taskId,
-                      start_date: "2012-09-04 06:00",
-                      end_date: "2012-09-04 06:00",
+                      start_date: widget.startDate.text.toString(),
+                      end_date: widget.endDate.text.toString(),
                       task_status: "",
                       tag_id: "",
                       reviewer_id: "",
