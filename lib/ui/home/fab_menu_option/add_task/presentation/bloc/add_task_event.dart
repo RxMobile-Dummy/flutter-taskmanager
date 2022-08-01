@@ -1,7 +1,7 @@
 
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/invite_project_assign_model.dart';
+import 'package:task_management/ui/home/pages/add_member/data/model/invite_project_assign_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 
 import '../../../../../../core/base/base_bloc.dart';
@@ -83,12 +83,6 @@ class GetTaskEvent extends BaseEvent {
 }
 
 
-class InviteProjectAssignEvent extends BaseEvent {
-  String project_id;
-  String assignee_ids;
-  InviteProjectAssignEvent({required this.project_id,required this.assignee_ids});
-}
-
 class AddTaskSuccessEvent extends BaseEvent {
   AddTaskModel? model;
 
@@ -111,11 +105,5 @@ class UpdateTaskSuccessEvent extends BaseEvent {
   AddTaskModel? model;
 
   UpdateTaskSuccessEvent({this.model});
-}
-
-class InviteProjectAssignSuccessEvent extends BaseEvent {
-  InviteProjectAssignModel? model;
-
-  InviteProjectAssignSuccessEvent({this.model});
 }
 

@@ -5,12 +5,12 @@ import 'package:task_management/ui/home/fab_menu_option/add_task/data/datasource
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/invite_project_assign_model.dart';
+import 'package:task_management/ui/home/pages/add_member/data/model/invite_project_assign_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/add_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/delete_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/get_task_usecase.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/invite_project_assign_usecase.dart';
+import 'package:task_management/ui/home/pages/add_member/domain/usecases/invite_project_assign_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/update_task_usecase.dart';
 
 import '../../../../../../core/api_call/baseClient.dart';
@@ -105,27 +105,6 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     return data;
   }
 
-  @override
-  Future<InviteProjectAssignModel> inviteProjectAssignCall(
-      InviteProjectAssignParams params) async {
-    // Dio dio = new Dio();
-    // dio.options.headers['Accept'] = 'application/json';
-    // dio.options.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
-    // dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    // var restClient = ApiClient(dio);
-    var map = new HashMap<String, String>();
-    map['project_id'] = params.project_id;
-    map['assignee_ids'] = params.assignee_ids;
-    final response = await _apiClient.inviteProjectAssign(map);
-    var data;
-    if (response != null) {
-      data = response;
-      return data;
-    } else {
-      print('failed');
-    }
-    return data;
-  }
 
   @override
   Future<GetTaskModel> getTaskCall(GetTaskParams params) async {

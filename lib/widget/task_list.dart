@@ -6,6 +6,7 @@ import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/pages/add_task.dart';
+import 'package:task_management/ui/home/pages/add_member/presentation/bloc/add_member_bloc.dart';
 
 import '../core/base/base_bloc.dart';
 import '../custom/progress_bar.dart';
@@ -159,6 +160,9 @@ class _TaskListState extends State<TaskList> {
                       ),
                       BlocProvider<CommentBloc>(
                         create: (context) => Sl.Sl<CommentBloc>(),
+                      ),
+                      BlocProvider<AddMemberBloc>(
+                        create: (context) => Sl.Sl<AddMemberBloc>(),
                       ),
                     ],
                     child: TaskDetails(getTaskModel: getTaskModel,),
