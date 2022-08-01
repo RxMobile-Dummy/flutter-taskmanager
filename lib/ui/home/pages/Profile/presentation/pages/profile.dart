@@ -1,27 +1,38 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_management/core/Strings/strings.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/get_note_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
+import 'package:task_management/ui/home/pages/Profile/presentation/bloc/profile_bloc.dart';
+import 'package:task_management/ui/home/pages/Profile/presentation/pages/update_profile.dart';
+import 'package:task_management/ui/home/pages/user_status/presentation/bloc/user_status_state.dart';
 
-import '../../../core/base/base_bloc.dart';
-import '../../../custom/custom_progress_painter.dart';
-import '../../../custom/progress_bar.dart';
-import '../../../utils/colors.dart';
-import '../../../utils/style.dart';
-import '../../../widget/profile_pi.dart';
-import '../../../widget/size.dart';
-import '../fab_menu_option/add_note/data/model/add_note_model.dart';
-import '../fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
-import '../fab_menu_option/add_note/presentation/bloc/add_note_event.dart';
-import '../fab_menu_option/add_note/presentation/bloc/add_note_state.dart';
-import '../fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
-import '../fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
+import '../../../../../../core/base/base_bloc.dart';
+import '../../../../../../custom/custom_progress_painter.dart';
+import '../../../../../../custom/progress_bar.dart';
+import '../../../../../../features/login/presentation/bloc/login_bloc.dart';
+import '../../../../../../features/login/presentation/pages/login.dart';
+import '../../../../../../utils/colors.dart';
+import '../../../../../../utils/style.dart';
+import '../../../../../../widget/profile_pi.dart';
+import '../../../../../../widget/size.dart';
+import '../../../../fab_menu_option/add_note/data/model/add_note_model.dart';
+import '../../../../fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
+import '../../../../fab_menu_option/add_note/presentation/bloc/add_note_event.dart';
+import '../../../../fab_menu_option/add_note/presentation/bloc/add_note_state.dart';
+import '../../../../fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
+import '../../../../fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
+import '../../../user_status/presentation/bloc/user_status_bloc.dart';
+import 'package:task_management/injection_container.dart' as Sl;
+
+import '../../../user_status/presentation/bloc/user_status_event.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -37,12 +48,19 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   ];
 
   late AnimationController colorController;
+  TextEditingController email = TextEditingController();
+  TextEditingController mobile = TextEditingController();
+  TextEditingController lastName = TextEditingController();
+  TextEditingController firstName = TextEditingController();
+  File? imageFile;
   late Animation<Color> color;
   Map<String, dynamic> userMap = Map();
   GetTaskModel getTaskModel = GetTaskModel();
   GetNoteModel getNoteModel = GetNoteModel();
   int noOfTask = 0;
   int noOfNote = 0;
+  String userStatus = "";
+  int totalTask = 0;
 
   @override
   void initState() {
@@ -51,6 +69,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await _getNote();
       await _getTask();
+      await _getUserStatus();
       setState(() {
         userMap = jsonDecode(prefs.getString('userData') ?? "");
         print(userMap);
@@ -66,6 +85,14 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     return Future.delayed(Duration()).then((_) {
       //ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddNoteBloc>(context).add(GetNoteEvent());
+      return "";
+    });
+  }
+
+  Future<String> _getUserStatus() {
+    return Future.delayed(Duration()).then((_) {
+      //ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<UserStatusBloc>(context).add(GetUserStatusEvent());
       return "";
     });
   }
@@ -91,6 +118,22 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           style: CustomTextStyle.styleSemiBold.copyWith(fontSize: 18),
         ),
         backgroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout,color: CustomColors.colorBlue,size: 25,),
+            onPressed: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.clear();
+              Navigator.pushAndRemoveUntil(
+                context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                create: (context) => Sl.Sl<LoginBloc>(),
+                child: Login(),
+              )),
+                    (route) => false,
+              );
+            },
+          )
+        ],
       ),
       body: buildWidget(), /*BlocListener<AddTaskBloc, BaseState>(
         listener: (context, state) {
@@ -145,15 +188,37 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             child: Row(
                               children: [
                                 sized_16(),
-                                userProfilePic(radius: 30.0),
+                                userProfilePic(radius: 30.0,imagePath: "${Strings.baseUrl}${userMap['profile_pic']}"),
                                 sized_16(size: 16.0),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      "${userMap['first_name']}"
-                                      " ${userMap['last_name']}",
-                                      style: CustomTextStyle.styleSemiBold,
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "${userMap['first_name']}"
+                                              " ${userMap['last_name']}",
+                                          style: CustomTextStyle.styleSemiBold,
+                                        ),
+                                        BlocBuilder<UserStatusBloc, BaseState>(
+                                          builder: (context, state) {
+                                            if (state is GetUserStatusState) {
+                                              ProgressDialog.hideLoadingDialog(context);
+                                              for(int i=0;i<state.model!.data!.length;i++){
+                                                if(state.model!.data![i].id == int.parse(userMap['status_id'].toString())){
+                                                  userStatus = state.model!.data![i].userStatus!;
+                                                }
+                                              }
+                                              return Text(
+                                                "  ($userStatus)",
+                                                style: CustomTextStyle.styleSemiBold.copyWith(color: CustomColors.colorBlue,fontSize: 20),
+                                              );
+                                            } else {
+                                              return const SizedBox();
+                                            }
+                                          },
+                                        ),
+                                      ],
                                     ),
                                     sized_16(size: 4.0),
                                     Text(
@@ -167,15 +232,56 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                           .substring(3),
                                       style: CustomTextStyle.styleMedium
                                           .copyWith(color: Colors.grey),
-                                    )
+                                    ),
                                   ],
                                 ),
                               ],
                             ),
                           ),
                         ),
-                        IconButton(
-                            icon: Icon(Icons.settings), onPressed: () {}),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10,top: 10),
+                          child: GestureDetector(
+                            child: Text(
+                              "Update Profile",
+                              style: CustomTextStyle.styleSemiBold.copyWith(fontSize: 18,color: CustomColors.colorBlue),
+                            ),
+                            onTap: (){
+                              email.text = userMap['email'];
+                              mobile.text = userMap['mobile_number'].toString().substring(3);
+                              firstName.text = userMap['first_name'];
+                              lastName.text = userMap['last_name'];
+                              imageFile = File(userMap['profile_pic']);
+                              Navigator.push(
+                                context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MultiBlocProvider(
+                                        providers: [
+                                          BlocProvider<UserStatusBloc>(
+                                            create: (context) => Sl.Sl<UserStatusBloc>(),
+                                          ),
+                                          BlocProvider<LoginBloc>(
+                                            create: (context) => Sl.Sl<LoginBloc>(),
+                                          ),
+                                          BlocProvider<UpdateProfileBloc>(
+                                            create: (context) => Sl.Sl<UpdateProfileBloc>(),
+                                          ),
+                                        ],
+                                        child: UpdateProfile(
+                                          selectedUserStatus: int.parse(userMap['status_id']),
+                                          selectedUserRole: int.parse(userMap['role']),
+                                          mobile: mobile,
+                                          email: email,
+                                          lastName: lastName,
+                                          firstName: firstName,
+                                          imageFile: imageFile,
+                                        ),
+                                      )),
+                              );
+
+                            },
+                          ),
+                        ),
                       ],
                     ),
                   sized_16(size: 24.0),
@@ -183,37 +289,61 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       sized_16(size: 16.0),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "120",
-                              style: CustomTextStyle.styleMedium,
-                            ),
-                            Text(
-                              "Create Tasks",
-                              style: CustomTextStyle.styleSemiBold
-                                  .copyWith(color: Colors.grey, fontSize: 14),
-                            ),
-                          ],
-                        ),
+                      BlocBuilder<AddTaskBloc, BaseState>(
+                        builder: (context, state) {
+                          if (state is GetTaskState) {
+                            ProgressDialog.hideLoadingDialog(context);
+                            return Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${state.model!.data!.length}",
+                                    style: CustomTextStyle.styleMedium,
+                                  ),
+                                  Text(
+                                    "Create Tasks",
+                                    style: CustomTextStyle.styleSemiBold
+                                        .copyWith(color: Colors.grey, fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            return const SizedBox();
+                          }
+                        },
                       ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "80",
-                              style: CustomTextStyle.styleMedium,
-                            ),
-                            Text(
-                              "Completed Tasks",
-                              style: CustomTextStyle.styleSemiBold
-                                  .copyWith(color: Colors.grey, fontSize: 14),
-                            ),
-                          ],
-                        ),
+                      BlocBuilder<AddTaskBloc, BaseState>(
+                        builder: (context, state) {
+                          if (state is GetTaskState) {
+                            ProgressDialog.hideLoadingDialog(context);
+                            totalTask =0;
+                            for(int i=0;i<state.model!.data!.length;i++){
+                              if(state.model!.data![i].isCompleted == true){
+                                totalTask++;
+                              }
+                            }
+                            return Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    totalTask.toString(),
+                                    style: CustomTextStyle.styleMedium,
+                                  ),
+                                  Text(
+                                    "Completed Tasks",
+                                    style: CustomTextStyle.styleSemiBold
+                                        .copyWith(color: Colors.grey, fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            return const SizedBox();
+                          }
+                        },
                       ),
                     ],
                   ),

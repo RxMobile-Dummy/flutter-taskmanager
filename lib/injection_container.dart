@@ -30,6 +30,12 @@ import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/invite_project_assign_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/update_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
+import 'package:task_management/ui/home/pages/Profile/data/datasource/profile_data_source.dart';
+import 'package:task_management/ui/home/pages/Profile/data/datasource/profile_data_source_impl.dart';
+import 'package:task_management/ui/home/pages/Profile/data/repositories/profile_repositories.dart';
+import 'package:task_management/ui/home/pages/Profile/domain/repositories/profile_repositories.dart';
+import 'package:task_management/ui/home/pages/Profile/domain/usecases/update_profile_usecase.dart';
+import 'package:task_management/ui/home/pages/Profile/presentation/bloc/profile_bloc.dart';
 import 'package:task_management/ui/home/pages/Project/data/datasource/project_data_source.dart';
 import 'package:task_management/ui/home/pages/Project/data/datasource/project_data_source_impl.dart';
 import 'package:task_management/ui/home/pages/Project/data/repositories/project_repositories.dart';
@@ -48,6 +54,12 @@ import 'package:task_management/ui/home/pages/comment/domain/usecases/delete_com
 import 'package:task_management/ui/home/pages/comment/domain/usecases/get_comment_usecase.dart';
 import 'package:task_management/ui/home/pages/comment/domain/usecases/update_comment_usecase.dart';
 import 'package:task_management/ui/home/pages/comment/presentation/bloc/comment_bloc.dart';
+import 'package:task_management/ui/home/pages/user_status/data/datasource/user_status_data_source.dart';
+import 'package:task_management/ui/home/pages/user_status/data/datasource/user_status_data_source_impl.dart';
+import 'package:task_management/ui/home/pages/user_status/data/repositories/user_status_repositories.dart';
+import 'package:task_management/ui/home/pages/user_status/domain/repositories/user_status_repositories.dart';
+import 'package:task_management/ui/home/pages/user_status/domain/usecases/get_user_status_usecase.dart';
+import 'package:task_management/ui/home/pages/user_status/presentation/bloc/user_status_bloc.dart';
 
 import 'core/api_call/custom_dio_client.dart';
 import 'features/login/data/datasource/login_data_sourse.dart';
@@ -66,22 +78,24 @@ Future<void> init() async {
 
   // bloc
   Sl.registerFactory(() => LoginBloc(
-    getUserRoleUsecase: Sl.call(),
+      getUserRoleUsecase: Sl.call(),
       loginCase: Sl.call(),
       forgotPasswardUsecase: Sl.call(),
       resetPasswardUsecase: Sl.call(),
       signUpUsecase: Sl.call()));
+  Sl.registerFactory(() => UserStatusBloc(getUserStatusUsecase: Sl.call()));
+  Sl.registerFactory(() => UpdateProfileBloc(updateProfileUsecase: Sl.call()));
   Sl.registerFactory(() => AddTaskBloc(
       addTaskUsecase: Sl.call(),
       deleteTaskUsecase: Sl.call(),
       updateTaskUsecase: Sl.call(),
       inviteProjectAssignUsecase: Sl.call(),
-  getTaskUsecase: Sl.call()));
+      getTaskUsecase: Sl.call()));
   Sl.registerFactory(() => AddNoteBloc(
       addNoteUsecase: Sl.call(),
-  getNoteUsecase: Sl.call(),
-  updateNoteUsecase: Sl.call(),
-  deleteNoteUsecase: Sl.call()));
+      getNoteUsecase: Sl.call(),
+      updateNoteUsecase: Sl.call(),
+      deleteNoteUsecase: Sl.call()));
   Sl.registerFactory(() => ProjectBloc(
       addProjectUsecase: Sl.call(),
       getAllPeojectsUsecase: Sl.call(),
@@ -96,8 +110,9 @@ Future<void> init() async {
   Sl.registerLazySingleton(() => LoginCase(loginRepositories: Sl()));
   Sl.registerLazySingleton(() => SignUpUsecase(loginRepositories: Sl()));
   Sl.registerLazySingleton(
-      () => ForgotPasswardUsecase(loginRepositories: Sl()));
+          () => ForgotPasswardUsecase(loginRepositories: Sl()));
   Sl.registerLazySingleton(() => ResetPasswardUsecase(loginRepositories: Sl()));
+  Sl.registerLazySingleton(() => GetUserStatusUsecase(userStatusRepositories: Sl()));
   Sl.registerLazySingleton(() => AddTaskUsecase(addTaskRepositories: Sl()));
   Sl.registerLazySingleton(() => UpdateTaskUsecase(addTaskRepositories: Sl()));
   Sl.registerLazySingleton(() => DeleteTaskUsecase(addTaskRepositories: Sl()));
@@ -108,40 +123,50 @@ Future<void> init() async {
   Sl.registerLazySingleton(() => UpdateNoteUsecase(addNoteRepositories: Sl()));
   Sl.registerLazySingleton(() => DeleteNoteUsecase(addNoteRepositories: Sl()));
   Sl.registerLazySingleton(() => GetUserRoleUsecase(loginRepositories: Sl()));
+  Sl.registerLazySingleton(() => UpdateProfileUsecase(updateProfileRepositories: Sl()));
   Sl.registerLazySingleton(
-      () => InviteProjectAssignUsecase(addTaskRepositories: Sl()));
+          () => InviteProjectAssignUsecase(addTaskRepositories: Sl()));
   Sl.registerLazySingleton(
-      () => AddCommentUsecase(addCommentRepositories: Sl()));
+          () => AddCommentUsecase(addCommentRepositories: Sl()));
   Sl.registerLazySingleton(
-      () => UpdateCommentUsecase(addCommentRepositories: Sl()));
+          () => UpdateCommentUsecase(addCommentRepositories: Sl()));
   Sl.registerLazySingleton(
-      () => DeleteCommentUsecase(addCommentRepositories: Sl()));
+          () => DeleteCommentUsecase(addCommentRepositories: Sl()));
   Sl.registerLazySingleton(
-      () => GetCommentUsecase(addCommentRepositories: Sl()));
+          () => GetCommentUsecase(addCommentRepositories: Sl()));
   Sl.registerLazySingleton(
-      () => GetAllPeojectsUsecase(projectRepositories: Sl()));
+          () => GetAllPeojectsUsecase(projectRepositories: Sl()));
   Sl.registerLazySingleton(
-      () => UpdateProjectUsecase(projectRepositories: Sl()));
+          () => UpdateProjectUsecase(projectRepositories: Sl()));
   Sl.registerLazySingleton(
-      () => DeleteProjectUsecase(projectRepositories: Sl()));
+          () => DeleteProjectUsecase(projectRepositories: Sl()));
 
   // Repository
   Sl.registerLazySingleton<LoginRepositories>(
-    () => LoginRepositoriesImpl(localDataSource: Sl()),
+        () => LoginRepositoriesImpl(localDataSource: Sl()),
   );
 
+  Sl.registerLazySingleton<UpdateProfileRepositories>(
+        () => UpdateUserProfileRepositoriesImpl(profileDataSource: Sl()),
+  );
+
+  Sl.registerLazySingleton<UserStatusRepositories>(
+        () => UserStatusRepositoriesImpl(userStatusDataSource: Sl()),
+  );
+
+
   Sl.registerLazySingleton<AddTaskRepositories>(
-    () => AddTaskRepositoriesImpl(addTaskDataSource: Sl()),
+        () => AddTaskRepositoriesImpl(addTaskDataSource: Sl()),
   );
 
   Sl.registerLazySingleton<AddNoteRepositories>(
-    () => AddNotesRepositoriesImpl(addNoteDataSource: Sl()),
+        () => AddNotesRepositoriesImpl(addNoteDataSource: Sl()),
   );
   Sl.registerLazySingleton<ProjectRepositories>(
-    () => ProjectRepositoriesImpl(projectDataSource: Sl()),
+        () => ProjectRepositoriesImpl(projectDataSource: Sl()),
   );
   Sl.registerLazySingleton<AddCommentRepositories>(
-    () => AddCommentRepositoriesImpl(addCommentDataSource: Sl()),
+        () => AddCommentRepositoriesImpl(addCommentDataSource: Sl()),
   );
 /*  Sl.registerLazySingleton<CharRepository>(
         () => CharRepositoryImpl(
@@ -150,23 +175,31 @@ Future<void> init() async {
 
   // Local Data sources
   Sl.registerLazySingleton<LocalDataSource>(
-    () => LocalDataSourceImpl(Sl.get()),
+        () => LocalDataSourceImpl(Sl.get()),
+  );
+
+  Sl.registerLazySingleton<ProfileDataSource>(
+        () => UpdateProfileDataSourceImpl(Sl.get()),
+  );
+
+  Sl.registerLazySingleton<UserStatusDataSource>(
+        () => UserStatusDataSourceImpl(Sl.get()),
   );
 
   Sl.registerLazySingleton<AddTaskDataSource>(
-    () => AddTaskDataSourceImpl(Sl.get()),
+        () => AddTaskDataSourceImpl(Sl.get()),
   );
 
   Sl.registerLazySingleton<AddNoteDataSource>(
-    () => AddNotesDataSourceImpl(Sl.get()),
+        () => AddNotesDataSourceImpl(Sl.get()),
   );
 
   Sl.registerLazySingleton<ProjectDataSource>(
-    () => ProjectDataSourceImpl(Sl.get()),
+        () => ProjectDataSourceImpl(Sl.get()),
   );
 
   Sl.registerLazySingleton<AddCommentDataSource>(
-    () => AddCommentDataSourceImpl(Sl.get()),
+        () => AddCommentDataSourceImpl(Sl.get()),
   );
 
   /*Sl.registerLazySingleton<CharRemoteDataSource>(
@@ -180,7 +213,7 @@ Future<Dio> createDioClient() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var authToken = prefs.getString('access');
   Map<String, dynamic> headers = {};
-  if (authToken != null || authToken != "") {
+  if (authToken != null && authToken != "") {
     headers["Accept"] = 'application/json';
     headers["Authorization"] = authToken;
   }
@@ -196,9 +229,18 @@ Future<Dio> createDioClient() async {
   dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
   dio.interceptors.add(
     InterceptorsWrapper(
-      onRequest: (request, handler) {
-        if (authToken != null && authToken != '')
+      onRequest: (request, handler) async {
+        if (authToken != null && authToken != ''){
           request.headers['Authorization'] = 'Bearer $authToken';
+        }else {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          var authToken = prefs.getString('access');
+         // var authToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTk2NzI5MTIsImVtYWlsIjoicmVlY2hhOTk5QGdtYWlsLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE3MDA0MjQyOTU0In0.68SG-dqGiFRSsqQJqp0hqlHsSnvtaQhRjREk_OmpSdM";
+          Map<String, dynamic> headers = {};
+          if (authToken != null && authToken != "") {
+            request.headers['Authorization'] = 'Bearer $authToken';
+          }
+        }
         return handler.next(request);
       },
       onError: (err, handler) async {
