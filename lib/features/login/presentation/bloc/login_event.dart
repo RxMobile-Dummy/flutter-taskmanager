@@ -59,9 +59,10 @@ class ForgotPassEvent extends BaseEvent {
 }
 
 class ResetPasswordEvent extends BaseEvent {
-  String? newPassword;
+  String newPassword;
+  String email;
 
-  ResetPasswordEvent({this.newPassword});
+  ResetPasswordEvent({required this.newPassword,required this.email});
 }
 
 class PasswordDoesNotMatch extends BaseEvent {}

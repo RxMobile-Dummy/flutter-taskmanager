@@ -5,11 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/features/login/presentation/bloc/login_bloc.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 
 import '../onboarding/onboarding.dart';
 import '../utils/style.dart';
 import '../widget/size.dart';
 import 'home/home.dart';
+import 'package:task_management/injection_container.dart' as Sl;
 
 
 class Splash extends StatefulWidget {
@@ -26,9 +28,17 @@ class _SplashState extends State<Splash> {
       var authToken = prefs.getString('access');
       Timer(Duration(seconds: 2), () {
         Get.off(
-          BlocProvider<LoginBloc>(
+          MultiBlocProvider(providers: [
+            BlocProvider<LoginBloc>(
+              create: (context) => Sl.Sl<LoginBloc>(),
+            ),
+            BlocProvider<AddTaskBloc>(
+              create: (context) => Sl.Sl<AddTaskBloc>(),
+            ),
+          ], child: authToken == null ? OnBoarding() : Home())
+         /* BlocProvider<LoginBloc>(
             create: (context) =>
-                BlocProvider.of<LoginBloc>(context), child: authToken == null ? OnBoarding() : Home(),),
+                BlocProvider.of<LoginBloc>(context), child: authToken == null ? OnBoarding() : Home(),),*/
         );
       });
     });

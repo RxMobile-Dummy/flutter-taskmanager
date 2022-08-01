@@ -41,6 +41,7 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
           comment_user_id: event.comment_user_id,
           task_id: event.task_id,
           description: event.description,
+          files: event.files,
         );
       } else if (event is DeleteCommentEvent) {
         deleteCommentCall(
@@ -89,6 +90,7 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
     String? comment_user_id,
     String? task_id,
     String? description,
+    List<String>? files
   }) {
     updateCommentUsecase!
         .call(UpdateCommentParams(
@@ -96,6 +98,7 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
       description: description ?? "",
       task_id: task_id ?? "",
       comment_user_id: comment_user_id ?? "",
+      files: files ?? [],
     ))
         .listen((data) {
       data.fold((onError) {

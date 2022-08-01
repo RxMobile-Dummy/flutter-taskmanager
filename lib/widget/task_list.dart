@@ -36,6 +36,7 @@ class _TaskListState extends State<TaskList> {
   TextEditingController commentController = TextEditingController();
   TextEditingController startDate = TextEditingController();
   TextEditingController endDate = TextEditingController();
+  String taskStatus = "";
 
   @override
   void initState() {
@@ -160,7 +161,7 @@ class _TaskListState extends State<TaskList> {
                         create: (context) => Sl.Sl<CommentBloc>(),
                       ),
                     ],
-                    child: TaskDetails(),
+                    child: TaskDetails(getTaskModel: getTaskModel,),
                   )),
         );
         //Get.to(TaskDetails());
@@ -197,20 +198,22 @@ class _TaskListState extends State<TaskList> {
                     commentController.text = getTaskModel.comment ?? "";
                     startDate.text = getTaskModel.startDate ?? "";
                     endDate.text = getTaskModel.endDate ?? "";
+                    taskStatus = getTaskModel.isCompleted ?? false ? "Completed" : "InCompleted";
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => BlocProvider<AddTaskBloc>(
-                                create: (context) => Sl.Sl<AddTaskBloc>(),
-                                child: UpdateTask(
-                                  titleController: titleController,
-                                  commentController: commentController,
-                                  descriptionController: descriptionController,
-                                  taskId: getTaskModel.id ?? 0,
-                                  endDate: startDate,
-                                  startDate: startDate,
-                                ),
-                              )),
+                            create: (context) => Sl.Sl<AddTaskBloc>(),
+                            child: UpdateTask(
+                              titleController: titleController,
+                              commentController: commentController,
+                              descriptionController: descriptionController,
+                              taskId: getTaskModel.id ?? 0,
+                              endDate: startDate,
+                              startDate: startDate,
+                              selectedRadio: taskStatus,
+                            ),
+                          )),
                     );
                   },
                   icon: const Icon(

@@ -24,9 +24,11 @@ class ResetPasswardUsecase extends UseCase<ResetPasswardModel, ResetPasswardPara
 
 class ResetPasswardParams extends Equatable {
   String password;
+  String email;
 
   ResetPasswardParams({
     required this.password,
+    required this.email,
   });
 
   @override
@@ -36,6 +38,7 @@ class ResetPasswardParams extends Equatable {
     final Map<String, dynamic> data = new Map<String, dynamic>();
 
     data['password'] = this.password;
+    data['email'] = this.email;
 
     return data;
   }

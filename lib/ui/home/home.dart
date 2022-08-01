@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
+import 'package:task_management/ui/home/pages/Profile/presentation/bloc/profile_bloc.dart';
 import 'package:task_management/ui/home/pages/Project/presentation/bloc/project_bloc.dart';
 import 'package:task_management/ui/home/pages/my_task.dart';
-import 'package:task_management/ui/home/pages/profile.dart';
 import 'package:task_management/ui/home/pages/Project/presentation/pages/project.dart';
+import 'package:task_management/ui/home/pages/Profile/presentation/pages/profile.dart';
 import 'package:task_management/ui/home/pages/quick_notes.dart';
 import 'package:task_management/ui/home/pages/user_status/presentation/bloc/user_status_bloc.dart';
 
+import '../../custom/progress_bar.dart';
 import '../../utils/style.dart';
 import 'fab_menu_option/add_check_list.dart';
 import 'fab_menu_option/add_note/presentation/pages/add_note.dart';
 import 'fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
+import 'fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
 import 'fab_menu_option/add_task/presentation/pages/add_task.dart';
 import 'package:task_management/injection_container.dart' as Sl;
 
@@ -23,16 +28,17 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   late Widget myTask;
-  Widget dashboardWidget =BlocProvider<ProjectBloc>(
+  Widget dashboardWidget = BlocProvider<ProjectBloc>(
     create: (context) => Sl.Sl<ProjectBloc>(),
     child: Project(),
   );
- /* Project();*/
+
+  /* Project();*/
   Widget quickNoteWidget = BlocProvider<AddNoteBloc>(
     create: (context) => Sl.Sl<AddNoteBloc>(),
-    child:  QuickNotes(),
+    child: QuickNotes(),
   );
-  /*Widget profileWidget =  MultiBlocProvider(
+  Widget profileWidget = MultiBlocProvider(
     providers: [
       BlocProvider<AddNoteBloc>(
         create: (context) => Sl.Sl<AddNoteBloc>(),
@@ -43,7 +49,12 @@ class _HomeState extends State<Home> {
       BlocProvider<UserStatusBloc>(
         create: (context) => Sl.Sl<UserStatusBloc>(),
       ),
-    ], child: Profile(),);*/
+      BlocProvider<UpdateProfileBloc>(
+        create: (context) => Sl.Sl<UpdateProfileBloc>(),
+      ),
+    ],
+    child: Profile(),
+  );
   Widget? selectedWidget;
   int menuIndex = 0;
   GlobalKey keyFab = GlobalKey();
@@ -52,9 +63,9 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    myTask =  BlocProvider<AddTaskBloc>(
+    myTask = BlocProvider<AddTaskBloc>(
       create: (context) => Sl.Sl<AddTaskBloc>(),
-      child:  MyTask(),
+      child: MyTask(),
     );
     selectedWidget = myTask;
   }
@@ -144,10 +155,18 @@ class _HomeState extends State<Home> {
                     onPressed: () {
                       Get.back();
                       Navigator.push(
-                        context,MaterialPageRoute(builder: (context) =>BlocProvider<AddTaskBloc>(
-                        create: (context) => Sl.Sl<AddTaskBloc>(),
-                        child: AddTask(),
-                      )),);
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BlocProvider<AddTaskBloc>(
+                              create: (context) => Sl.Sl<AddTaskBloc>(),
+                              child: AddTask(),
+                            )),
+                      ).then((value) {
+                        if (value != null) {
+                          context.read<AddTaskBloc>().getTaskCall();
+                        }
+                        print(value);
+                      });
                       //Get.to(AddTask());
                     },
                   ),
@@ -163,10 +182,13 @@ class _HomeState extends State<Home> {
                     onPressed: () {
                       Get.back();
                       Navigator.push(
-                        context,MaterialPageRoute(builder: (context) =>BlocProvider<AddNoteBloc>(
-                        create: (context) => Sl.Sl<AddNoteBloc>(),
-                        child: AddNote(),
-                      )),);
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BlocProvider<AddNoteBloc>(
+                              create: (context) => Sl.Sl<AddNoteBloc>(),
+                              child: AddNote(),
+                            )),
+                      );
                       //Get.to(AddNote());
                     },
                   ),
@@ -194,6 +216,14 @@ class _HomeState extends State<Home> {
     showDialog(context: context, builder: (context) => alertDialog);
   }
 
+  getFormatedDate(date) {
+    var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+    var inputDate = inputFormat.parse(date);
+    var outputFormat = DateFormat('dd/MM/yyyy');
+    print(outputFormat.format(inputDate));
+    return outputFormat.format(inputDate);
+  }
+
   getMenuItem() {
     if (menuIndex == 0 && selectedWidget != myTask) {
       selectedWidget = myTask;
@@ -205,10 +235,10 @@ class _HomeState extends State<Home> {
       selectedWidget = quickNoteWidget;
       setState(() {});
     } else {
-      /*if (selectedWidget != profileWidget) {
+      if (selectedWidget != profileWidget) {
         selectedWidget = profileWidget;
         setState(() {});
-      }*/
+      }
     }
   }
 }

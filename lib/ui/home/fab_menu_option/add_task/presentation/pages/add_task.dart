@@ -60,7 +60,9 @@ class _AddNoteState extends State<AddTask> {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(model!.message??""),
               ));
-              Navigator.of(context).pop();
+             /* BlocProvider.of<AddTaskBloc>(context).add(
+                  GetTaskEvent(date: getFormatedDate(DateTime.now().toString()),));*/
+              Navigator.of(context).pop(/*model*/);
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
             }
@@ -72,6 +74,15 @@ class _AddNoteState extends State<AddTask> {
       ),
     );
   }
+
+  Future<String> _getTask() {
+    return Future.delayed(Duration()).then((_) {
+      //ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<AddTaskBloc>(context).add(GetTaskEvent(date: ""));
+      return "";
+    });
+  }
+
 Widget buildWidget(){
     return RoundedCornerPage(
       title: "Add Task",
@@ -155,14 +166,6 @@ Widget buildWidget(){
                         titleBorder(color: Colors.grey.shade200)),
                   ),
                 ),
-               /* Container(
-                  margin: EdgeInsets.only(left: 16, top: 24),
-                  child: Text(
-                    "Description",
-                    style: CustomTextStyle.styleBold
-                        .copyWith(color: Colors.grey),
-                  ),
-                ),*/
                 Container(
                   margin: EdgeInsets.only(left: 16, right: 16, top: 16),
                   decoration: BoxDecoration(
@@ -244,8 +247,13 @@ Widget buildWidget(){
                         child: TextField(
                           controller: startDate,
                           decoration:  InputDecoration(
-                              icon: const Icon(Icons.calendar_today,color: CustomColors.colorBlue,),
-                              labelText: "Enter Start Date",
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: CustomColors.colorBlue)),
+                            focusedBorder: const UnderlineInputBorder(
+                                borderSide: BorderSide(color: CustomColors.colorBlue)),
+                            icon: const Icon(Icons.calendar_today,
+                              color: CustomColors.colorBlue,),
+                            labelText: "Enter Start Date",
                             labelStyle: CustomTextStyle.styleSemiBold,
                           ),
                           readOnly: true,
@@ -253,8 +261,31 @@ Widget buildWidget(){
                             DateTime? pickedDate = await showDatePicker(
                                 context: context,
                                 initialDate: DateTime.now(),
+                                builder: (BuildContext context, Widget ?child) {
+                                  return Theme(
+                                    data: ThemeData(
+                                      primarySwatch: Colors.grey,
+                                      splashColor: Colors.black,
+                                      textTheme: const TextTheme(
+                                        subtitle1: TextStyle(color: Colors.black),
+                                        button: TextStyle(color: Colors.black),
+                                      ),
+                                      accentColor: Colors.black,
+                                      colorScheme: const ColorScheme.light(
+                                          primary: CustomColors.colorBlue,
+                                          primaryVariant: Colors.black,
+                                          secondaryVariant: Colors.black,
+                                          onSecondary: Colors.black,
+                                          onPrimary: Colors.white,
+                                          surface: Colors.black,
+                                          onSurface: Colors.black,
+                                          secondary: Colors.black),
+                                      dialogBackgroundColor: Colors.white,
+                                    ),
+                                    child: child ??const Text(""),
+                                  );
+                                },
                                 firstDate: DateTime(1950),
-                                //DateTime.now() - not to allow to choose before today.
                                 lastDate: DateTime(2100));
 
                             if (pickedDate != null) {
@@ -278,6 +309,10 @@ Widget buildWidget(){
                         child: TextField(
                           controller: endDate,
                           decoration:  InputDecoration(
+                            enabledBorder: const UnderlineInputBorder(
+                                borderSide: BorderSide(color: CustomColors.colorBlue)),
+                            focusedBorder: const UnderlineInputBorder(
+                                borderSide: BorderSide(color: CustomColors.colorBlue)),
                               icon: const Icon(Icons.calendar_today,color: CustomColors.colorBlue,),
                               labelText: "Enter End Date",
                             labelStyle: CustomTextStyle.styleSemiBold,
@@ -287,8 +322,31 @@ Widget buildWidget(){
                             DateTime? pickedDate = await showDatePicker(
                                 context: context,
                                 initialDate: DateTime.now(),
+                                builder: (BuildContext context, Widget ?child) {
+                                  return Theme(
+                                    data: ThemeData(
+                                      primarySwatch: Colors.grey,
+                                      splashColor: Colors.black,
+                                      textTheme: const TextTheme(
+                                        subtitle1: TextStyle(color: Colors.black),
+                                        button: TextStyle(color: Colors.black),
+                                      ),
+                                      accentColor: Colors.black,
+                                      colorScheme: const ColorScheme.light(
+                                          primary: CustomColors.colorBlue,
+                                          primaryVariant: Colors.black,
+                                          secondaryVariant: Colors.black,
+                                          onSecondary: Colors.black,
+                                          onPrimary: Colors.white,
+                                          surface: Colors.black,
+                                          onSurface: Colors.black,
+                                          secondary: Colors.black),
+                                      dialogBackgroundColor: Colors.white,
+                                    ),
+                                    child: child ??const Text(""),
+                                  );
+                                },
                                 firstDate: DateTime(1950),
-                                //DateTime.now() - not to allow to choose before today.
                                 lastDate: DateTime(2100));
 
                             if (pickedDate != null) {

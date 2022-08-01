@@ -29,12 +29,14 @@ class UpdateCommentParams extends Equatable {
   String comment_user_id;
   String task_id;
   String description;
+  List<String>? files;
 
   UpdateCommentParams({
     required this.id,
     required this.comment_user_id,
     required this.task_id,
     required this.description,
+    this.files,
   });
 
   @override
@@ -47,6 +49,7 @@ class UpdateCommentParams extends Equatable {
     data['comment_user_id'] = this.comment_user_id;
     data['task_id'] = this.task_id;
     data['description'] = this.description;
+    data['files'] = this.files;
 
     return data;
   }

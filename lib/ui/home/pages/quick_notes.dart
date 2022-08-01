@@ -44,7 +44,7 @@ class _QuickNotesState extends State<QuickNotes> {
   Future<String> _getNote() {
     //loginBloc = BlocProvider.of<LoginBloc>(context);
   return Future.delayed(Duration()).then((_) {
-      ProgressDialog.showLoadingDialog(context);
+      //ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddNoteBloc>(context).add(
           GetNoteEvent());
       return "";

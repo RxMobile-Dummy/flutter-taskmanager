@@ -309,7 +309,7 @@ class _ProjectState extends State<Project> {
                 children: listColors
                     .map((e) => GestureDetector(
                           onTap: () {
-                            setState(() async {
+                            setState(()  {
                              /* SharedPreferences prefs = await SharedPreferences.getInstance();
                               var authToken = prefs.getString('id');
                               print(authToken);*/
@@ -517,7 +517,7 @@ class _ProjectState extends State<Project> {
     var id = prefs.getString('id');
     print(id);
      return Future.delayed(Duration()).then((_) {
-      ProgressDialog.showLoadingDialog(context);
+      //ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<ProjectBloc>(context).add(
           GetAllProjectsEvent(
             id: int.parse(id ?? ""),

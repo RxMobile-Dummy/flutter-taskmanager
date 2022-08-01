@@ -54,8 +54,9 @@ class Data {
     description = json['description'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    //files = json['files'];
     if (json['files'] != null) {
-      files = <dynamic>[];
+      files = <String>[];
       json['files'].forEach((v) {
         files!.add(v);
       });
@@ -73,6 +74,7 @@ class Data {
     data['description'] = this.description;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
+    //data['files'] = this.files;
     if (this.files != null) {
       data['files'] = this.files!.map((v) => v.toJson()).toList();
     }
