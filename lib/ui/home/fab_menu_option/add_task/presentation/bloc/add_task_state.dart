@@ -7,7 +7,7 @@ import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 
 import '../../../../../../core/base/base_bloc.dart';
-import '../../data/model/invite_project_assign_model.dart';
+import '../../../../pages/add_member/data/model/invite_project_assign_model.dart';
 
 
 
@@ -34,12 +34,6 @@ class UpdateTaskState extends BaseState {
   AddTaskModel? model;
 
   UpdateTaskState({this.model});
-}
-
-class InviteProjectAssignState extends BaseState {
-  InviteProjectAssignModel? model;
-
-  InviteProjectAssignState({this.model});
 }
 
 

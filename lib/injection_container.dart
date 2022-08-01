@@ -27,7 +27,7 @@ import 'package:task_management/ui/home/fab_menu_option/add_task/domain/reposito
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/add_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/delete_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/get_task_usecase.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/invite_project_assign_usecase.dart';
+import 'package:task_management/ui/home/pages/add_member/domain/usecases/invite_project_assign_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/update_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import 'package:task_management/ui/home/pages/Profile/data/datasource/profile_data_source.dart';
@@ -45,6 +45,12 @@ import 'package:task_management/ui/home/pages/Project/domain/usecases/delete_pro
 import 'package:task_management/ui/home/pages/Project/domain/usecases/get_all_projects_usecase.dart';
 import 'package:task_management/ui/home/pages/Project/domain/usecases/update_project_usecase.dart';
 import 'package:task_management/ui/home/pages/Project/presentation/bloc/project_bloc.dart';
+import 'package:task_management/ui/home/pages/add_member/data/datasource/add_member_data_source.dart';
+import 'package:task_management/ui/home/pages/add_member/data/datasource/add_member_data_source_impl.dart';
+import 'package:task_management/ui/home/pages/add_member/data/repositories/add_member_repositories.dart';
+import 'package:task_management/ui/home/pages/add_member/domain/repositories/add_member_repositories.dart';
+import 'package:task_management/ui/home/pages/add_member/domain/usecases/add_member_usecase.dart';
+import 'package:task_management/ui/home/pages/add_member/presentation/bloc/add_member_bloc.dart';
 import 'package:task_management/ui/home/pages/comment/data/datasource/comment_data_source.dart';
 import 'package:task_management/ui/home/pages/comment/data/datasource/comment_data_source_impl.dart';
 import 'package:task_management/ui/home/pages/comment/data/repositories/comment_repositories.dart';
@@ -85,11 +91,11 @@ Future<void> init() async {
       signUpUsecase: Sl.call()));
   Sl.registerFactory(() => UserStatusBloc(getUserStatusUsecase: Sl.call()));
   Sl.registerFactory(() => UpdateProfileBloc(updateProfileUsecase: Sl.call()));
+  Sl.registerFactory(() => AddMemberBloc(getMemberUsecase: Sl.call(),inviteProjectAssignUsecase: Sl.call()));
   Sl.registerFactory(() => AddTaskBloc(
       addTaskUsecase: Sl.call(),
       deleteTaskUsecase: Sl.call(),
       updateTaskUsecase: Sl.call(),
-      inviteProjectAssignUsecase: Sl.call(),
       getTaskUsecase: Sl.call()));
   Sl.registerFactory(() => AddNoteBloc(
       addNoteUsecase: Sl.call(),
@@ -108,6 +114,7 @@ Future<void> init() async {
       getCommentUsecase: Sl.call()));
   // Use cases
   Sl.registerLazySingleton(() => LoginCase(loginRepositories: Sl()));
+  Sl.registerLazySingleton(() => GetMemberUsecase(addMemberRepositories: Sl()));
   Sl.registerLazySingleton(() => SignUpUsecase(loginRepositories: Sl()));
   Sl.registerLazySingleton(
           () => ForgotPasswardUsecase(loginRepositories: Sl()));
@@ -125,7 +132,7 @@ Future<void> init() async {
   Sl.registerLazySingleton(() => GetUserRoleUsecase(loginRepositories: Sl()));
   Sl.registerLazySingleton(() => UpdateProfileUsecase(updateProfileRepositories: Sl()));
   Sl.registerLazySingleton(
-          () => InviteProjectAssignUsecase(addTaskRepositories: Sl()));
+          () => InviteProjectAssignUsecase(addMemberRepositories: Sl()));
   Sl.registerLazySingleton(
           () => AddCommentUsecase(addCommentRepositories: Sl()));
   Sl.registerLazySingleton(
@@ -144,6 +151,10 @@ Future<void> init() async {
   // Repository
   Sl.registerLazySingleton<LoginRepositories>(
         () => LoginRepositoriesImpl(localDataSource: Sl()),
+  );
+
+  Sl.registerLazySingleton<AddMemberRepositories>(
+        () => AddMemberRepositoriesImpl(addMemberDataSource: Sl()),
   );
 
   Sl.registerLazySingleton<UpdateProfileRepositories>(
@@ -176,6 +187,10 @@ Future<void> init() async {
   // Local Data sources
   Sl.registerLazySingleton<LocalDataSource>(
         () => LocalDataSourceImpl(Sl.get()),
+  );
+
+  Sl.registerLazySingleton<AddMemberDataSource>(
+        () => AddMemberDataSourceImpl(Sl.get()),
   );
 
   Sl.registerLazySingleton<ProfileDataSource>(

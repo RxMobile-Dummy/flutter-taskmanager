@@ -3,23 +3,26 @@ import 'package:equatable/equatable.dart';
 import 'package:task_management/features/login/data/model/forgot_password_model.dart';
 import 'package:task_management/features/login/data/model/reset_passward_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/invite_project_assign_model.dart';
+import 'package:task_management/ui/home/pages/add_member/data/model/invite_project_assign_model.dart';
+import 'package:task_management/ui/home/pages/add_member/domain/repositories/add_member_repositories.dart';
 
 import '../../../../../../core/failure/failure.dart';
 import '../../../../../../core/usecase.dart';
 import '../../../../../../features/login/domain/repositories/login_repositories.dart';
-import '../repositories/add_task_repositories.dart';
+import '../../../../fab_menu_option/add_task/domain/repositories/add_task_repositories.dart';
 
 
 class InviteProjectAssignUsecase extends UseCase<InviteProjectAssignModel, InviteProjectAssignParams> {
-  final AddTaskRepositories? addTaskRepositories;
+  final AddMemberRepositories? addMemberRepositories;
 
-  InviteProjectAssignUsecase({this.addTaskRepositories});
+  InviteProjectAssignUsecase({this.addMemberRepositories});
 
   @override
   Stream<Either<Failure, InviteProjectAssignModel>> call(InviteProjectAssignParams params) {
-    return addTaskRepositories!.inviteProjectAssignCall(params);
+    return addMemberRepositories!.inviteProjectAssignCall(params);
   }
+
+
 
 
 

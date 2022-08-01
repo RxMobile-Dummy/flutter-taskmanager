@@ -3,12 +3,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
+import 'package:task_management/ui/home/pages/add_member/presentation/bloc/add_member_bloc.dart';
 import 'package:task_management/ui/home/pages/comment/data/model/add_comment_model.dart';
 import 'package:task_management/ui/home/pages/comment/data/model/delete_comment_model.dart';
 import 'package:task_management/ui/home/pages/comment/data/model/get_comment_model.dart';
@@ -28,8 +30,10 @@ import '../../../widget/rounded_corner_page.dart';
 import '../../../widget/size.dart';
 import '../../../widget/textfield.dart';
 import '../fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
+import '../pages/add_member/presentation/pages/add_member_page.dart';
 import '../pages/comment/presentation/bloc/comment_bloc.dart';
 import '../pages/comment/presentation/bloc/comment_state.dart';
+import 'package:task_management/injection_container.dart' as Sl;
 
 class TaskDetails extends StatefulWidget {
   var getTaskModel;
@@ -401,7 +405,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                           },
                         ),
                         sized_16(size: 8.0),
-                       /* Transform.rotate(
+                        /* Transform.rotate(
                           angle: 2.5,
                           child: Icon(
                             Icons.attachment,
@@ -753,20 +757,22 @@ class _TaskDetailsState extends State<TaskDetails> {
                                       children: <Widget>[
                                         InkWell(
                                           onTap: () async {
-                                            PickedFile? pickedFile = await ImagePicker().getImage(
+                                            PickedFile? pickedFile =
+                                                await ImagePicker().getImage(
                                               source: ImageSource.camera,
                                               maxWidth: 1800,
                                               maxHeight: 1800,
                                             );
                                             if (pickedFile != null) {
                                               setState(() {
-                                                  imageFileForEdit = File(pickedFile.path);
+                                                imageFileForEdit =
+                                                    File(pickedFile.path);
                                                 //isEdit ? imageFileForEdit : imageFile = File(pickedFile.path);
                                                 print(imageFile);
                                                 print(imageFileForEdit);
                                               });
                                             }
-                                           /* getFromCamera(context,
+                                            /* getFromCamera(context,
                                                 isEdit: true);*/
                                           },
                                           child: const Icon(
@@ -1020,7 +1026,7 @@ class _TaskDetailsState extends State<TaskDetails> {
 
   popupMenu() {
     return PopupMenuButton(
-      itemBuilder: (context) {
+      itemBuilder: (BuildContext c1) {
         return [
           PopupMenuItem(
             child: Text(
@@ -1036,7 +1042,6 @@ class _TaskDetailsState extends State<TaskDetails> {
               style: CustomTextStyle.styleMedium,
             ),
             value: 2,
-            onTap: () {},
           ),
           PopupMenuItem(
             child: Text(
@@ -1054,6 +1059,24 @@ class _TaskDetailsState extends State<TaskDetails> {
         setState(() {
           selectedMenu = value;
         });
+
+        if (value == 3) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>
+            MultiBlocProvider(
+              providers: [
+                BlocProvider<AddMemberBloc>(
+                  create: (context) => Sl.Sl<AddMemberBloc>(),
+                ),
+                BlocProvider<AddTaskBloc>(
+                  create: (context) => Sl.Sl<AddTaskBloc>(),
+                )
+              ],
+              child: GetAllUserList(project_id: widget.getTaskModel.projectId),
+            )),
+          );
+        }
       },
       initialValue: selectedMenu,
       offset: Offset(
