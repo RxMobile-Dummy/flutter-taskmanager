@@ -11,6 +11,7 @@ import 'package:task_management/features/login/presentation/pages/sign_up.dart';
 import '../../../../core/base/base_bloc.dart';
 import '../../../../custom/progress_bar.dart';
 import '../../../../ui/forgot_password.dart';
+import '../../../../ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import '../../../../ui/home/home.dart';
 import '../../../../utils/colors.dart';
 import '../../../../utils/style.dart';
@@ -52,23 +53,27 @@ class _LoginState extends State<Login> {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(model!.message??""),
             ));
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setString('access', model.data!.authenticationToken!.access ?? "");
-            prefs.setString('refresh', model.data!.authenticationToken!.refresh ?? "");
-            prefs.setString('id', model.data?.id!.toString() ?? "");
-            String user = jsonEncode(model.data?.toJson());
-            prefs.setString('userData', user);
-            /*Map json = jsonDecode(prefs.getString('userData') ?? "");
-            print(json);
-            var user1 = model.data;
-            print(user1);*/
-            Get.off(Home());
-          } /*else if (state is ForgotPasswordStatus) {
-            ProgressDialog.hideLoadingDialog(context);
-            ForgotPasswordModel? model = state.model;
-            print(model!.message??"");
-            Get.off(Home());
-          }*/else if (state is StateErrorGeneral) {
+            if(model.success == true){
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.setString('access', model.data!.authenticationToken!.access ?? "");
+              prefs.setString('refresh', model.data!.authenticationToken!.refresh ?? "");
+              prefs.setString('id', model.data?.id!.toString() ?? "");
+              String user = jsonEncode(model.data?.toJson());
+              prefs.setString('userData', user);
+              Navigator.pushAndRemoveUntil<dynamic>(
+                context,
+                MaterialPageRoute(builder: (context) =>BlocProvider<AddTaskBloc>(
+                  create: (context) => Sl.Sl<AddTaskBloc>(),
+                  child: Home(),
+                )),
+                    (route) => false,
+              );
+            }else {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text("Please check your credentials that you have entered."),
+              ));
+            }
+          } else if (state is StateErrorGeneral) {
             ProgressDialog.hideLoadingDialog(context);
           }
         },
@@ -127,10 +132,12 @@ class _LoginState extends State<Login> {
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
-                      context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                      create: (context) => Sl.Sl<LoginBloc>(),
-                      child: ForgotPassword(),
-                    )),);
+                      context,
+                      MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                        create: (context) => Sl.Sl<LoginBloc>(),
+                        child: ForgotPassword(),
+                      )),
+                    );
                    // Get.to(ForgotPassword());
                   },
                   child: Container(
@@ -160,10 +167,12 @@ class _LoginState extends State<Login> {
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
-                          context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                          create: (context) => Sl.Sl<LoginBloc>(),
-                          child: SignUp(),
-                        )),);
+                          context,
+                          MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                            create: (context) => Sl.Sl<LoginBloc>(),
+                            child: SignUp(),
+                          )),
+                        );
                         // Get.to(ForgotPassword());
                       },
                       child:Text(

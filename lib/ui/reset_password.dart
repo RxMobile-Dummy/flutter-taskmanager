@@ -14,6 +14,8 @@ import '../widget/rounded_corner_page.dart';
 import '../widget/textfield.dart';
 
 class ResetPassword extends StatefulWidget {
+  String email;
+  ResetPassword({required this.email});
   @override
   _ResetPasswordState createState() => _ResetPasswordState();
 }
@@ -55,7 +57,7 @@ class _ResetPasswordState extends State<ResetPassword> {
         title: "Reset Password",
         child: Expanded(
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(16),
@@ -64,18 +66,18 @@ class _ResetPasswordState extends State<ResetPassword> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 32,
                   ),
                   CustomTextField(
-                    key: Key("tefResetCode"),
+                    key: const Key("tefResetCode"),
                     label: "Reset code",
                     hint: "Enter code",
                     textEditingController: TextEditingController(),
                   ),
-                  SizedBox(height: 32,),
+                  const SizedBox(height: 32,),
                   CustomTextField(
-                    key: Key("tefPassword"),
+                    key: const Key("tefPassword"),
                     label: "New password",
                     hint: "Enter your password",
                     icon: IconButton(
@@ -93,9 +95,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                     textEditingController: tieNewPassword,
                     isObscureText: isNewPasswordShow,
                   ),
-                  SizedBox(height: 32,),
+                  const SizedBox(height: 32,),
                   CustomTextField(
-                    key: Key("tefConfirmPassword"),
+                    key: const Key("tefConfirmPassword"),
                     label: "Confirm password",
                     hint: "Enter your confirm password",
                     icon: IconButton(
@@ -113,14 +115,14 @@ class _ResetPasswordState extends State<ResetPassword> {
                     textEditingController: tieConfirmPassword,
                     isObscureText: isConfirmPasswordShow,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 24,
                   ),
                   Button(
                     "Change Password",
                     onPress: () {
                       if(tieNewPassword.text == tieConfirmPassword.text){
-                        _resetPassward(tieNewPassword.text);
+                        _resetPassward(tieNewPassword.text,widget.email);
                       }else{
                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                           content: Text('Passward does not same'),
@@ -129,7 +131,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                       //Get.to(ResetSuccess());
                     },
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 48,
                   )
                 ],
@@ -138,12 +140,12 @@ class _ResetPasswordState extends State<ResetPassword> {
           ),
         ));
   }
-  Future<String> _resetPassward(String passward) {
+  Future<String> _resetPassward(String passward,String email) {
     //loginBloc = BlocProvider.of<LoginBloc>(context);
-    return Future.delayed(Duration()).then((_) {
+    return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<LoginBloc>(context).add(
-          ResetPasswordEvent(newPassword: passward.trim()));
+          ResetPasswordEvent(newPassword: passward.trim(),email: email));
       return "";
     });
   }

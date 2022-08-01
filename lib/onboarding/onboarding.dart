@@ -121,10 +121,12 @@ class _OnBoardingState extends State<OnBoarding> {
                         padding: EdgeInsets.only(top: 12, bottom: 12),
                         onPressed: () {
                           Navigator.push(
-                            context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                            create: (context) => Sl.Sl<LoginBloc>(),
-                            child: Login(),
-                          )),);
+                            context,
+                            MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                              create: (context) => Sl.Sl<LoginBloc>(),
+                              child: Login(),
+                            )),
+                          );
                          // Get.off(Login());
                         },
                         child: Text("Get Started",
@@ -138,10 +140,12 @@ class _OnBoardingState extends State<OnBoarding> {
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
-                          context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                          create: (context) => Sl.Sl<LoginBloc>(),
-                          child: Login(),
-                        )),);
+                          context,
+                          MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                            create: (context) => Sl.Sl<LoginBloc>(),
+                            child: Login(),
+                          )),
+                        );
                        // Get.off(Login());
                       },
                       child: Text(

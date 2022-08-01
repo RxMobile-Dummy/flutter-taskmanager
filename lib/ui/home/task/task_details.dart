@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
 import 'package:task_management/ui/home/pages/comment/data/model/add_comment_model.dart';
@@ -11,6 +15,7 @@ import 'package:task_management/ui/home/pages/comment/data/model/get_comment_mod
 import 'package:task_management/ui/home/pages/comment/data/model/update_comment_model.dart';
 import 'package:task_management/ui/home/pages/comment/presentation/bloc/comment_event.dart';
 
+import '../../../core/Strings/strings.dart';
 import '../../../core/base/base_bloc.dart';
 import '../../../custom/progress_bar.dart';
 import '../../../utils/border.dart';
@@ -26,8 +31,11 @@ import '../fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import '../pages/comment/presentation/bloc/comment_bloc.dart';
 import '../pages/comment/presentation/bloc/comment_state.dart';
 
-
 class TaskDetails extends StatefulWidget {
+  var getTaskModel;
+
+  TaskDetails({required this.getTaskModel});
+
   @override
   _TaskDetailsState createState() => _TaskDetailsState();
 }
@@ -38,15 +46,19 @@ class _TaskDetailsState extends State<TaskDetails> {
   GetCommentModel getCommentModel = GetCommentModel();
   TextEditingController commentController = TextEditingController();
   var authToken;
+  File? imageFile;
+  File? imageFileForEdit;
+  List<String>? imageList;
+  List<String>? imageListForEdit;
 
   @override
   void initState() {
-     WidgetsBinding.instance.addPostFrameCallback((_) async {
-       SharedPreferences prefs = await SharedPreferences.getInstance();
-       authToken  = prefs.getString('id');
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      authToken = prefs.getString('id');
       await _getComment(comment_user_id: authToken);
-       // var token = prefs.getString('access');
-       print(authToken);
+      // var token = prefs.getString('access');
+      print(authToken);
     });
     super.initState();
   }
@@ -62,22 +74,21 @@ class _TaskDetailsState extends State<TaskDetails> {
               ProgressDialog.hideLoadingDialog(context);
               DeleteTaskModel? model = state.model;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(model!.message??""),
+                content: Text(model!.message ?? ""),
               ));
               Navigator.of(context).pop();
-            }else if (state is StateErrorGeneral) {
+            } else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
             }
           },
           bloc: BlocProvider.of<AddTaskBloc>(context),
-          child:  BlocBuilder<AddTaskBloc, BaseState>(builder: (context, state) {
-            return buildWidget();
-          })
-      ),
+          child: BlocBuilder<AddTaskBloc, BaseState>(builder: (context, state) {
+            return buildWidget(context);
+          })),
     );
   }
 
-  Widget buildWidget(){
+  Widget buildWidget(BuildContext context) {
     return RoundedCornerPage(
         title: "",
         backButton: false,
@@ -87,117 +98,119 @@ class _TaskDetailsState extends State<TaskDetails> {
         ),
         child: Expanded(
             child: RoundedCornerDecoration(Container(
-              width: double.infinity,
-              padding: EdgeInsets.only(left: 16, right: 16),
-              child: SingleChildScrollView(
-                child: Column(
+          width: double.infinity,
+          padding: EdgeInsets.only(left: 16, right: 16),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  height: 24,
+                ),
+                Text(
+                  widget.getTaskModel
+                      .name /*"Meeting according with design team in Central Park"*/,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: CustomTextStyle.styleBold.copyWith(
+                    fontSize: 20,
+                  ),
+                ),
+                sized_16(size: 32.0),
+                item(
+                    Row(
+                      children: [
+                        userProfilePic(),
+                        sized_16(),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            title("Assigned To"),
+                            sized_16(size: 4.0),
+                            Text(
+                              "Saksi Malik",
+                              style: CustomTextStyle.styleSemiBold
+                                  .copyWith(fontSize: 16),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                    isFirst: true),
+                item(Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      height: 24,
+                    const Icon(
+                      Icons.date_range,
+                      color: Colors.grey,
                     ),
-                    Text(
-                      "Meeting according with design team in Central Park",
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: CustomTextStyle.styleBold.copyWith(
-                        fontSize: 20,
-                      ),
+                    sized_16(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        title("Date"),
+                        sized_16(size: 4.0),
+                        Text(
+                          widget.getTaskModel.startDate,
+                          style: CustomTextStyle.styleSemiBold
+                              .copyWith(fontSize: 16),
+                        )
+                      ],
                     ),
-                    sized_16(size: 32.0),
-                    item(
+                  ],
+                )),
+                item(Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.description,
+                      color: Colors.grey,
+                    ),
+                    sized_16(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        title("Description"),
+                        sized_16(size: 4.0),
+                        Text(
+                          widget.getTaskModel
+                              .description /*"Lorem ipsum dolor sit amet,\nconsectetur adipiscing."*/,
+                          style: CustomTextStyle.styleSemiBold
+                              .copyWith(fontSize: 16),
+                        )
+                      ],
+                    ),
+                  ],
+                )),
+                item(Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.device_hub,
+                      color: Colors.grey,
+                    ),
+                    sized_16(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        title("Members"),
+                        sized_16(size: 16.0),
                         Row(
                           children: [
                             userProfilePic(),
-                            sized_16(),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                title("Assigned To"),
-                                sized_16(size: 4.0),
-                                Text(
-                                  "Saksi Malik",
-                                  style: CustomTextStyle.styleSemiBold
-                                      .copyWith(fontSize: 16),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                        isFirst: true),
-                    item(Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.date_range,
-                          color: Colors.grey,
-                        ),
-                        sized_16(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            title("Date"),
                             sized_16(size: 4.0),
-                            Text(
-                              "Aug 5,2020",
-                              style: CustomTextStyle.styleSemiBold
-                                  .copyWith(fontSize: 16),
-                            )
-                          ],
-                        ),
-                      ],
-                    )),
-                    item(Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.description,
-                          color: Colors.grey,
-                        ),
-                        sized_16(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            title("Description"),
+                            userProfilePic(),
                             sized_16(size: 4.0),
-                            Text(
-                              "Lorem ipsum dolor sit amet,\nconsectetur adipiscing.",
-                              style: CustomTextStyle.styleSemiBold
-                                  .copyWith(fontSize: 16),
-                            )
+                            userProfilePic(),
+                            sized_16(size: 4.0),
+                            userProfilePic(),
                           ],
-                        ),
+                        )
                       ],
-                    )),
-                    item(Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.device_hub,
-                          color: Colors.grey,
-                        ),
-                        sized_16(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            title("Members"),
-                            sized_16(size: 16.0),
-                            Row(
-                              children: [
-                                userProfilePic(),
-                                sized_16(size: 4.0),
-                                userProfilePic(),
-                                sized_16(size: 4.0),
-                                userProfilePic(),
-                                sized_16(size: 4.0),
-                                userProfilePic(),
-                              ],
-                            )
-                          ],
-                        ),
-                      ],
-                    )),
-                    item(Row(
+                    ),
+                  ],
+                )),
+                /*  item(Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Transform.rotate(
@@ -208,7 +221,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                           ),
                         ),
                         sized_16(),
-                        Column(
+                        */ /*Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             title("Tag"),
@@ -222,116 +235,117 @@ class _TaskDetailsState extends State<TaskDetails> {
                               padding: const EdgeInsets.all(8),
                             )
                           ],
-                        ),
+                        ),*/ /*
                       ],
-                    )),
-                    BlocListener<CommentBloc, BaseState>(
-                        listener: (context, state) async {
-                          if (state is StateOnSuccess) {
-                            ProgressDialog.hideLoadingDialog(context);
-                          }  else if (state is GetCommentState) {
-                            ProgressDialog.hideLoadingDialog(context);
-                           // GetCommentModel? model = state.model;
-                            getCommentModel = state.model!;
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(getCommentModel.message??""),
-                            ));
-                           // Navigator.of(context).pop();
-                          }else if (state is AddCommentState) {
-                            ProgressDialog.hideLoadingDialog(context);
-                            AddCommentModel? model = state.model;
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(model!.message??""),
-                            ));
-                            await _getComment(comment_user_id: authToken);
-                            //Navigator.of(context).pop();
-                          }else if (state is UpdateCommentState) {
-                            ProgressDialog.hideLoadingDialog(context);
-                            UpdateCommentModel? model = state.model;
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(model!.message??""),
-                            ));
-                            Navigator.of(context).pop();
-                            await _getComment(comment_user_id: authToken);
-                          }else if (state is DeleteCommentState) {
-                            ProgressDialog.hideLoadingDialog(context);
-                            DeleteCommentModel? model = state.model;
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(model!.message??""),
-                            ));
-                            await _getComment(comment_user_id: authToken);
-                           // Navigator.of(context).pop();
-                          }else if (state is StateErrorGeneral) {
-                            ProgressDialog.hideLoadingDialog(context);
-                          }
-                        },
-                        bloc: BlocProvider.of<CommentBloc>(context),
-                        child:  BlocBuilder<CommentBloc, BaseState>(builder: (context, state) {
-                          return Column(
-                            children: [
-                              commentSection(),
-                              Button(
-                                "Complete Task",
-                                onPress: () {},
-                                horizontalMargin: 0,
-                                verticalMargin: 8,
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    isCommentDisplay = !isCommentDisplay;
-                                    /*_getComment(
+                    )),*/
+                BlocListener<CommentBloc, BaseState>(
+                    listener: (context, state) async {
+                      if (state is StateOnSuccess) {
+                        ProgressDialog.hideLoadingDialog(context);
+                      } else if (state is GetCommentState) {
+                        ProgressDialog.hideLoadingDialog(context);
+                        // GetCommentModel? model = state.model;
+                        getCommentModel = state.model!;
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(getCommentModel.message ?? ""),
+                        ));
+                        // Navigator.of(context).pop();
+                      } else if (state is AddCommentState) {
+                        ProgressDialog.hideLoadingDialog(context);
+                        AddCommentModel? model = state.model;
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(model!.message ?? ""),
+                        ));
+                        await _getComment(comment_user_id: authToken);
+                        //Navigator.of(context).pop();
+                      } else if (state is UpdateCommentState) {
+                        ProgressDialog.hideLoadingDialog(context);
+                        UpdateCommentModel? model = state.model;
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(model!.message ?? ""),
+                        ));
+                        Navigator.of(context).pop();
+                        await _getComment(comment_user_id: authToken);
+                      } else if (state is DeleteCommentState) {
+                        ProgressDialog.hideLoadingDialog(context);
+                        DeleteCommentModel? model = state.model;
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(model!.message ?? ""),
+                        ));
+                        await _getComment(comment_user_id: authToken);
+                        // Navigator.of(context).pop();
+                      } else if (state is StateErrorGeneral) {
+                        ProgressDialog.hideLoadingDialog(context);
+                      }
+                    },
+                    bloc: BlocProvider.of<CommentBloc>(context),
+                    child: BlocBuilder<CommentBloc, BaseState>(
+                        builder: (context, state) {
+                      return Column(
+                        children: [
+                          commentSection(context),
+                          Button(
+                            "Complete Task",
+                            onPress: () {},
+                            horizontalMargin: 0,
+                            verticalMargin: 8,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isCommentDisplay = !isCommentDisplay;
+                                /*_getComment(
                                       id: 8,
                                       comment_user_id: "10",
                                       task_id: "",
                                       project_id: "4"
                                     );*/
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Comment",
-                                      style: CustomTextStyle.styleBold,
-                                    ),
-                                    Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Container(
-                                          margin: const EdgeInsets.only(top: 8),
-                                          alignment: Alignment.topCenter,
-                                          child: Transform.rotate(
-                                            angle: isCommentDisplay ? 3 : 0,
-                                            child: Icon(
-                                              Icons.keyboard_arrow_down,
-                                              color: Colors.grey.shade500,
-                                            ),
-                                          ),
-                                        ),
-                                        Transform.rotate(
-                                          angle: isCommentDisplay ? 3 : 0,
-                                          child: const Icon(
-                                            Icons.keyboard_arrow_down,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
+                              });
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Comment",
+                                  style: CustomTextStyle.styleBold,
                                 ),
-                              ),
-                            ],
-                          );
-                        })
-                    ),
-                    sized_16()
-                  ],
-                ),
-              ),
-            ))));
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 8),
+                                      alignment: Alignment.topCenter,
+                                      child: Transform.rotate(
+                                        angle: isCommentDisplay ? 3 : 0,
+                                        child: Icon(
+                                          Icons.keyboard_arrow_down,
+                                          color: Colors.grey.shade500,
+                                        ),
+                                      ),
+                                    ),
+                                    Transform.rotate(
+                                      angle: isCommentDisplay ? 3 : 0,
+                                      child: const Icon(
+                                        Icons.keyboard_arrow_down,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    })),
+                sized_16()
+              ],
+            ),
+          ),
+        ))));
   }
-  commentSection() {
+
+  commentSection(BuildContext context) {
     return Visibility(
       visible: isCommentDisplay,
       child: Container(
@@ -358,64 +372,183 @@ class _TaskDetailsState extends State<TaskDetails> {
                         enabledBorder: titleBorder(color: Colors.transparent),
                         focusedBorder: titleBorder(color: Colors.transparent)),
                   ),
-                   Container(
-          color: Colors.grey.shade100,
-          padding: const EdgeInsets.only(
-              left: 16, top: 10, right: 16, bottom: 10),
-          child: Row(
-            children: [
-              Icon(
-                Icons.add_photo_alternate,
-                color: Colors.grey.shade400,
-              ),
-              sized_16(size: 8.0),
-              Transform.rotate(
-                angle: 2.5,
-                child: Icon(
-                  Icons.attachment,
-                  color: Colors.grey.shade400,
-                ),
-              ),
-              Expanded(
-                child: Container(),
-              ),
-              GestureDetector(
-                onTap: () async {
-                   SharedPreferences prefs = await SharedPreferences.getInstance();
-                   var authToken = prefs.getString('id');
-                   print(authToken);
-                  _addComment(
-                    comment_user_id: authToken,
-                    description: commentController.text,
-                    files: [
-                      "https://upload.wikimedia.org/wikipedia/commons/3/3f/JPEG_example_flower.jpg",
-                      "https://jpeg.org/images/jpeg-home.jpg"
-                    ],
-                  );
-                },
-                child: Text(
-                  "Send",
-                  style: CustomTextStyle.styleBold
-                      .copyWith(color: CustomColors.colorBlue),
-                ),
-              )
-            ],
-          ),
-        ),
+                  Container(
+                    color: Colors.grey.shade100,
+                    padding: const EdgeInsets.only(
+                        left: 16, top: 10, right: 16, bottom: 10),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.add_photo_alternate,
+                            color: Colors.grey.shade400,
+                          ),
+                          onPressed: () {
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (context1) => GestureDetector(
+                                      onTap: () => Navigator.of(context1).pop(),
+                                      child: Theme(
+                                          data: ThemeData(
+                                              bottomSheetTheme:
+                                                  const BottomSheetThemeData(
+                                                      backgroundColor:
+                                                          Colors.black,
+                                                      modalBackgroundColor:
+                                                          Colors.grey)),
+                                          child: showSheetForImage(context)),
+                                    ));
+                          },
+                        ),
+                        sized_16(size: 8.0),
+                       /* Transform.rotate(
+                          angle: 2.5,
+                          child: Icon(
+                            Icons.attachment,
+                            color: Colors.grey.shade400,
+                          ),
+                        ),*/
+                        Expanded(
+                          child: Container(),
+                        ),
+                        GestureDetector(
+                          onTap: () async {
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            var authToken = prefs.getString('id');
+                            print(authToken);
+                            imageList = [];
+                            imageList?.add(imageFile!.path);
+                            _addComment(
+                              comment_user_id: authToken,
+                              description: commentController.text,
+                              files: imageList,
+                            );
+                          },
+                          child: Text(
+                            "Send",
+                            style: CustomTextStyle.styleBold
+                                .copyWith(color: CustomColors.colorBlue),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-            listComment()
+            getCommentModel.data != null
+                ? getCommentModel.data!.length <= 0
+                    ? SizedBox()
+                    : listComment(context)
+                : SizedBox()
           ],
         ),
       ),
     );
   }
 
-  listComment() {
+  showSheetForImage(BuildContext context, {bool isEdit = false}) {
+    return Material(
+      child: Container(
+        height: 150,
+        decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topRight: Radius.circular(16), topLeft: Radius.circular(16)),
+            color: Colors.white),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.camera,
+                    size: 35,
+                  ),
+                  onPressed: () {
+                    getFromCamera(context, isEdit: isEdit);
+                    //Navigator.pop(context);
+                  },
+                ),
+                Text(
+                  "Camera",
+                  style: CustomTextStyle.styleBold,
+                )
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 120),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.image_outlined,
+                      size: 35,
+                    ),
+                    onPressed: () {
+                      getFromGallery(context, isEdit: isEdit);
+                    },
+                  ),
+                  Text(
+                    "Gallery",
+                    style: CustomTextStyle.styleBold,
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  getFromCamera(BuildContext context, {bool isEdit = false}) async {
+    PickedFile? pickedFile = await ImagePicker().getImage(
+      source: ImageSource.camera,
+      maxWidth: 1800,
+      maxHeight: 1800,
+    );
+    if (pickedFile != null) {
+      setState(() {
+        if (isEdit == true) {
+          imageFileForEdit = File(pickedFile.path);
+        } else {
+          imageFile = File(pickedFile.path);
+        }
+        //isEdit ? imageFileForEdit : imageFile = File(pickedFile.path);
+        print(imageFile);
+        print(imageFileForEdit);
+      });
+    }
+  }
+
+  getFromGallery(BuildContext context, {bool isEdit = false}) async {
+    PickedFile? pickedFile = await ImagePicker().getImage(
+      source: ImageSource.gallery,
+      maxWidth: 1800,
+      maxHeight: 1800,
+    );
+    if (pickedFile != null) {
+      setState(() {
+        if (isEdit == true) {
+          imageFileForEdit = File(pickedFile.path);
+        } else {
+          imageFile = File(pickedFile.path);
+        }
+        //  isEdit ? imageFileForEdit : imageFile = File(pickedFile.path);
+        print(imageFile);
+        print(imageFileForEdit);
+      });
+    }
+  }
+
+  listComment(BuildContext context) {
     return ListView.builder(
       itemBuilder: (context, index) {
-        return commentItem(index);
+        return commentItem(index, context);
       },
       itemCount: getCommentModel.data?.length,
       primary: false,
@@ -429,7 +562,7 @@ class _TaskDetailsState extends State<TaskDetails> {
     );
   }
 
-  commentItem(index) {
+  commentItem(index, BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: 16),
       child: Column(
@@ -437,13 +570,18 @@ class _TaskDetailsState extends State<TaskDetails> {
         children: [
           Row(
             children: [
-              userProfilePic(),
+              userProfilePic(
+                  radius: 30.0,
+                  imagePath: (getCommentModel.data![index].files!.isEmpty)
+                      ? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA7ECizMinUV4oPQG6BUFIZZmeXehbj7pytQ&usqp=CAU"
+                      : "${Strings.baseUrl}${getCommentModel.data![index].files![0]}"),
               sized_16(),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                   "${getCommentModel.data![index].userData?.firstName}" " ${getCommentModel.data![index].userData?.lastName}",
+                    "${getCommentModel.data![index].userData?.firstName}"
+                    " ${getCommentModel.data![index].userData?.lastName}",
                     style: CustomTextStyle.styleSemiBold.copyWith(fontSize: 16),
                   ),
                   sized_16(size: 4.0),
@@ -462,14 +600,15 @@ class _TaskDetailsState extends State<TaskDetails> {
               Container(
                 margin: const EdgeInsets.only(left: 0, top: 8),
                 child: Text(
-                  getCommentModel.data![index].description ?? "Lorem ipsum dolor sit amet,consectetur\nadipiscing.",
+                  getCommentModel.data![index].description ??
+                      "Lorem ipsum dolor sit amet,consectetur\nadipiscing.",
                   style:
-                  CustomTextStyle.styleMedium.copyWith(color: Colors.black),
+                      CustomTextStyle.styleMedium.copyWith(color: Colors.black),
                 ),
               ),
               Container(
                 margin: const EdgeInsets.only(left: 0, top: 8),
-                child:Row(
+                child: Row(
                   children: [
                     GestureDetector(
                       child: Text(
@@ -477,21 +616,13 @@ class _TaskDetailsState extends State<TaskDetails> {
                         style: CustomTextStyle.styleBold
                             .copyWith(color: CustomColors.colorBlue),
                       ),
-                      onTap: (){
-                        commentController.text = getCommentModel.data![index].description ?? "";
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (context) => Theme(
-                                data: ThemeData(
-                                    bottomSheetTheme: const BottomSheetThemeData(
-                                        backgroundColor: Colors.black,
-                                        modalBackgroundColor: Colors.grey)),
-                                child: showEditDialogContent(
-                                  index,
-                                  commentController,
-                                    getCommentModel.data![index].id ?? 0,
-                                  getCommentModel.data![index].commentUserId ?? "",
-                                )));
+                      onTap: () {
+                        commentController.text =
+                            getCommentModel.data![index].description ?? "";
+                        imageFileForEdit =
+                            File(getCommentModel.data![index].files![0]);
+                        print(".................");
+                        openBottomSheet(context, index, commentController);
                         /*_updateComment(
                           description: getCommentModel.data![index].description,
                           task_id: "",
@@ -508,9 +639,10 @@ class _TaskDetailsState extends State<TaskDetails> {
                           style: CustomTextStyle.styleBold
                               .copyWith(color: CustomColors.colorBlue),
                         ),
-                        onTap: (){
+                        onTap: () {
                           _deleteComment(
-                            comment_user_id: getCommentModel.data![index].commentUserId,
+                            comment_user_id:
+                                getCommentModel.data![index].commentUserId,
                             id: getCommentModel.data![index].id,
                           );
                         },
@@ -521,7 +653,7 @@ class _TaskDetailsState extends State<TaskDetails> {
               ),
             ],
           ),
-         /* Visibility(
+          /* Visibility(
               visible: index == 1,
               child: Container(
                 margin: EdgeInsets.only(top: 12),
@@ -540,47 +672,332 @@ class _TaskDetailsState extends State<TaskDetails> {
     );
   }
 
-  showEditDialogContent(int index,TextEditingController description,int id,String comment_user_id) {
-    return Material(
-      child: Container(
-        decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-                topRight: Radius.circular(16), topLeft: Radius.circular(16)),
-            color: Colors.white),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(
-                height: 32,
+  openBottomSheet(BuildContext context, int index,
+      TextEditingController textEditingController) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context1) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return Theme(
+                data: ThemeData(
+                    bottomSheetTheme: const BottomSheetThemeData(
+                        backgroundColor: Colors.black,
+                        modalBackgroundColor: Colors.grey)),
+                // child: showEditDialogContent(
+                //     index,
+                //     textEditingController,
+                //     getCommentModel.data![index].id ?? 0,
+                //     getCommentModel.data![index].commentUserId ?? "",
+                //     context1)
+                child: Container(
+                  decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(16),
+                          topLeft: Radius.circular(16)),
+                      color: Colors.white),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 32,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20),
+                          child: GestureDetector(
+                            child: Stack(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 2, color: Colors.grey),
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: (imageFileForEdit == null ||
+                                          imageFileForEdit == "")
+                                      ? Image.asset(
+                                          'assets/images/image_holder.png',
+                                          height: 120,
+                                          width: 120,
+                                          fit: BoxFit.fill,
+                                        )
+                                      : imageFileForEdit
+                                              .toString()
+                                              .contains("static")
+                                          ? Image.network(
+                                              "${Strings.baseUrl}${imageFileForEdit?.path}",
+                                              height: 120,
+                                              width: 120,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.file(
+                                              imageFileForEdit!,
+                                              height: 120,
+                                              width: 120,
+                                              fit: BoxFit.cover,
+                                            ),
+                                ),
+                                Positioned(
+                                  left: 0.5,
+                                  right: 0.5,
+                                  bottom: 0.1,
+                                  child: Container(
+                                    padding: EdgeInsets.all(2.0),
+                                    alignment: Alignment.bottomCenter,
+                                    color: Colors.black26,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        InkWell(
+                                          onTap: () async {
+                                            PickedFile? pickedFile = await ImagePicker().getImage(
+                                              source: ImageSource.camera,
+                                              maxWidth: 1800,
+                                              maxHeight: 1800,
+                                            );
+                                            if (pickedFile != null) {
+                                              setState(() {
+                                                  imageFileForEdit = File(pickedFile.path);
+                                                //isEdit ? imageFileForEdit : imageFile = File(pickedFile.path);
+                                                print(imageFile);
+                                                print(imageFileForEdit);
+                                              });
+                                            }
+                                           /* getFromCamera(context,
+                                                isEdit: true);*/
+                                          },
+                                          child: const Icon(
+                                            Icons.camera,
+                                          ),
+                                        ),
+                                        InkWell(
+                                          onTap: () async {
+                                            PickedFile? pickedFile =
+                                                await ImagePicker().getImage(
+                                              source: ImageSource.gallery,
+                                              maxWidth: 1800,
+                                              maxHeight: 1800,
+                                            );
+                                            if (pickedFile != null) {
+                                              setState(() {
+                                                imageFileForEdit =
+                                                    File(pickedFile.path);
+                                                //  isEdit ? imageFileForEdit : imageFile = File(pickedFile.path);
+                                                print(imageFile);
+                                                print(imageFileForEdit);
+                                              });
+                                            }
+                                            // getFromGallery(context,isEdit: true);
+                                          },
+                                          child: const Icon(
+                                            Icons.image_outlined,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            onTap: () {
+                              /* showModalBottomSheet(
+                      context: context,
+                      builder: (context1) => GestureDetector(
+                        onTap: () => Navigator.of(context1).pop(),
+                        child: Theme(
+                            data: ThemeData(
+                                bottomSheetTheme:
+                                const BottomSheetThemeData(
+                                    backgroundColor: Colors.black,
+                                    modalBackgroundColor:
+                                    Colors.grey)),
+                            child: showSheetForImage(context1,
+                                isEdit: true)),
+                      ));*/
+                              print("OPEN");
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 32,
+                        ),
+                        CustomTextField(
+                          //initialValue: description.text,
+                          label: "Description",
+                          minLines: 5,
+                          textEditingController: textEditingController,
+                        ),
+                        Button(
+                          "Done",
+                          onPress: () {
+                            imageListForEdit = [];
+                            imageListForEdit?.add(imageFileForEdit!.path);
+                            _updateComment(
+                              description: textEditingController.text,
+                              task_id: "",
+                              comment_user_id:
+                                  getCommentModel.data![index].commentUserId ??
+                                      "",
+                              id: getCommentModel.data![index].id ?? 0,
+                              files: imageListForEdit,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ));
+          });
+        });
+  }
+
+  showEditDialogContent(int index, TextEditingController description, int id,
+      String comment_user_id, BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(16), topLeft: Radius.circular(16)),
+          color: Colors.white),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 32,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: GestureDetector(
+                child: Stack(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(width: 2, color: Colors.grey),
+                          borderRadius: BorderRadius.circular(10)),
+                      child:
+                          (imageFileForEdit == null || imageFileForEdit == "")
+                              ? Image.asset(
+                                  'assets/images/image_holder.png',
+                                  height: 120,
+                                  width: 120,
+                                  fit: BoxFit.fill,
+                                )
+                              : imageFileForEdit.toString().contains("static")
+                                  ? Image.network(
+                                      "${Strings.baseUrl}${imageFileForEdit?.path}",
+                                      height: 120,
+                                      width: 120,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.file(
+                                      imageFileForEdit!,
+                                      height: 120,
+                                      width: 120,
+                                      fit: BoxFit.cover,
+                                    ),
+                    ),
+                    Positioned(
+                      left: 0.5,
+                      right: 0.5,
+                      bottom: 0.1,
+                      child: Container(
+                        padding: EdgeInsets.all(2.0),
+                        alignment: Alignment.bottomCenter,
+                        color: Colors.black26,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            InkWell(
+                              onTap: () {
+                                getFromCamera(context, isEdit: true);
+                              },
+                              child: const Icon(
+                                Icons.camera,
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () async {
+                                PickedFile? pickedFile =
+                                    await ImagePicker().getImage(
+                                  source: ImageSource.gallery,
+                                  maxWidth: 1800,
+                                  maxHeight: 1800,
+                                );
+                                if (pickedFile != null) {
+                                  setState(() {
+                                    imageFileForEdit = File(pickedFile.path);
+                                    //  isEdit ? imageFileForEdit : imageFile = File(pickedFile.path);
+                                    print(imageFile);
+                                    print(imageFileForEdit);
+                                  });
+                                }
+                                // getFromGallery(context,isEdit: true);
+                              },
+                              child: const Icon(
+                                Icons.image_outlined,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  /* showModalBottomSheet(
+                      context: context,
+                      builder: (context1) => GestureDetector(
+                        onTap: () => Navigator.of(context1).pop(),
+                        child: Theme(
+                            data: ThemeData(
+                                bottomSheetTheme:
+                                const BottomSheetThemeData(
+                                    backgroundColor: Colors.black,
+                                    modalBackgroundColor:
+                                    Colors.grey)),
+                            child: showSheetForImage(context1,
+                                isEdit: true)),
+                      ));*/
+                  print("OPEN");
+                },
               ),
-              CustomTextField(
-                //initialValue: description.text,
-                label: "Description",
-                minLines: 5,
-                textEditingController: description,
-              ),
-              Container(
+            ),
+            const SizedBox(
+              height: 32,
+            ),
+            CustomTextField(
+              //initialValue: description.text,
+              label: "Description",
+              minLines: 5,
+              textEditingController: description,
+            ),
+            /* Container(
                 margin: const EdgeInsets.only(left: 16, top: 32),
                 child: Text(
                   "Choose Color",
                   style: CustomTextStyle.styleBold,
                 ),
-              ),
-              Button(
-                "Done",
-                onPress: () {
-                  _updateComment(
-                    description: description.text,
-                    task_id: "",
-                    comment_user_id: comment_user_id,
-                    id: id,
-                  );
-                },
-              ),
-            ],
-          ),
+              ),*/
+            Button(
+              "Done",
+              onPress: () {
+                imageListForEdit = [];
+                imageListForEdit?.add(imageFileForEdit!.path);
+                _updateComment(
+                  description: description.text,
+                  task_id: "",
+                  comment_user_id: comment_user_id,
+                  id: id,
+                  files: imageListForEdit,
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -611,9 +1028,7 @@ class _TaskDetailsState extends State<TaskDetails> {
               style: CustomTextStyle.styleMedium,
             ),
             value: 1,
-            onTap: (){
-
-            },
+            onTap: () {},
           ),
           PopupMenuItem(
             child: Text(
@@ -621,9 +1036,7 @@ class _TaskDetailsState extends State<TaskDetails> {
               style: CustomTextStyle.styleMedium,
             ),
             value: 2,
-            onTap: (){
-
-            },
+            onTap: () {},
           ),
           PopupMenuItem(
             child: Text(
@@ -631,23 +1044,8 @@ class _TaskDetailsState extends State<TaskDetails> {
               style: CustomTextStyle.styleMedium,
             ),
             value: 3,
-            onTap: (){
+            onTap: () {
               _deleteTask(id: 31);
-            },
-          ),
-
-          PopupMenuItem(
-            child: Text(
-              "View Tag",
-              style: CustomTextStyle.styleMedium,
-            ),
-            value: 3,
-            onTap: (){
-             /* Navigator.push(
-                context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                create: (context) => Sl.Sl<LoginBloc>(),
-                child: Login(),
-              )),);*/
             },
           ),
         ];
@@ -659,69 +1057,83 @@ class _TaskDetailsState extends State<TaskDetails> {
       },
       initialValue: selectedMenu,
       offset: Offset(
-          0, selectedMenu == 3 ? 300 : selectedMenu == 2 ? 200 : 100),
+          0,
+          selectedMenu == 3
+              ? 300
+              : selectedMenu == 2
+                  ? 200
+                  : 100),
       elevation: 4,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4)),
-      icon: Icon(Icons.settings,color: Colors.white,),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      icon: Icon(
+        Icons.settings,
+        color: Colors.white,
+      ),
     );
   }
 
-  Future<String> _deleteTask({int? id }) {
+  Future<String> _deleteTask({int? id}) {
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
-      BlocProvider.of<AddTaskBloc>(context).add(
-          DeleteTaskEvent(id: id ?? 0 ));
+      BlocProvider.of<AddTaskBloc>(context).add(DeleteTaskEvent(id: id ?? 0));
       return "";
     });
   }
 
-  Future<String> _addComment({String? comment_user_id,List<String>? files,String? description}) {
+  Future<String> _addComment(
+      {String? comment_user_id, List<String>? files, String? description}) {
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
-      BlocProvider.of<CommentBloc>(context).add(
-          AddCommentEvent(
-            description: description ?? "",
-            comment_user_id: int.parse(comment_user_id ?? ""),
-            files: files ?? [],
-          ));
+      BlocProvider.of<CommentBloc>(context).add(AddCommentEvent(
+        description: description ?? "",
+        comment_user_id: int.parse(comment_user_id ?? ""),
+        files: files ?? [],
+      ));
       return "";
     });
   }
 
-  Future<String> _updateComment({int? id,String? comment_user_id,String? task_id,String? description}) {
+  Future<String> _updateComment(
+      {int? id,
+      String? comment_user_id,
+      String? task_id,
+      String? description,
+      List<String>? files}) {
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
-      BlocProvider.of<CommentBloc>(context).add(
-          UpdateCommentEvent(
-            id: id ?? 0,
-              description: description ?? "",
-              task_id: task_id ?? "",
-              comment_user_id: comment_user_id ?? ""
-          ));
+      BlocProvider.of<CommentBloc>(context).add(UpdateCommentEvent(
+        id: id ?? 0,
+        description: description ?? "",
+        task_id: task_id ?? "",
+        comment_user_id: comment_user_id ?? "",
+        files: files ?? [],
+      ));
       return "";
     });
   }
 
-  Future<String> _deleteComment({int? id,String? comment_user_id,}) {
+  Future<String> _deleteComment({
+    int? id,
+    String? comment_user_id,
+  }) {
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
-      BlocProvider.of<CommentBloc>(context).add(
-          DeleteCommentEvent(
-              id: id ?? 0,
-              comment_user_id: comment_user_id ?? "",
-          ));
+      BlocProvider.of<CommentBloc>(context).add(DeleteCommentEvent(
+        id: id ?? 0,
+        comment_user_id: comment_user_id ?? "",
+      ));
       return "";
     });
   }
 
-  Future<String> _getComment({String? comment_user_id,}) {
+  Future<String> _getComment({
+    String? comment_user_id,
+  }) {
     return Future.delayed(Duration()).then((_) {
-      ProgressDialog.showLoadingDialog(context);
-      BlocProvider.of<CommentBloc>(context).add(
-          GetCommentEvent(
-            comment_user_id: comment_user_id ?? "",
-          ));
+      //ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<CommentBloc>(context).add(GetCommentEvent(
+        comment_user_id: comment_user_id ?? "",
+      ));
       return "";
     });
   }

@@ -19,10 +19,11 @@ class UpdateCommentEvent extends BaseEvent {
   String comment_user_id;
   String task_id;
   String description;
+  List<String> files;
 
 
   UpdateCommentEvent({
-    required this.id,required this.description,required this.task_id,required this.comment_user_id});
+    required this.id,required this.description,required this.task_id,required this.comment_user_id,required this.files});
 }
 
 class DeleteCommentEvent extends BaseEvent {

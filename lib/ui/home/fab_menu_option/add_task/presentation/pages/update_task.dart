@@ -26,7 +26,8 @@ class UpdateTask extends StatefulWidget {
   TextEditingController startDate = TextEditingController();
   TextEditingController endDate = TextEditingController();
   int taskId;
-  UpdateTask({required this.endDate,required this.startDate,required this.taskId,required this.commentController,required this.descriptionController,required this.titleController});
+  String selectedRadio;
+  UpdateTask({required this.selectedRadio,required this.endDate,required this.startDate,required this.taskId,required this.commentController,required this.descriptionController,required this.titleController});
   @override
   _UpdateTaskState createState() => _UpdateTaskState();
 }
@@ -209,6 +210,10 @@ class _UpdateTaskState extends State<UpdateTask> {
                   child: TextField(
                     controller: widget.startDate,
                     decoration:  InputDecoration(
+                      enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: CustomColors.colorBlue)),
+                      focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: CustomColors.colorBlue)),
                         icon: const Icon(Icons.calendar_today,color: CustomColors.colorBlue,),
                         labelText: "Enter Start Date",
                       labelStyle: CustomTextStyle.styleSemiBold,
@@ -218,6 +223,30 @@ class _UpdateTaskState extends State<UpdateTask> {
                       DateTime? pickedDate = await showDatePicker(
                           context: context,
                           initialDate: DateTime.now(),
+                          builder: (BuildContext context, Widget ?child) {
+                            return Theme(
+                              data: ThemeData(
+                                primarySwatch: Colors.grey,
+                                splashColor: Colors.black,
+                                textTheme: const TextTheme(
+                                  subtitle1: TextStyle(color: Colors.black),
+                                  button: TextStyle(color: Colors.black),
+                                ),
+                                accentColor: Colors.black,
+                                colorScheme: const ColorScheme.light(
+                                    primary: CustomColors.colorBlue,
+                                    primaryVariant: Colors.black,
+                                    secondaryVariant: Colors.black,
+                                    onSecondary: Colors.black,
+                                    onPrimary: Colors.white,
+                                    surface: Colors.black,
+                                    onSurface: Colors.black,
+                                    secondary: Colors.black),
+                                dialogBackgroundColor: Colors.white,
+                              ),
+                              child: child ??const Text(""),
+                            );
+                          },
                           firstDate: DateTime(1950),
                           lastDate: DateTime(2100));
                       if (pickedDate != null) {
@@ -238,6 +267,10 @@ class _UpdateTaskState extends State<UpdateTask> {
                   child: TextField(
                     controller: widget.endDate,
                     decoration:  InputDecoration(
+                      enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: CustomColors.colorBlue)),
+                      focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: CustomColors.colorBlue)),
                         icon: const Icon(Icons.calendar_today,color: CustomColors.colorBlue,),
                         labelText: "Enter End Date",
                       labelStyle: CustomTextStyle.styleSemiBold,
@@ -247,6 +280,30 @@ class _UpdateTaskState extends State<UpdateTask> {
                       DateTime? pickedDate = await showDatePicker(
                           context: context,
                           initialDate: DateTime.now(),
+                          builder: (BuildContext context, Widget ?child) {
+                            return Theme(
+                              data: ThemeData(
+                                primarySwatch: Colors.grey,
+                                splashColor: Colors.black,
+                                textTheme: const TextTheme(
+                                  subtitle1: TextStyle(color: Colors.black),
+                                  button: TextStyle(color: Colors.black),
+                                ),
+                                accentColor: Colors.black,
+                                colorScheme: const ColorScheme.light(
+                                    primary: CustomColors.colorBlue,
+                                    primaryVariant: Colors.black,
+                                    secondaryVariant: Colors.black,
+                                    onSecondary: Colors.black,
+                                    onPrimary: Colors.white,
+                                    surface: Colors.black,
+                                    onSurface: Colors.black,
+                                    secondary: Colors.black),
+                                dialogBackgroundColor: Colors.white,
+                              ),
+                              child: child ??const Text(""),
+                            );
+                          },
                           firstDate: DateTime(1950),
                           //DateTime.now() - not to allow to choose before today.
                           lastDate: DateTime(2100));
@@ -265,6 +322,32 @@ class _UpdateTaskState extends State<UpdateTask> {
                       } else {}
                     },
                   ))),
+                ListTile(
+                  leading: Radio<String>(
+                    value: 'Completed',
+                    groupValue: widget.selectedRadio,
+                    activeColor: CustomColors.colorBlue,
+                    onChanged: (value) {
+                      setState(() {
+                        widget.selectedRadio = value!;
+                      });
+                    },
+                  ),
+                  title: const Text('Completed'),
+                ),
+                ListTile(
+                  leading: Radio<String>(
+                    value: 'InCompleted',
+                    groupValue: widget.selectedRadio,
+                    activeColor: CustomColors.colorBlue,
+                    onChanged: (value) {
+                      setState(() {
+                        widget.selectedRadio = value!;
+                      });
+                    },
+                  ),
+                  title: const Text('InCompleted'),
+                ),
              /*   Container(
                     width: double.infinity,
                     margin: EdgeInsets.only(top: 24),
@@ -327,7 +410,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                       assignee_id: "",
                       description: widget.descriptionController.text,
                       name: widget.titleController.text,
-                      isCompleted: true,
+                      isCompleted: widget.selectedRadio == "Completed" ? true : false,
                     );
                   },
                 ),

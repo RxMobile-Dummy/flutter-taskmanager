@@ -33,10 +33,16 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
       multipartArray.add(MultipartFile.fromFileSync(params.files![i], filename:
       pathManager.basename(params.files![i])));
     }*/
+    List<MultipartFile> multipartImageList = [];
+    for (var file in params.files!) {
+      MultipartFile multipartFile =
+      await MultipartFile.fromFile(file, filename: pathManager.basename(file));
+      multipartImageList.add(multipartFile);
+    }
     var map = new HashMap<String, dynamic>();
     map['comment_user_id'] = params.comment_user_id;
     map['description'] = params.description;
-   // map['files'] =  multipartArray;
+    map['files'] =  multipartImageList;
     FormData formData = new FormData.fromMap(map);
     final response = await _apiClient.addComment(formData);
     var data ;
@@ -56,12 +62,20 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
     // dio.options.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
     // dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
     // var restClient = ApiClient(dio);
+    List<MultipartFile> multipartImageList = [];
+    for (var file in params.files!) {
+      MultipartFile multipartFile =
+      await MultipartFile.fromFile(file, filename: pathManager.basename(file.toString()));
+      multipartImageList.add(multipartFile);
+    }
     var map = new HashMap<String, dynamic>();
     map['id'] = params.id;
     map['comment_user_id'] = params.comment_user_id;
     map['task_id'] = params.task_id;
     map['description'] = params.description;
-    final response = await _apiClient.updateComment(map);
+    map['files'] =  multipartImageList;
+    FormData formData = new FormData.fromMap(map);
+    final response = await _apiClient.updateComment(formData);
     var data ;
     if(response != null ){
       data =response;

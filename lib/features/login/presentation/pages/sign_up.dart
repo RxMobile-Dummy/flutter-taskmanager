@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/features/login/data/model/get_user_role_model.dart';
 import 'package:task_management/features/login/data/model/sign_up_model.dart';
+import 'package:task_management/utils/colors.dart';
 
 import '../../../../core/base/base_bloc.dart';
 import '../../../../custom/progress_bar.dart';
@@ -66,11 +67,14 @@ class _SignUpState extends State<SignUp> {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setString('id', model.data!.id!.toString());
               prefs.setString('role', model.data!.role ?? "");
-              Navigator.push(
-                context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                create: (context) => Sl.Sl<LoginBloc>(),
-                child: Login(),
-              )),);
+              Navigator.pushAndRemoveUntil<dynamic>(
+                context,
+                MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                  create: (context) => Sl.Sl<LoginBloc>(),
+                  child: Login(),
+                )),
+                    (route) => false,
+              );
             //  Get.off(Login());
             } else if (state is GetUserRoleState) {
             ProgressDialog.hideLoadingDialog(context);
@@ -104,11 +108,11 @@ class _SignUpState extends State<SignUp> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 32,
                 ),
                 CustomTextField(
-                  key: Key("firstName"),
+                  key: const Key("firstName"),
                   label: "first name",
                   hint: "Enter first name",
                   errorMessage: "Please Enter first name",
@@ -119,7 +123,7 @@ class _SignUpState extends State<SignUp> {
                   height: 24,
                 ),
                 CustomTextField(
-                  key: Key("lastName"),
+                  key: const Key("lastName"),
                   label: "last name",
                   hint: "Enter last name",
                   errorMessage: "Please Enter last name",
@@ -130,7 +134,7 @@ class _SignUpState extends State<SignUp> {
                   height: 24,
                 ),
                 CustomTextField(
-                  key: Key("email"),
+                  key: const Key("email"),
                   label: "email",
                   hint: "Enter email",
                   errorMessage: "Please Enter email",
@@ -141,7 +145,7 @@ class _SignUpState extends State<SignUp> {
                   height: 24,
                 ),
                 CustomTextField(
-                  key: Key("mobile"),
+                  key: const Key("mobile"),
                   label: "mobile",
                   hint: "Enter mobile number",
                   errorMessage: "Please Enter mobile number",
@@ -152,7 +156,7 @@ class _SignUpState extends State<SignUp> {
                   height: 24,
                 ),
                 CustomTextField(
-                  key: Key("password"),
+                  key: const Key("password"),
                   label: "password",
                   hint: "Enter password",
                   errorMessage: "Please Enter password",
@@ -175,14 +179,17 @@ class _SignUpState extends State<SignUp> {
                   height: 24,
                 ),
            Padding(
-             padding: EdgeInsets.symmetric(horizontal: 10),
+             padding: const EdgeInsets.symmetric(horizontal: 10),
              child: Row(
                children: [
                  Expanded(
                    child: DropdownButtonFormField(
                      isExpanded: true,
-                     decoration: const InputDecoration(
+                     decoration:  const InputDecoration(
                        border: OutlineInputBorder(),
+                       focusedBorder: OutlineInputBorder(
+                         borderSide: BorderSide(color: CustomColors.colorBlue),
+                       ),
                      ),
                      validator: (value) {
                        if (value == null || value == "") {

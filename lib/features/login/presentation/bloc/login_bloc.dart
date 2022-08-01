@@ -46,7 +46,7 @@ class LoginBloc extends Bloc<BaseEvent, BaseState> {
       }else if (event is ForgotPassEvent) {
     forgotPassword(event.email ?? "");
     } else if (event is ResetPasswordEvent) {
-    resetPassward(event.newPassword ?? "");
+    resetPassward(event.newPassword,event.email);
     } else if (event is EventOnSuccess) {
    // yield StateOnSuccess(event.response ?? "");
     } else if (event is EventLoading) {
@@ -156,9 +156,9 @@ class LoginBloc extends Bloc<BaseEvent, BaseState> {
     });
   }
 
-  resetPassward(String password) {
+  resetPassward(String password,String email) {
     resetPasswardUsecase
-        ?.call(ResetPasswardParams(password: password))
+        ?.call(ResetPasswardParams(password: password,email: email))
         .listen((data) {
       data.fold((onError) {
         add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
