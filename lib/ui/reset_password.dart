@@ -1,14 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:task_management/features/login/data/model/reset_passward_model.dart';
 import 'package:task_management/features/login/presentation/bloc/login_state.dart';
 import 'package:task_management/ui/reset_success.dart';
+import 'package:task_management/utils/colors.dart';
 
 import '../core/base/base_bloc.dart';
 import '../custom/progress_bar.dart';
+import '../features/login/data/model/forgot_password_model.dart';
 import '../features/login/presentation/bloc/login_bloc.dart';
 import '../features/login/presentation/bloc/login_event.dart';
+import '../utils/style.dart';
 import '../widget/button.dart';
 import '../widget/rounded_corner_page.dart';
 import '../widget/textfield.dart';
@@ -25,6 +30,41 @@ class _ResetPasswordState extends State<ResetPassword> {
   TextEditingController tieNewPassword = TextEditingController();
   TextEditingController tieConfirmPassword = TextEditingController();
   TextEditingController resetCode = TextEditingController();
+  int secondsRemaining = 60;
+  bool enableResend = false;
+  Timer? timer;
+
+  @override
+  void initState() {
+    timer = Timer.periodic(Duration(seconds: 1), (_) {
+      if (secondsRemaining != 0) {
+        setState(() {
+          secondsRemaining--;
+        });
+      } else {
+        setState(() {
+          enableResend = true;
+        });
+      }
+    });
+    super.initState();
+  }
+
+
+  @override
+  dispose(){
+    timer!.cancel();
+    super.dispose();
+  }
+
+  void _resendCode() {
+    setState((){
+      secondsRemaining = 60;
+      enableResend = false;
+      _forgotPassward(widget.email);
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +74,20 @@ class _ResetPasswordState extends State<ResetPassword> {
           listener: (context, state) {
             if (state is StateOnSuccess) {
               ProgressDialog.hideLoadingDialog(context);
-            } if (state is ResetPasswordStatus) {
+            } else if (state is ResetPasswordStatus) {
               ProgressDialog.hideLoadingDialog(context);
               ResetPasswardModel? model = state.model;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(model!.message??""),
               ));
               Get.to(ResetSuccess());
+            } else if (state is ForgotPasswordStatus) {
+              ProgressDialog.hideLoadingDialog(context);
+              ForgotPasswordModel? model = state.model;
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(model!.message??""),
+              ));
+              // Get.off(ResetPassword());
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
             }
@@ -76,6 +123,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     hint: "Enter code",
                     textEditingController: resetCode,
                     textInputType: TextInputType.number,
+                    lengthLimit: 6,
                   ),
                   const SizedBox(height: 32,),
                   CustomTextField(
@@ -125,7 +173,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     onPress: () {
                       if(resetCode.text.isNotEmpty){
                         if(tieNewPassword.text == tieConfirmPassword.text){
-                          _resetPassward(tieNewPassword.text,widget.email);
+                          _resetPassward(tieNewPassword.text,resetCode.text);
                         }else{
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                             content: Text('Password does not same'),
@@ -139,6 +187,22 @@ class _ResetPasswordState extends State<ResetPassword> {
                       //Get.to(ResetSuccess());
                     },
                   ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: FlatButton(
+                      onPressed: enableResend ? _resendCode : null,
+                      child: Text(
+                        'Resend Code',
+                        style: CustomTextStyle.styleBold.copyWith(fontSize: 18,color: CustomColors.colorBlue),
+                      ),
+                    ),
+                  ),
+                 Center(
+                   child:  Text(
+                     'after $secondsRemaining seconds',
+                     style: CustomTextStyle.styleBold.copyWith(fontSize: 18,color: Colors.black),
+                   ),
+                 ),
                   const SizedBox(
                     height: 48,
                   )
@@ -148,12 +212,22 @@ class _ResetPasswordState extends State<ResetPassword> {
           ),
         ));
   }
-  Future<String> _resetPassward(String passward,String email) {
+
+  Future<String> _forgotPassward(String email) {
+    return Future.delayed(const Duration()).then((_) {
+      ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<LoginBloc>(context).add(
+          ForgotPassEvent(email: email.trim()));
+      return "";
+    });
+  }
+
+  Future<String> _resetPassward(String passward,String otp) {
     //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<LoginBloc>(context).add(
-          ResetPasswordEvent(newPassword: passward.trim(),email: email));
+          ResetPasswordEvent(newPassword: passward.trim(),otp: otp));
       return "";
     });
   }

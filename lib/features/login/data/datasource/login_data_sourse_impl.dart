@@ -67,7 +67,7 @@ class LocalDataSourceImpl implements LocalDataSource {
     var restClient = ApiClient(dio);*/
     var map = new HashMap<String, String>();
     map['password'] = params.password;
-    map['email'] = params.email;
+    map['otp'] = params.otp;
     final response = await _apiClient.resetPassward(map);
     var data;
     if(response != null ){
