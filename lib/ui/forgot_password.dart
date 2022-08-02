@@ -31,7 +31,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           listener: (context, state) {
             if (state is StateOnSuccess) {
               ProgressDialog.hideLoadingDialog(context);
-            } if (state is ForgotPasswordStatus) {
+            }else if (state is ForgotPasswordStatus) {
               ProgressDialog.hideLoadingDialog(context);
               ForgotPasswordModel? model = state.model;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(

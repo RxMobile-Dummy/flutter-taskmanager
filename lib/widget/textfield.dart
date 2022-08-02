@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../utils/colors.dart';
 import '../utils/style.dart';
@@ -16,6 +17,7 @@ class CustomTextField extends StatelessWidget {
   IconButton? icon;
   Key? key;
   int minLines;
+  int? lengthLimit = 5000;
 
   CustomTextField(
       {this.key,
@@ -24,6 +26,7 @@ class CustomTextField extends StatelessWidget {
       this.textInputType = TextInputType.text,
       this.textEditingController,
       this.icon,
+        this.lengthLimit,
       this.minLines = 1,
         this.initialValue,
       this.isObscureText = false,
@@ -53,6 +56,9 @@ class CustomTextField extends StatelessWidget {
               }
             },
             style: CustomTextStyle.styleMedium,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(lengthLimit),
+              ],
             decoration: InputDecoration(
               contentPadding: EdgeInsets.only(top: 16),
               border: border(),
