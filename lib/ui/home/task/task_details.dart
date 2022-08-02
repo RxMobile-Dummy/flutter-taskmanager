@@ -1060,7 +1060,7 @@ class _TaskDetailsState extends State<TaskDetails> {
           selectedMenu = value;
         });
 
-        if (value == 3) {
+        if (value == 1) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) =>

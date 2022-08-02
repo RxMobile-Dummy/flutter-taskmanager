@@ -14,6 +14,7 @@ import '../ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
 import '../ui/home/fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
 import '../ui/home/fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
 import '../ui/home/fab_menu_option/add_task/presentation/pages/update_task.dart';
+import '../ui/home/pages/Project/presentation/bloc/project_bloc.dart';
 import '../ui/home/pages/comment/presentation/bloc/comment_bloc.dart';
 import '../ui/home/task/task_details.dart';
 import '../utils/colors.dart';
@@ -206,18 +207,23 @@ class _TaskListState extends State<TaskList> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => BlocProvider<AddTaskBloc>(
-                            create: (context) => Sl.Sl<AddTaskBloc>(),
-                            child: UpdateTask(
-                              titleController: titleController,
-                              commentController: commentController,
-                              descriptionController: descriptionController,
-                              taskId: getTaskModel.id ?? 0,
-                              endDate: startDate,
-                              startDate: startDate,
-                              selectedRadio: taskStatus,
+                          builder: (context) => MultiBlocProvider(providers: [
+                            BlocProvider<AddTaskBloc>(
+                              create: (context) => Sl.Sl<AddTaskBloc>(),
                             ),
-                          )),
+                            BlocProvider<ProjectBloc>(
+                              create: (context) => Sl.Sl<ProjectBloc>(),
+                            ),
+                          ], child: UpdateTask(
+                            titleController: titleController,
+                            commentController: commentController,
+                            descriptionController: descriptionController,
+                            taskId: getTaskModel.id ?? 0,
+                            endDate: startDate,
+                            startDate: startDate,
+                            selectedRadio: taskStatus,
+                            projectId: getTaskModel.projectId ?? "",
+                          ),)),
                     );
                   },
                   icon: const Icon(

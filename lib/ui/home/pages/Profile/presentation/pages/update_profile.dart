@@ -17,6 +17,7 @@ import '../../../../../../core/base/base_bloc.dart';
 import '../../../../../../custom/progress_bar.dart';
 import '../../../../../../features/login/presentation/bloc/login_bloc.dart';
 import '../../../../../../features/login/presentation/bloc/login_event.dart';
+import '../../../../../../utils/colors.dart';
 import '../../../../../../utils/style.dart';
 import '../../../../../../widget/button.dart';
 import '../../../../../../widget/decoration.dart';
@@ -265,8 +266,11 @@ class _UpdateProfileState extends State<UpdateProfile> {
                             Expanded(
                               child: DropdownButtonFormField(
                                 isExpanded: true,
-                                decoration: const InputDecoration(
+                                decoration:  const InputDecoration(
                                   border: OutlineInputBorder(),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: CustomColors.colorBlue),
+                                  ),
                                 ),
                                 validator: (value) {
                                   if (value == null || value == "") {
@@ -338,6 +342,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                 isExpanded: true,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: CustomColors.colorBlue),
+                                  ),
                                 ),
                                 validator: (value) {
                                   if (value == null || value == "") {

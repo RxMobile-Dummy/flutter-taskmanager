@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
@@ -16,6 +17,9 @@ import '../../../../../../utils/style.dart';
 import '../../../../../../widget/button.dart';
 import '../../../../../../widget/decoration.dart';
 import '../../../../../../widget/rounded_corner_page.dart';
+import '../../../../pages/Project/presentation/bloc/project_bloc.dart';
+import '../../../../pages/Project/presentation/bloc/project_event.dart';
+import '../../../../pages/Project/presentation/bloc/project_state.dart';
 import '../bloc/add_task_event.dart';
 
 
@@ -27,7 +31,8 @@ class UpdateTask extends StatefulWidget {
   TextEditingController endDate = TextEditingController();
   int taskId;
   String selectedRadio;
-  UpdateTask({required this.selectedRadio,required this.endDate,required this.startDate,required this.taskId,required this.commentController,required this.descriptionController,required this.titleController});
+  String projectId;
+  UpdateTask({required this.projectId,required this.selectedRadio,required this.endDate,required this.startDate,required this.taskId,required this.commentController,required this.descriptionController,required this.titleController});
   @override
   _UpdateTaskState createState() => _UpdateTaskState();
 }
@@ -43,10 +48,30 @@ class _UpdateTaskState extends State<UpdateTask> {
   ];
 
   Color? selectedColors;
+  List<String> projectList = [];
+  String? selectProject;
+  List<dynamic> listOfProject = [];
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _getProject();
+    });
     super.initState();
+  }
+
+  Future<String> _getProject() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var id = prefs.getString('id');
+    print(id);
+    return Future.delayed(Duration()).then((_) {
+      //ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<ProjectBloc>(context).add(
+          GetAllProjectsEvent(
+            id: int.parse(id ?? ""),
+          ));
+      return "";
+    });
   }
 
   @override
@@ -83,15 +108,15 @@ class _UpdateTaskState extends State<UpdateTask> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
+                /*Container(
                     margin: EdgeInsets.only(left: 16, top: 32),
                     child: Row(
                       children: [
-                        Text(
+                       *//* Text(
                           "For",
                           style: CustomTextStyle.styleBold,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 16,
                         ),
                         Container(
@@ -99,7 +124,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                           decoration: BoxDecoration(
                               color: Colors.grey.shade200,
                               borderRadius: BorderRadius.circular(100)),
-                          child: Text("Assignee"),
+                          child: const Text("Assignee"),
                         ),
                         Expanded(
                           child: Container(),
@@ -107,7 +132,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                         Text(
                           "In",
                           style: CustomTextStyle.styleBold,
-                        ),
+                        ),*//*
                         SizedBox(
                           width: 16,
                         ),
@@ -120,7 +145,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                           child: Text("Project"),
                         ),
                       ],
-                    )),
+                    )),*/
                 Container(
                   margin: EdgeInsets.only(top: 24),
                   color: Colors.grey.shade200,
@@ -348,6 +373,72 @@ class _UpdateTaskState extends State<UpdateTask> {
                   ),
                   title: const Text('InCompleted'),
                 ),
+                const SizedBox(
+                  height: 24,
+                ),
+                BlocBuilder<ProjectBloc, BaseState>(
+                  builder: (context, state) {
+                    if (state is GetAllProjectsState) {
+                      ProgressDialog.hideLoadingDialog(context);
+                      projectList = [];
+                      listOfProject = state.model!.data!;
+                      for (int i = 0; i < state.model!.data!.length; i++) {
+                        projectList.add(state.model!.data![i].name ?? "");
+                      }
+                      for(int i=0;i<state.model!.data!.length;i++){
+                        if(int.parse(widget.projectId) == state.model!.data![i].id){
+                          selectProject = state.model!.data![i].name;
+                        }
+                      }
+                      return Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: DropdownButtonFormField(
+                                isExpanded: true,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: CustomColors.colorBlue),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value == "") {
+                                    return 'Please Select User role.';
+                                  }
+                                  return null;
+                                },
+                                borderRadius: BorderRadius.circular(5),
+                                hint: const Text('Please choose a Role'),
+                                value: selectProject,
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    selectProject = newValue!;
+                                    for(int i=0;i<listOfProject.length;i++){
+                                      if(selectProject == listOfProject[i].name){
+                                        widget.projectId = listOfProject[i].id.toString();
+                                        break;
+                                      }
+                                    }
+                                  });
+                                },
+                                items: projectList.map((userRole) {
+                                  return DropdownMenuItem(
+                                    child: Text(userRole),
+                                    value: userRole,
+                                  );
+                                }).toList(),
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    } else {
+                      return const SizedBox();
+                    }
+                  },
+                ),
              /*   Container(
                     width: double.infinity,
                     margin: EdgeInsets.only(top: 24),
@@ -403,7 +494,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                       task_status: "",
                       tag_id: "",
                       reviewer_id: "",
-                      project_id: "",
+                      project_id: widget.projectId,
                       priority: "Urgent",
                       is_private: "false",
                       comment: widget.commentController.text,

@@ -24,6 +24,7 @@ class _ResetPasswordState extends State<ResetPassword> {
   bool isNewPasswordShow = true, isConfirmPasswordShow = true;
   TextEditingController tieNewPassword = TextEditingController();
   TextEditingController tieConfirmPassword = TextEditingController();
+  TextEditingController resetCode = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +74,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                     key: const Key("tefResetCode"),
                     label: "Reset code",
                     hint: "Enter code",
-                    textEditingController: TextEditingController(),
+                    textEditingController: resetCode,
+                    textInputType: TextInputType.number,
                   ),
                   const SizedBox(height: 32,),
                   CustomTextField(
@@ -121,11 +123,17 @@ class _ResetPasswordState extends State<ResetPassword> {
                   Button(
                     "Change Password",
                     onPress: () {
-                      if(tieNewPassword.text == tieConfirmPassword.text){
-                        _resetPassward(tieNewPassword.text,widget.email);
-                      }else{
+                      if(resetCode.text.isNotEmpty){
+                        if(tieNewPassword.text == tieConfirmPassword.text){
+                          _resetPassward(tieNewPassword.text,widget.email);
+                        }else{
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                            content: Text('Password does not same'),
+                          ),);
+                        }
+                      }else {
                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('Passward does not same'),
+                          content: Text('Please enter reset code.'),
                         ),);
                       }
                       //Get.to(ResetSuccess());
