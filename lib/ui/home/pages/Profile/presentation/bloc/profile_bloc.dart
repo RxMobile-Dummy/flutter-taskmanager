@@ -31,6 +31,8 @@ class UpdateProfileBloc extends Bloc<BaseEvent, BaseState> {
         );
       } else if (event is UpdateProfileSuccessEvent){
         emit(UpdateProfileState(model: event.model));
+      }else if (event is EventErrorGeneral) {
+        emit(StateErrorGeneral(event.message));
       }
     });
   }

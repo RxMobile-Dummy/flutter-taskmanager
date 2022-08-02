@@ -58,6 +58,8 @@ class ProjectBloc extends Bloc<BaseEvent, BaseState> {
         emit(UpdateProjectState(model: event.model));
       }else if (event is DeleteProjectSuccessEvent){
         emit(DeleteProjectState(model: event.model));
+      }else if (event is EventErrorGeneral) {
+        emit(StateErrorGeneral(event.message));
       }
     });
   }

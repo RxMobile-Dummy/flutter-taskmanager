@@ -20,6 +20,8 @@ GetUserStatusUsecase? getUserStatusUsecase;
         getUserStatusCall();
       } else if (event is GetUserStatusSuccessEvent){
         emit(GetUserStatusState(model: event.model));
+      }else if (event is EventErrorGeneral) {
+        emit(StateErrorGeneral(event.message));
       }
     });
   }

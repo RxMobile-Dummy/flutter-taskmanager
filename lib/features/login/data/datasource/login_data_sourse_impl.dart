@@ -60,11 +60,6 @@ class LocalDataSourceImpl implements LocalDataSource {
 
   @override
   Future<ResetPasswardModel> resetPasswordCall(ResetPasswardParams params) async {
-   /* Dio dio = new Dio();
-    dio.options.headers['Accept'] = 'application/json';
-    dio.options.headers['Authorization'] = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTc4ODMwOTgsImVtYWlsIjoibWFuc2hhLmNoYXdsYUByYWRpeHdlYi5jb20iLCJtb2JpbGVfbnVtYmVyIjoiKzkxNzAzMDgyMzU5MiJ9.cRHAAuz7ys0mp_ThHzN0_iFC1b-Jbz0B0t6HoylI35o';
-    dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    var restClient = ApiClient(dio);*/
     var map = new HashMap<String, String>();
     map['password'] = params.password;
     map['otp'] = params.otp;

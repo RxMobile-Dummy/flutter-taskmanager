@@ -88,7 +88,9 @@ class _ProjectState extends State<Project> {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(model!.message??""),
             ));
-            _getProject();
+            if(model.success == true){
+              _getProject();
+            }
           }else if (state is AddProjectState) {
             ProgressDialog.hideLoadingDialog(context);
             AddProjectModel? model = state.model;
@@ -97,18 +99,25 @@ class _ProjectState extends State<Project> {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(model!.message??""),
             ));
-            Navigator.of(context).pop();
-            _getProject();
+            if(model.success == true){
+              Navigator.of(context).pop();
+              _getProject();
+            }
           }else if (state is UpdateProjectState) {
             ProgressDialog.hideLoadingDialog(context);
             UpdateProjectModel? model = state.model;
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(model!.message??""),
             ));
-            Navigator.of(context).pop();
-            _getProject();
+            if(model.success == true){
+              Navigator.of(context).pop();
+              _getProject();
+            }
           }else if (state is StateErrorGeneral) {
             ProgressDialog.hideLoadingDialog(context);
+            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+              content: Text(state.message),
+            ));
           }
         },
         bloc: BlocProvider.of<ProjectBloc>(context),

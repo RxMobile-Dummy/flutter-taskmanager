@@ -70,24 +70,37 @@ class _QuickNotesState extends State<QuickNotes> {
             ProgressDialog.hideLoadingDialog(context);
           }else if (state is GetNoteState) {
             ProgressDialog.hideLoadingDialog(context);
-           /* GetNoteModel? model = state.model;*/
             getNoteModel = state.model!;
+            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+              content: Text(getNoteModel.message??""),
+            ));
             print(getNoteModel.message??"");
-            //Navigator.of(context).pop();
           }else if (state is UpdateNoteState) {
             ProgressDialog.hideLoadingDialog(context);
              UpdateNoteModel? model = state.model;
+            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+              content: Text(getNoteModel.message??""),
+            ));
             print(model?.message??"");
-            Navigator.of(context).pop();
-            _getNote();
+            if(getNoteModel.success == true){
+              Navigator.of(context).pop();
+              _getNote();
+            }
           }else if (state is DeleteNoteState) {
             ProgressDialog.hideLoadingDialog(context);
             DeleteNoteModel? model = state.model;
+            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+              content: Text(getNoteModel.message??""),
+            ));
             print(model?.message??"");
-            _getNote();
-            //Navigator.of(context).pop();
+            if(getNoteModel.success == true){
+              _getNote();
+            }
           }else if (state is StateErrorGeneral) {
             ProgressDialog.hideLoadingDialog(context);
+            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+              content: Text(state.message),
+            ));
           }
         },
         bloc: BlocProvider.of<AddNoteBloc>(context),

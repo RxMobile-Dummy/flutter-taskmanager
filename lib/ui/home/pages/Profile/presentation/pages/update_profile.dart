@@ -114,13 +114,18 @@ class _UpdateProfileState extends State<UpdateProfile> {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(updateUserProfileModel.message ?? ""),
               ));
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              String user = jsonEncode(updateUserProfileModel.data?.toJson());
-              prefs.setString('userData', user);
-              Navigator.of(context).pop();
+              if(updateUserProfileModel.success == true){
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                String user = jsonEncode(updateUserProfileModel.data?.toJson());
+                prefs.setString('userData', user);
+                Navigator.of(context).pop();
+              }
               //  Get.off(Login());
             } else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                content: Text(state.message),
+              ));
             }
           },
           bloc: BlocProvider.of<UpdateProfileBloc>(context),
@@ -309,6 +314,12 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           ],
                         ),
                       );
+                    }else if (state is StateErrorGeneral) {
+                      ProgressDialog.hideLoadingDialog(context);
+                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                        content: Text(state.message),
+                      ));
+                      return const SizedBox();
                     } else {
                       return const SizedBox();
                     }
@@ -381,7 +392,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           ],
                         ),
                       );
-                    } else {
+                    } else if (state is StateErrorGeneral) {
+                      ProgressDialog.hideLoadingDialog(context);
+                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                        content: Text(state.message),
+                      ));
+                      return const SizedBox();
+                    }else {
                       return const SizedBox();
                     }
                   },

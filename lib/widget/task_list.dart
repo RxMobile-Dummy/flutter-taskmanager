@@ -70,6 +70,12 @@ class _TaskListState extends State<TaskList> {
               (state.model?.data?.isNotEmpty ?? false)) {
             return buildWidget(state.model?.data);
           }
+        }else if (state is StateErrorGeneral) {
+          ProgressDialog.hideLoadingDialog(context);
+          ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+            content: Text(state.message),
+          ));
+          return const SizedBox();
         }
         return Center(
           child: Text(

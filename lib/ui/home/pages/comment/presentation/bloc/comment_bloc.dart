@@ -60,6 +60,8 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
         emit(DeleteCommentState(model: event.model));
       }else if (event is GetCommentSuccessEvent){
         emit(GetCommentState(model: event.model));
+      }else if (event is EventErrorGeneral) {
+        emit(StateErrorGeneral(event.message));
       }
     });
   }

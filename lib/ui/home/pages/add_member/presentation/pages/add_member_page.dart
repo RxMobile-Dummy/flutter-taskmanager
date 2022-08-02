@@ -66,9 +66,14 @@ class _GetAllUserListState extends State<GetAllUserList> {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(model!.message ?? ""),
               ));
-              Navigator.of(context).pop();
+              if(model.status == true){
+                Navigator.of(context).pop();
+              }
             } else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                content: Text(state.message),
+              ));
             }
           },
           bloc: BlocProvider.of<AddMemberBloc>(context),
@@ -78,7 +83,13 @@ class _GetAllUserListState extends State<GetAllUserList> {
                 ProgressDialog.hideLoadingDialog(context);
                 addMemberModel = state.model!;
                 return buildWidget(addMemberModel.data ?? []);
-              } else {
+              } else if (state is StateErrorGeneral) {
+                ProgressDialog.hideLoadingDialog(context);
+                ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                  content: Text(state.message),
+                ));
+                return const SizedBox();
+              }else {
                 return Center(
                   child: Text(
                     "No user found",

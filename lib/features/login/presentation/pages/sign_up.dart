@@ -64,17 +64,19 @@ class _SignUpState extends State<SignUp> {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(model!.message??""),
               ));
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setString('id', model.data!.id!.toString());
-              prefs.setString('role', model.data!.role ?? "");
-              Navigator.pushAndRemoveUntil<dynamic>(
-                context,
-                MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                  create: (context) => Sl.Sl<LoginBloc>(),
-                  child: Login(),
-                )),
-                    (route) => false,
-              );
+              if(model.success == true){
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString('id', model.data!.id!.toString());
+                prefs.setString('role', model.data!.role ?? "");
+                Navigator.pushAndRemoveUntil<dynamic>(
+                  context,
+                  MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                    create: (context) => Sl.Sl<LoginBloc>(),
+                    child: Login(),
+                  )),
+                      (route) => false,
+                );
+              }
             //  Get.off(Login());
             } else if (state is GetUserRoleState) {
             ProgressDialog.hideLoadingDialog(context);
@@ -85,6 +87,9 @@ class _SignUpState extends State<SignUp> {
             print(getUserRoleModel.message??"");
           }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                content: Text(state.message),
+              ));
             }
           },
           bloc: BlocProvider.of<LoginBloc>(context),

@@ -39,8 +39,8 @@ class EventRequest<T> extends BaseEvent {
 }
 
 class EventErrorGeneral extends BaseEvent {
-  String errorMessage;
-  EventErrorGeneral(this.errorMessage);
+  String message;
+  EventErrorGeneral(this.message);
 }
 
 class EventValidationError extends BaseEvent {

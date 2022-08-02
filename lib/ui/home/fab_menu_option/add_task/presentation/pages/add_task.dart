@@ -88,9 +88,14 @@ class _AddNoteState extends State<AddTask> {
               ));
              /* BlocProvider.of<AddTaskBloc>(context).add(
                   GetTaskEvent(date: getFormatedDate(DateTime.now().toString()),));*/
-              Navigator.of(context).pop(/*model*/);
+              if(model.success == true){
+                Navigator.of(context).pop(/*model*/);
+              }
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                content: Text(state.message),
+              ));
             }
           },
           bloc: BlocProvider.of<AddTaskBloc>(context),
@@ -396,55 +401,61 @@ Widget buildWidget(){
               builder: (context, state) {
                 if (state is GetAllProjectsState) {
                   ProgressDialog.hideLoadingDialog(context);
-                  projectList = [];
-                  listOfProject = state.model!.data!;
-                  for (int i = 0; i < state.model!.data!.length; i++) {
-                    projectList.add(state.model!.data![i].name ?? "");
-                  }
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButtonFormField(
-                            isExpanded: true,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: CustomColors.colorBlue),
+                    projectList = [];
+                    listOfProject = state.model!.data!;
+                    for (int i = 0; i < state.model!.data!.length; i++) {
+                      projectList.add(state.model!.data![i].name ?? "");
+                    }
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField(
+                              isExpanded: true,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: CustomColors.colorBlue),
+                                ),
                               ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value == "") {
-                                return 'Please Select User role.';
-                              }
-                              return null;
-                            },
-                            borderRadius: BorderRadius.circular(5),
-                            hint: const Text('Please choose a Role'),
-                            value: selectProject,
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectProject = newValue!;
-                              });
-                              for(int i=0;i<listOfProject.length;i++){
-                                if(selectProject == listOfProject[i].name){
-                                  projectId = listOfProject[i].id.toString();
-                                  break;
+                              validator: (value) {
+                                if (value == null || value == "") {
+                                  return 'Please Select User role.';
                                 }
-                              }
-                            },
-                            items: projectList.map((userRole) {
-                              return DropdownMenuItem(
-                                child: Text(userRole),
-                                value: userRole,
-                              );
-                            }).toList(),
-                          ),
-                        )
-                      ],
-                    ),
-                  );
+                                return null;
+                              },
+                              borderRadius: BorderRadius.circular(5),
+                              hint: const Text('Please choose a Role'),
+                              value: selectProject,
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectProject = newValue!;
+                                });
+                                for(int i=0;i<listOfProject.length;i++){
+                                  if(selectProject == listOfProject[i].name){
+                                    projectId = listOfProject[i].id.toString();
+                                    break;
+                                  }
+                                }
+                              },
+                              items: projectList.map((userRole) {
+                                return DropdownMenuItem(
+                                  child: Text(userRole),
+                                  value: userRole,
+                                );
+                              }).toList(),
+                            ),
+                          )
+                        ],
+                      ),
+                    );
+                }else if (state is StateErrorGeneral) {
+                  ProgressDialog.hideLoadingDialog(context);
+                  ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                    content: Text(state.message),
+                  ));
+                  return const SizedBox();
                 } else {
                   return const SizedBox();
                 }

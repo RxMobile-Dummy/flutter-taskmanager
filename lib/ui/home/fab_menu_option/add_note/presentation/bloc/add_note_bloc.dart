@@ -52,6 +52,8 @@ class AddNoteBloc extends Bloc<BaseEvent, BaseState> {
         emit(UpdateNoteState(model: event.model));
       }else if (event is DeleteNoteSuccessEvent){
         emit(DeleteNoteState(model: event.model));
+      }else if (event is EventErrorGeneral) {
+        emit(StateErrorGeneral(event.message));
       }
     });
   }
