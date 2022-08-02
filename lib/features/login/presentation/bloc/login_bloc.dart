@@ -52,7 +52,7 @@ class LoginBloc extends Bloc<BaseEvent, BaseState> {
     } else if (event is EventLoading) {
     //yield StateLoading();
     } else if (event is EventErrorGeneral) {
-    //yield StateErrorGeneral(event.errorMessage);
+        emit(StateErrorGeneral(event.message));
     }else if (event is LoginSuccessEvent){
         emit(LoginState(model: event.model));
       }else if (event is ForgotPasswardSuccessEvent){

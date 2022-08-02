@@ -71,6 +71,8 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
         emit(UpdateTaskState(model: event.model));
       } else if (event is GetTaskSuccessEvent) {
         emit(GetTaskState(model: event.model));
+      }else if (event is EventErrorGeneral) {
+        emit(StateErrorGeneral(event.message));
       }
     });
   }

@@ -29,6 +29,8 @@ class AddMemberBloc extends Bloc<BaseEvent, BaseState> {
         emit(AddMemberState(model: event.model));
       } else if (event is InviteProjectAssignSuccessEvent) {
         emit(InviteProjectAssignState(model: event.model));
+      }else if (event is EventErrorGeneral) {
+        emit(StateErrorGeneral(event.message));
       }
     });
   }

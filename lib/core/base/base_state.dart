@@ -43,9 +43,9 @@ class ValidationError extends BaseState {
 }
 
 class StateErrorGeneral extends BaseState {
-  String errorMessage;
+  String message;
 
-  StateErrorGeneral(this.errorMessage);
+  StateErrorGeneral(this.message);
 }
 
 class StatePaginationSuccess extends BaseState implements Equatable {

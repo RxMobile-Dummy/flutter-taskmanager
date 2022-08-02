@@ -80,7 +80,9 @@ class _ResetPasswordState extends State<ResetPassword> {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(model!.message??""),
               ));
-              Get.to(ResetSuccess());
+              if(model.success == true){
+                Get.to(ResetSuccess());
+              }
             } else if (state is ForgotPasswordStatus) {
               ProgressDialog.hideLoadingDialog(context);
               ForgotPasswordModel? model = state.model;
@@ -90,6 +92,9 @@ class _ResetPasswordState extends State<ResetPassword> {
               // Get.off(ResetPassword());
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                content: Text(state.message),
+              ));
             }
           },
           bloc: BlocProvider.of<LoginBloc>(context),

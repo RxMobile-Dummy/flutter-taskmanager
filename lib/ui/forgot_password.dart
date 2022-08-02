@@ -37,17 +37,22 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(model!.message??""),
               ));
-              Navigator.pushAndRemoveUntil<dynamic>(
-                context,
-                MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                  create: (context) => Sl.Sl<LoginBloc>(),
-                  child: ResetPassword(email: emailController.text),
-                )),
-                    (route) => false,
-              );
+              if(model.success == true){
+                Navigator.pushAndRemoveUntil<dynamic>(
+                  context,
+                  MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                    create: (context) => Sl.Sl<LoginBloc>(),
+                    child: ResetPassword(email: emailController.text),
+                  )),
+                      (route) => false,
+                );
+              }
              // Get.off(ResetPassword());
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                content: Text(state.message),
+              ));
             }
           },
           bloc: BlocProvider.of<LoginBloc>(context),

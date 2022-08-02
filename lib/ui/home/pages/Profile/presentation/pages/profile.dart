@@ -213,7 +213,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                                 "  ($userStatus)",
                                                 style: CustomTextStyle.styleSemiBold.copyWith(color: CustomColors.colorBlue,fontSize: 20),
                                               );
-                                            } else {
+                                            } else if (state is StateErrorGeneral) {
+                                              ProgressDialog.hideLoadingDialog(context);
+                                              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                                                content: Text(state.message),
+                                              ));
+                                              return const SizedBox();
+                                            }else {
                                               return const SizedBox();
                                             }
                                           },
@@ -309,6 +315,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                 ],
                               ),
                             );
+                          }else if (state is StateErrorGeneral) {
+                            ProgressDialog.hideLoadingDialog(context);
+                            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                              content: Text(state.message),
+                            ));
+                            return const SizedBox();
                           } else {
                             return const SizedBox();
                           }
@@ -340,6 +352,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                 ],
                               ),
                             );
+                          }else if (state is StateErrorGeneral) {
+                            ProgressDialog.hideLoadingDialog(context);
+                            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                              content: Text(state.message),
+                            ));
+                            return const SizedBox();
                           } else {
                             return const SizedBox();
                           }
@@ -361,6 +379,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     height: 100,
                     child:  taskCategory(0,state.model?.data?.length ?? 0,"Tasks"),
                   );
+                }else if (state is StateErrorGeneral) {
+                  ProgressDialog.hideLoadingDialog(context);
+                  ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                    content: Text(state.message),
+                  ));
+                  return const SizedBox();
                 } else {
                   return const SizedBox();
                 }
@@ -376,6 +400,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     height: 100,
                     child:  taskCategory(1,state.model?.data?.length ?? 0,"Notes"),
                   );
+                }else if (state is StateErrorGeneral) {
+                  ProgressDialog.hideLoadingDialog(context);
+                  ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                    content: Text(state.message),
+                  ));
+                  return const SizedBox();
                 } else {
                   return const SizedBox();
                 }
@@ -463,6 +493,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       ProgressDialog.hideLoadingDialog(context);
                       return progressPercentage(
                           double.parse(state.model?.data?.length.toString() ?? ""), "Tasks", CustomColors.colorRed);
+                    }else if (state is StateErrorGeneral) {
+                      ProgressDialog.hideLoadingDialog(context);
+                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                        content: Text(state.message),
+                      ));
+                      return const SizedBox();
                     } else {
                       return const SizedBox();
                     }
@@ -477,6 +513,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       ProgressDialog.hideLoadingDialog(context);
                       return progressPercentage(double.parse(state.model?.data?.length.toString() ?? ""),
                           "Quick Notes", CustomColors.colorPurple);
+                    }else if (state is StateErrorGeneral) {
+                      ProgressDialog.hideLoadingDialog(context);
+                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                        content: Text(state.message),
+                      ));
+                      return const SizedBox();
                     } else {
                       return const SizedBox();
                     }

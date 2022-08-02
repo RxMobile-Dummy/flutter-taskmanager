@@ -78,9 +78,15 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                 } else if (state is GetTaskState) {
                   ProgressDialog.hideLoadingDialog(context);
                   getTaskModel = state.model!;
+                  ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                    content: Text(getTaskModel.message ?? ""),
+                  ));
                   print(getTaskModel.message??"");
                 }else if (state is StateErrorGeneral) {
                   ProgressDialog.hideLoadingDialog(context);
+                  ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                    content: Text(state.message),
+                  ));
                 }
               },
               bloc: BlocProvider.of<AddTaskBloc>(context),

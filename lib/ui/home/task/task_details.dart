@@ -80,9 +80,14 @@ class _TaskDetailsState extends State<TaskDetails> {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(model!.message ?? ""),
               ));
-              Navigator.of(context).pop();
+              if(model.success == true){
+                Navigator.of(context).pop();
+              }
             } else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                content: Text(state.message),
+              ));
             }
           },
           bloc: BlocProvider.of<AddTaskBloc>(context),
@@ -260,7 +265,9 @@ class _TaskDetailsState extends State<TaskDetails> {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(model!.message ?? ""),
                         ));
-                        await _getComment(comment_user_id: authToken);
+                        if(model.success == true){
+                          await _getComment(comment_user_id: authToken);
+                        }
                         //Navigator.of(context).pop();
                       } else if (state is UpdateCommentState) {
                         ProgressDialog.hideLoadingDialog(context);
@@ -268,18 +275,24 @@ class _TaskDetailsState extends State<TaskDetails> {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(model!.message ?? ""),
                         ));
-                        Navigator.of(context).pop();
-                        await _getComment(comment_user_id: authToken);
+                        if(model.success == true){
+                          Navigator.of(context).pop();
+                          await _getComment(comment_user_id: authToken);
+                        }
                       } else if (state is DeleteCommentState) {
                         ProgressDialog.hideLoadingDialog(context);
                         DeleteCommentModel? model = state.model;
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(model!.message ?? ""),
                         ));
-                        await _getComment(comment_user_id: authToken);
-                        // Navigator.of(context).pop();
+                        if(model.success == true){
+                          await _getComment(comment_user_id: authToken);
+                        }
                       } else if (state is StateErrorGeneral) {
                         ProgressDialog.hideLoadingDialog(context);
+                        ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                          content: Text(state.message),
+                        ));
                       }
                     },
                     bloc: BlocProvider.of<CommentBloc>(context),

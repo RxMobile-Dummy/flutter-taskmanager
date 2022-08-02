@@ -87,9 +87,14 @@ class _UpdateTaskState extends State<UpdateTask> {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(model!.message??""),
               ));
-              Navigator.of(context).pop();
+              if(model.success == true){
+                Navigator.of(context).pop();
+              }
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                content: Text(state.message),
+              ));
             }
           },
           bloc: BlocProvider.of<AddTaskBloc>(context),
@@ -434,6 +439,12 @@ class _UpdateTaskState extends State<UpdateTask> {
                           ],
                         ),
                       );
+                    }else if (state is StateErrorGeneral) {
+                      ProgressDialog.hideLoadingDialog(context);
+                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                        content: Text(state.message),
+                      ));
+                      return const SizedBox();
                     } else {
                       return const SizedBox();
                     }

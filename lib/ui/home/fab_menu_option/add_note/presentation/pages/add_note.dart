@@ -51,10 +51,15 @@ class _AddNoteState extends State<AddNote> {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(model!.message??""),
               ));
-              Navigator.of(context).pop();
+              if(model.success == true){
+                Navigator.of(context).pop();
+              }
               //_getNote();
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                content: Text(state.message),
+              ));
             }
           },
           bloc: BlocProvider.of<AddNoteBloc>(context),

@@ -68,13 +68,16 @@ class _LoginState extends State<Login> {
                 )),
                     (route) => false,
               );
-            }else {
+            }/*else {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content: Text("Please check your credentials that you have entered."),
               ));
-            }
+            }*/
           } else if (state is StateErrorGeneral) {
             ProgressDialog.hideLoadingDialog(context);
+            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+              content: Text(state.message),
+            ));
           }
         },
         bloc: BlocProvider.of<LoginBloc>(context),
