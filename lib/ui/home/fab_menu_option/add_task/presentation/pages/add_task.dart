@@ -3,9 +3,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
+import 'package:task_management/ui/home/pages/Project/data/model/get_all_project_model.dart';
+import 'package:task_management/ui/home/pages/Project/presentation/bloc/project_state.dart';
 
 import '../../../../../../core/base/base_bloc.dart';
 import '../../../../../../custom/progress_bar.dart';
@@ -15,6 +18,8 @@ import '../../../../../../utils/style.dart';
 import '../../../../../../widget/button.dart';
 import '../../../../../../widget/decoration.dart';
 import '../../../../../../widget/rounded_corner_page.dart';
+import '../../../../pages/Project/presentation/bloc/project_bloc.dart';
+import '../../../../pages/Project/presentation/bloc/project_event.dart';
 import '../../data/model/update_task.dart';
 import '../bloc/add_task_event.dart';
 
@@ -39,12 +44,33 @@ class _AddNoteState extends State<AddTask> {
   ];
 
   Color? selectedColors;
+  List<String> projectList = [];
+  String? selectProject;
+  List<dynamic> listOfProject = [];
+  String? projectId;
 
   @override
   void initState() {
     startDate.text = "";
     endDate.text = "";
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _getProject();
+    });
     super.initState();
+  }
+
+  Future<String> _getProject() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var id = prefs.getString('id');
+    print(id);
+    return Future.delayed(Duration()).then((_) {
+      //ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<ProjectBloc>(context).add(
+          GetAllProjectsEvent(
+            id: int.parse(id ?? ""),
+          ));
+      return "";
+    });
   }
 
   @override
@@ -92,23 +118,23 @@ Widget buildWidget(){
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                    margin: EdgeInsets.only(left: 16, top: 32),
+                /*Container(
+                    margin: const EdgeInsets.only(left: 16, top: 32),
                     child: Row(
                       children: [
-                        Text(
+                       *//* Text(
                           "For",
                           style: CustomTextStyle.styleBold,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 16,
                         ),
                         Container(
-                          padding: EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                               color: Colors.grey.shade200,
                               borderRadius: BorderRadius.circular(100)),
-                          child: Text("Assignee"),
+                          child: const Text("Assignee"),
                         ),
                         Expanded(
                           child: Container(),
@@ -116,20 +142,20 @@ Widget buildWidget(){
                         Text(
                           "In",
                           style: CustomTextStyle.styleBold,
-                        ),
-                        SizedBox(
+                        ),*//*
+                        const SizedBox(
                           width: 16,
                         ),
                         Container(
-                          margin: EdgeInsets.only(right: 16),
-                          padding: EdgeInsets.all(12),
+                          margin: const EdgeInsets.only(right: 16),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                               color: Colors.grey.shade200,
                               borderRadius: BorderRadius.circular(100)),
-                          child: Text("Project"),
+                          child: const Text("Project"),
                         ),
                       ],
-                    )),
+                    )),*/
                 Container(
                   margin: EdgeInsets.only(top: 24),
                   color: Colors.grey.shade200,
@@ -363,6 +389,67 @@ Widget buildWidget(){
                             } else {}
                           },
                         ))),
+            const SizedBox(
+              height: 24,
+            ),
+            BlocBuilder<ProjectBloc, BaseState>(
+              builder: (context, state) {
+                if (state is GetAllProjectsState) {
+                  ProgressDialog.hideLoadingDialog(context);
+                  projectList = [];
+                  listOfProject = state.model!.data!;
+                  for (int i = 0; i < state.model!.data!.length; i++) {
+                    projectList.add(state.model!.data![i].name ?? "");
+                  }
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField(
+                            isExpanded: true,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: CustomColors.colorBlue),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value == "") {
+                                return 'Please Select User role.';
+                              }
+                              return null;
+                            },
+                            borderRadius: BorderRadius.circular(5),
+                            hint: const Text('Please choose a Role'),
+                            value: selectProject,
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectProject = newValue!;
+                              });
+                              for(int i=0;i<listOfProject.length;i++){
+                                if(selectProject == listOfProject[i].name){
+                                  projectId = listOfProject[i].id.toString();
+                                  break;
+                                }
+                              }
+                            },
+                            items: projectList.map((userRole) {
+                              return DropdownMenuItem(
+                                child: Text(userRole),
+                                value: userRole,
+                              );
+                            }).toList(),
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
+            ),
              /*   Container(
                   margin: EdgeInsets.only(left: 16, top: 16),
                   padding: EdgeInsets.all(12),
@@ -380,7 +467,7 @@ Widget buildWidget(){
                       task_status: "",
                       tag_id: "",
                       reviewer_id: "",
-                      project_id: "",
+                      project_id: projectId,
                       priority: "Urgent",
                       is_private: "false",
                       comment: commentController.text,

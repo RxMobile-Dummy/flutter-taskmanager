@@ -146,7 +146,7 @@ class _GetAllUserListState extends State<GetAllUserList> {
                           onTap: (){
                             _addMember(
                               assignee_ids: list[index].id.toString(),
-                              project_id: "53",
+                              project_id: widget.project_id,
                             );
                           },
                           child: Text(

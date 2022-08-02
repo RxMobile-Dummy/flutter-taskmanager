@@ -157,10 +157,14 @@ class _HomeState extends State<Home> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => BlocProvider<AddTaskBloc>(
-                              create: (context) => Sl.Sl<AddTaskBloc>(),
-                              child: AddTask(),
-                            )),
+                            builder: (context) => MultiBlocProvider(providers: [
+                              BlocProvider<AddTaskBloc>(
+                                create: (context) => Sl.Sl<AddTaskBloc>(),
+                              ),
+                              BlocProvider<ProjectBloc>(
+                                create: (context) => Sl.Sl<ProjectBloc>(),
+                              ),
+                            ], child: AddTask())),
                       ).then((value) {
                         if (value != null) {
                           context.read<AddTaskBloc>().getTaskCall();
