@@ -1,5 +1,6 @@
 
 
+import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/domain/usecases/add_note_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/domain/usecases/delete_note_usecase.dart';
@@ -11,6 +12,7 @@ import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bl
 import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/base/base_bloc.dart';
 import '../../../../../../core/failure/failure.dart';
+import '../../data/model/get_note_model.dart';
 
 class AddNoteBloc extends Bloc<BaseEvent, BaseState> {
 
@@ -22,7 +24,7 @@ class AddNoteBloc extends Bloc<BaseEvent, BaseState> {
 
  AddNoteBloc(
       {required this.addNoteUsecase,required this.getNoteUsecase,required this.updateNoteUsecase,required this.deleteNoteUsecase}) : super(StateLoading()) {
-    on<BaseEvent>((event, emit) {
+    on<BaseEvent>((event, emit) async {
       if (event is EventRequest) {
       } else if (event is AddNoteEvent) {
         addNoteCall(
@@ -43,10 +45,19 @@ class AddNoteBloc extends Bloc<BaseEvent, BaseState> {
         );
       }
       else if (event is GetNoteEvent) {
-        getNoteCall();
+        emit(StateLoading());
+        var data  = await getNoteCall();
+
+        data.fold((onError) {
+          add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        }, (onSuccess) {
+          emit(GetNoteState(model: onSuccess));
+          //add(GetNoteSuccessEvent(model: onSuccess));
+        });
       }else if (event is AddNoteSuccessEvent){
         emit(AddNoteState(model: event.model));
       }else if (event is GetNoteSuccessEvent){
+        emit(StateLoading());
         emit(GetNoteState(model: event.model));
       }else if (event is UpdateNoteSuccessEvent){
         emit(UpdateNoteState(model: event.model));
@@ -117,16 +128,12 @@ class AddNoteBloc extends Bloc<BaseEvent, BaseState> {
    });
  }
 
- getNoteCall() {
-   getNoteUsecase!
+ Future<Either<Failure, GetNoteModel>> getNoteCall() async{
+   /*getNoteUsecase!
+       .call(GetNotesParams()).single.then((value) => BlocProvider.of<AddNoteBloc>(context).add(GetNoteEvent()));*/
+   return await getNoteUsecase!
        .call(GetNotesParams())
-       .listen((data) {
-     data.fold((onError) {
-       add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
-     }, (onSuccess) {
-       add(GetNoteSuccessEvent(model: onSuccess));
-     });
-   });
+       .first;
  }
 
   String? _mapFailureToMessage(Failure failure) {

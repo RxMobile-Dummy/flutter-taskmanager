@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_event.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_state.dart';
@@ -48,21 +49,32 @@ class _AddNoteState extends State<AddNote> {
             }else if (state is AddNoteState) {
               ProgressDialog.hideLoadingDialog(context);
               AddNotesModel? model = state.model;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(model!.message??""),
-              ));
+              Fluttertoast.showToast(
+                  msg: model!.message ?? "",
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: 20,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
               if(model.success == true){
                 Navigator.of(context).pop();
+               /* Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) =>BlocProvider<AddNoteBloc>(
+                    create: (context) => Sl.Sl<AddNoteBloc>(),
+                    child: QuickNotes(),
+                  )),
+                );*/
+                BlocProvider.of<AddNoteBloc>(context).add(
+                    GetNoteEvent());
               }
-              //_getNote();
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
-              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+              /*ScaffoldMessenger.of(context).showSnackBar( SnackBar(
                 content: Text(state.message),
-              ));
+              ));*/
             }
           },
-          bloc: BlocProvider.of<AddNoteBloc>(context),
           child:  BlocBuilder<AddNoteBloc, BaseState>(builder: (context, state) {
             return buildWidget();
           }),
@@ -158,13 +170,13 @@ class _AddNoteState extends State<AddNote> {
     //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
-      BlocProvider.of<AddNoteBloc>(context).add(
+      BlocProvider.of<AddNoteBloc>(context)..add(
           AddNoteEvent(
             description: description ?? "",
             project_id: project_id ?? "",
             title: title ?? "",
             task_id: task_id ?? "",
-          ));
+          ))..add(GetNoteEvent());
       return "";
     });
   }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -77,20 +78,28 @@ class _TaskDetailsState extends State<TaskDetails> {
             } else if (state is DeleteTaskState) {
               ProgressDialog.hideLoadingDialog(context);
               DeleteTaskModel? model = state.model;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(model!.message ?? ""),
-              ));
+              Fluttertoast.showToast(
+                  msg: model!.message ?? "",
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: 20,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
               if(model.success == true){
                 Navigator.of(context).pop();
               }
             } else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
-              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                content: Text(state.message),
-              ));
+              Fluttertoast.showToast(
+                  msg: state.message,
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: 20,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
             }
           },
-          bloc: BlocProvider.of<AddTaskBloc>(context),
+         // bloc: BlocProvider.of<AddTaskBloc>(context),
           child: BlocBuilder<AddTaskBloc, BaseState>(builder: (context, state) {
             return buildWidget(context);
           })),
@@ -255,16 +264,24 @@ class _TaskDetailsState extends State<TaskDetails> {
                         ProgressDialog.hideLoadingDialog(context);
                         // GetCommentModel? model = state.model;
                         getCommentModel = state.model!;
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(getCommentModel.message ?? ""),
-                        ));
+                        Fluttertoast.showToast(
+                            msg: getCommentModel.message ?? "",
+                            toastLength: Toast.LENGTH_LONG,
+                            fontSize: 20,
+                            backgroundColor: CustomColors.colorBlue,
+                            textColor: Colors.white
+                        );
                         // Navigator.of(context).pop();
                       } else if (state is AddCommentState) {
                         ProgressDialog.hideLoadingDialog(context);
                         AddCommentModel? model = state.model;
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(model!.message ?? ""),
-                        ));
+                        Fluttertoast.showToast(
+                            msg: model!.message ?? "",
+                            toastLength: Toast.LENGTH_LONG,
+                            fontSize: 20,
+                            backgroundColor: CustomColors.colorBlue,
+                            textColor: Colors.white
+                        );
                         if(model.success == true){
                           await _getComment(comment_user_id: authToken);
                         }
@@ -272,9 +289,13 @@ class _TaskDetailsState extends State<TaskDetails> {
                       } else if (state is UpdateCommentState) {
                         ProgressDialog.hideLoadingDialog(context);
                         UpdateCommentModel? model = state.model;
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(model!.message ?? ""),
-                        ));
+                        Fluttertoast.showToast(
+                            msg: model!.message ?? "",
+                            toastLength: Toast.LENGTH_LONG,
+                            fontSize: 20,
+                            backgroundColor: CustomColors.colorBlue,
+                            textColor: Colors.white
+                        );
                         if(model.success == true){
                           Navigator.of(context).pop();
                           await _getComment(comment_user_id: authToken);
@@ -282,17 +303,25 @@ class _TaskDetailsState extends State<TaskDetails> {
                       } else if (state is DeleteCommentState) {
                         ProgressDialog.hideLoadingDialog(context);
                         DeleteCommentModel? model = state.model;
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(model!.message ?? ""),
-                        ));
+                        Fluttertoast.showToast(
+                            msg: model!.message ?? "",
+                            toastLength: Toast.LENGTH_LONG,
+                            fontSize: 20,
+                            backgroundColor: CustomColors.colorBlue,
+                            textColor: Colors.white
+                        );
                         if(model.success == true){
                           await _getComment(comment_user_id: authToken);
                         }
                       } else if (state is StateErrorGeneral) {
                         ProgressDialog.hideLoadingDialog(context);
-                        ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                          content: Text(state.message),
-                        ));
+                        Fluttertoast.showToast(
+                            msg: state.message,
+                            toastLength: Toast.LENGTH_LONG,
+                            fontSize: 20,
+                            backgroundColor: CustomColors.colorBlue,
+                            textColor: Colors.white
+                        );
                       }
                     },
                     bloc: BlocProvider.of<CommentBloc>(context),
@@ -485,6 +514,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                     size: 35,
                   ),
                   onPressed: () {
+                    Get.back();
                     getFromCamera(context, isEdit: isEdit);
                     //Navigator.pop(context);
                   },
@@ -506,6 +536,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                       size: 35,
                     ),
                     onPressed: () {
+                      Get.back();
                       getFromGallery(context, isEdit: isEdit);
                     },
                   ),
@@ -770,6 +801,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                       children: <Widget>[
                                         InkWell(
                                           onTap: () async {
+                                            Get.back();
                                             PickedFile? pickedFile =
                                                 await ImagePicker().getImage(
                                               source: ImageSource.camera,
@@ -794,6 +826,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                         ),
                                         InkWell(
                                           onTap: () async {
+                                            Get.back();
                                             PickedFile? pickedFile =
                                                 await ImagePicker().getImage(
                                               source: ImageSource.gallery,
@@ -1082,9 +1115,6 @@ class _TaskDetailsState extends State<TaskDetails> {
                 BlocProvider<AddMemberBloc>(
                   create: (context) => Sl.Sl<AddMemberBloc>(),
                 ),
-                BlocProvider<AddTaskBloc>(
-                  create: (context) => Sl.Sl<AddTaskBloc>(),
-                )
               ],
               child: GetAllUserList(project_id: widget.getTaskModel.projectId),
             )),

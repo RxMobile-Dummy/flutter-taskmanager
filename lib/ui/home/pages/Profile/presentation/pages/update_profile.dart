@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -111,9 +112,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
             } else if (state is UpdateProfileState) {
               ProgressDialog.hideLoadingDialog(context);
               updateUserProfileModel = state.model!;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(updateUserProfileModel.message ?? ""),
-              ));
+              Fluttertoast.showToast(
+                  msg: updateUserProfileModel.message ?? "",
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: 20,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
               if(updateUserProfileModel.success == true){
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 String user = jsonEncode(updateUserProfileModel.data?.toJson());
@@ -123,9 +128,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
               //  Get.off(Login());
             } else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
-              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                content: Text(state.message),
-              ));
+              Fluttertoast.showToast(
+                  msg: state.message,
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: 20,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
             }
           },
           bloc: BlocProvider.of<UpdateProfileBloc>(context),
@@ -316,9 +325,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       );
                     }else if (state is StateErrorGeneral) {
                       ProgressDialog.hideLoadingDialog(context);
-                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                        content: Text(state.message),
-                      ));
+                      Fluttertoast.showToast(
+                          msg: state.message,
+                          toastLength: Toast.LENGTH_LONG,
+                          fontSize: 20,
+                          backgroundColor: CustomColors.colorBlue,
+                          textColor: Colors.white
+                      );
                       return const SizedBox();
                     } else {
                       return const SizedBox();
@@ -394,9 +407,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       );
                     } else if (state is StateErrorGeneral) {
                       ProgressDialog.hideLoadingDialog(context);
-                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                        content: Text(state.message),
-                      ));
+                      Fluttertoast.showToast(
+                          msg: state.message,
+                          toastLength: Toast.LENGTH_LONG,
+                          fontSize: 20,
+                          backgroundColor: CustomColors.colorBlue,
+                          textColor: Colors.white
+                      );
                       return const SizedBox();
                     }else {
                       return const SizedBox();
@@ -426,9 +443,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         profilePic:  imageList,
                       );
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("Please fill all the detials."),
-                      ));
+                      Fluttertoast.showToast(
+                          msg: 'Please fill all the details.',
+                          toastLength: Toast.LENGTH_LONG,
+                          fontSize: 20,
+                          backgroundColor: CustomColors.colorBlue,
+                          textColor: Colors.white
+                      );
                     }
                     //Get.off(Home());
                   },
@@ -464,6 +485,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     size: 35,
                   ),
                   onPressed: () {
+                    Get.back();
                     getFromCamera();
                   },
                 ),
@@ -484,6 +506,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       size: 35,
                     ),
                     onPressed: () {
+                      Get.back();
                       getFromGallery();
                     },
                   ),

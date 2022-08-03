@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/features/login/data/model/get_user_role_model.dart';
@@ -61,9 +62,13 @@ class _SignUpState extends State<SignUp> {
             }else if (state is SignUpState) {
               ProgressDialog.hideLoadingDialog(context);
               SignUpModel? model = state.model;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(model!.message??""),
-              ));
+              Fluttertoast.showToast(
+                  msg: model!.message ?? "",
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: 20,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
               if(model.success == true){
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 prefs.setString('id', model.data!.id!.toString());
@@ -87,9 +92,13 @@ class _SignUpState extends State<SignUp> {
             print(getUserRoleModel.message??"");
           }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
-              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                content: Text(state.message),
-              ));
+              Fluttertoast.showToast(
+                  msg: state.message,
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: 20,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
             }
           },
           bloc: BlocProvider.of<LoginBloc>(context),
@@ -248,9 +257,13 @@ class _SignUpState extends State<SignUp> {
                         email: email.text,
                       );
                     }else{
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("Please fill all the detials."),
-                      ));
+                      Fluttertoast.showToast(
+                          msg: "Please fill all the details.",
+                          toastLength: Toast.LENGTH_LONG,
+                          fontSize: 20,
+                          backgroundColor: CustomColors.colorBlue,
+                          textColor: Colors.white
+                      );
                     }
                     //Get.off(Home());
                   },

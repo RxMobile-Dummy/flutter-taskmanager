@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/ui/home/pages/Project/data/model/add_project_model.dart';
 import 'package:task_management/ui/home/pages/Project/data/model/delete_project_model.dart';
@@ -78,16 +79,24 @@ class _ProjectState extends State<Project> {
             /*for(var i=0;i< getAllProjectsModel.data!.length;i++){
               listTitle.add(getAllProjectsModel.data![i].name ?? "");
             }*/
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(getAllProjectsModel.message??""),
-            ));
+            Fluttertoast.showToast(
+                msg: getAllProjectsModel.message ?? "",
+                toastLength: Toast.LENGTH_LONG,
+                fontSize: 20,
+                backgroundColor: CustomColors.colorBlue,
+                textColor: Colors.white
+            );
            // Navigator.of(context).pop();
           } else if (state is DeleteProjectState) {
             ProgressDialog.hideLoadingDialog(context);
             DeleteProjectModel? model = state.model;
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(model!.message??""),
-            ));
+            Fluttertoast.showToast(
+                msg: model!.message ?? "",
+                toastLength: Toast.LENGTH_LONG,
+                fontSize: 20,
+                backgroundColor: CustomColors.colorBlue,
+                textColor: Colors.white
+            );
             if(model.success == true){
               _getProject();
             }
@@ -96,9 +105,13 @@ class _ProjectState extends State<Project> {
             AddProjectModel? model = state.model;
            /* SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.setString('project_id', model?.data?.id.toString() ?? "");*/
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(model!.message??""),
-            ));
+            Fluttertoast.showToast(
+                msg: model!.message ?? "",
+                toastLength: Toast.LENGTH_LONG,
+                fontSize: 20,
+                backgroundColor: CustomColors.colorBlue,
+                textColor: Colors.white
+            );
             if(model.success == true){
               Navigator.of(context).pop();
               _getProject();
@@ -106,18 +119,26 @@ class _ProjectState extends State<Project> {
           }else if (state is UpdateProjectState) {
             ProgressDialog.hideLoadingDialog(context);
             UpdateProjectModel? model = state.model;
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(model!.message??""),
-            ));
+            Fluttertoast.showToast(
+                msg: model!.message ?? "",
+                toastLength: Toast.LENGTH_LONG,
+                fontSize: 20,
+                backgroundColor: CustomColors.colorBlue,
+                textColor: Colors.white
+            );
             if(model.success == true){
               Navigator.of(context).pop();
               _getProject();
             }
           }else if (state is StateErrorGeneral) {
             ProgressDialog.hideLoadingDialog(context);
-            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-              content: Text(state.message),
-            ));
+            Fluttertoast.showToast(
+                msg: state.message,
+                toastLength: Toast.LENGTH_LONG,
+                fontSize: 20,
+                backgroundColor: CustomColors.colorBlue,
+                textColor: Colors.white
+            );
           }
         },
         bloc: BlocProvider.of<ProjectBloc>(context),
