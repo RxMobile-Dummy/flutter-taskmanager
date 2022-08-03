@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/core/Strings/strings.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/get_note_model.dart';
@@ -215,9 +216,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                               );
                                             } else if (state is StateErrorGeneral) {
                                               ProgressDialog.hideLoadingDialog(context);
-                                              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                                                content: Text(state.message),
-                                              ));
+                                              Fluttertoast.showToast(
+                                                  msg: getTaskModel.message ?? "",
+                                                  toastLength: Toast.LENGTH_LONG,
+                                                  fontSize: 20,
+                                                  backgroundColor: CustomColors.colorBlue,
+                                                  textColor: Colors.white
+                                              );
                                               return const SizedBox();
                                             }else {
                                               return const SizedBox();
@@ -317,9 +322,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             );
                           }else if (state is StateErrorGeneral) {
                             ProgressDialog.hideLoadingDialog(context);
-                            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                              content: Text(state.message),
-                            ));
+                            Fluttertoast.showToast(
+                                msg: getTaskModel.message ?? "",
+                                toastLength: Toast.LENGTH_LONG,
+                                fontSize: 20,
+                                backgroundColor: CustomColors.colorBlue,
+                                textColor: Colors.white
+                            );
                             return const SizedBox();
                           } else {
                             return const SizedBox();
@@ -354,9 +363,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             );
                           }else if (state is StateErrorGeneral) {
                             ProgressDialog.hideLoadingDialog(context);
-                            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                              content: Text(state.message),
-                            ));
+                            Fluttertoast.showToast(
+                                msg: getTaskModel.message ?? "",
+                                toastLength: Toast.LENGTH_LONG,
+                                fontSize: 20,
+                                backgroundColor: CustomColors.colorBlue,
+                                textColor: Colors.white
+                            );
                             return const SizedBox();
                           } else {
                             return const SizedBox();
@@ -381,9 +394,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   );
                 }else if (state is StateErrorGeneral) {
                   ProgressDialog.hideLoadingDialog(context);
-                  ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                    content: Text(state.message),
-                  ));
+                  Fluttertoast.showToast(
+                      msg: getTaskModel.message ?? "",
+                      toastLength: Toast.LENGTH_LONG,
+                      fontSize: 20,
+                      backgroundColor: CustomColors.colorBlue,
+                      textColor: Colors.white
+                  );
                   return const SizedBox();
                 } else {
                   return const SizedBox();
@@ -402,9 +419,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   );
                 }else if (state is StateErrorGeneral) {
                   ProgressDialog.hideLoadingDialog(context);
-                  ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                    content: Text(state.message),
-                  ));
+                  Fluttertoast.showToast(
+                      msg: getTaskModel.message ?? "",
+                      toastLength: Toast.LENGTH_LONG,
+                      fontSize: 20,
+                      backgroundColor: CustomColors.colorBlue,
+                      textColor: Colors.white
+                  );
                   return const SizedBox();
                 } else {
                   return const SizedBox();
@@ -495,9 +516,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           double.parse(state.model?.data?.length.toString() ?? ""), "Tasks", CustomColors.colorRed);
                     }else if (state is StateErrorGeneral) {
                       ProgressDialog.hideLoadingDialog(context);
-                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                        content: Text(state.message),
-                      ));
+                      Fluttertoast.showToast(
+                          msg: getTaskModel.message ?? "",
+                          toastLength: Toast.LENGTH_LONG,
+                          fontSize: 20,
+                          backgroundColor: CustomColors.colorBlue,
+                          textColor: Colors.white
+                      );
                       return const SizedBox();
                     } else {
                       return const SizedBox();
@@ -515,9 +540,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           "Quick Notes", CustomColors.colorPurple);
                     }else if (state is StateErrorGeneral) {
                       ProgressDialog.hideLoadingDialog(context);
-                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                        content: Text(state.message),
-                      ));
+                      Fluttertoast.showToast(
+                          msg: getTaskModel.message ?? "",
+                          toastLength: Toast.LENGTH_LONG,
+                          fontSize: 20,
+                          backgroundColor: CustomColors.colorBlue,
+                          textColor: Colors.white
+                      );
                       return const SizedBox();
                     } else {
                       return const SizedBox();

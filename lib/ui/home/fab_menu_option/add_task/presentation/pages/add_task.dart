@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
@@ -83,9 +84,13 @@ class _AddNoteState extends State<AddTask> {
             } else if (state is AddTaskState) {
               ProgressDialog.hideLoadingDialog(context);
               AddTaskModel? model = state.model;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(model!.message??""),
-              ));
+              Fluttertoast.showToast(
+                  msg: model!.message ?? "",
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: 20,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
              /* BlocProvider.of<AddTaskBloc>(context).add(
                   GetTaskEvent(date: getFormatedDate(DateTime.now().toString()),));*/
               if(model.success == true){
@@ -93,9 +98,13 @@ class _AddNoteState extends State<AddTask> {
               }
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
-              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                content: Text(state.message),
-              ));
+              Fluttertoast.showToast(
+                  msg: state.message,
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: 20,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
             }
           },
           bloc: BlocProvider.of<AddTaskBloc>(context),
@@ -452,9 +461,13 @@ Widget buildWidget(){
                     );
                 }else if (state is StateErrorGeneral) {
                   ProgressDialog.hideLoadingDialog(context);
-                  ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                    content: Text(state.message),
-                  ));
+                  Fluttertoast.showToast(
+                      msg: state.message,
+                      toastLength: Toast.LENGTH_LONG,
+                      fontSize: 20,
+                      backgroundColor: CustomColors.colorBlue,
+                      textColor: Colors.white
+                  );
                   return const SizedBox();
                 } else {
                   return const SizedBox();

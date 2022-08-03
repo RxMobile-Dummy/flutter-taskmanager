@@ -15,6 +15,7 @@ import 'package:task_management/ui/home/pages/user_status/presentation/bloc/user
 import '../../custom/progress_bar.dart';
 import '../../utils/style.dart';
 import 'fab_menu_option/add_check_list.dart';
+import 'fab_menu_option/add_note/presentation/bloc/add_note_event.dart';
 import 'fab_menu_option/add_note/presentation/pages/add_note.dart';
 import 'fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import 'fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
@@ -28,24 +29,12 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   late Widget myTask;
-  Widget dashboardWidget = BlocProvider<ProjectBloc>(
-    create: (context) => Sl.Sl<ProjectBloc>(),
-    child: Project(),
-  );
+  Widget dashboardWidget =  Project();
 
   /* Project();*/
-  Widget quickNoteWidget = BlocProvider<AddNoteBloc>(
-    create: (context) => Sl.Sl<AddNoteBloc>(),
-    child: QuickNotes(),
-  );
+  Widget quickNoteWidget = QuickNotes();
   Widget profileWidget = MultiBlocProvider(
     providers: [
-      BlocProvider<AddNoteBloc>(
-        create: (context) => Sl.Sl<AddNoteBloc>(),
-      ),
-      BlocProvider<AddTaskBloc>(
-        create: (context) => Sl.Sl<AddTaskBloc>(),
-      ),
       BlocProvider<UserStatusBloc>(
         create: (context) => Sl.Sl<UserStatusBloc>(),
       ),
@@ -161,9 +150,6 @@ class _HomeState extends State<Home> {
                               BlocProvider<AddTaskBloc>(
                                 create: (context) => Sl.Sl<AddTaskBloc>(),
                               ),
-                              BlocProvider<ProjectBloc>(
-                                create: (context) => Sl.Sl<ProjectBloc>(),
-                              ),
                             ], child: AddTask())),
                       ).then((value) {
                         if (value != null) {
@@ -188,10 +174,7 @@ class _HomeState extends State<Home> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => BlocProvider<AddNoteBloc>(
-                              create: (context) => Sl.Sl<AddNoteBloc>(),
-                              child: AddNote(),
-                            )),
+                            builder: (context) => AddNote()),
                       );
                       //Get.to(AddNote());
                     },

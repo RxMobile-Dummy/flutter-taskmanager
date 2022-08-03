@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/features/login/presentation/bloc/login_bloc.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 
 import '../onboarding/onboarding.dart';
@@ -31,9 +32,6 @@ class _SplashState extends State<Splash> {
           MultiBlocProvider(providers: [
             BlocProvider<LoginBloc>(
               create: (context) => Sl.Sl<LoginBloc>(),
-            ),
-            BlocProvider<AddTaskBloc>(
-              create: (context) => Sl.Sl<AddTaskBloc>(),
             ),
           ], child: authToken == null ? OnBoarding() : Home())
          /* BlocProvider<LoginBloc>(

@@ -1,13 +1,18 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../custom/progress_bar.dart';
 import '../../utils/calendar.dart';
 import '../../utils/colors.dart';
 import '../../utils/style.dart';
 import '../../widget/task_list.dart';
 import 'fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import 'package:task_management/injection_container.dart' as Sl;
+
+import 'fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
 
 class MonthPage extends StatefulWidget {
   var dateSelectionHandler;
@@ -24,10 +29,40 @@ class MonthPage extends StatefulWidget {
 class _MonthPageState extends State<MonthPage> {
   bool isExpanded = false;
   String? date1;
+  var random;
+  var refreshKey = GlobalKey<RefreshIndicatorState>();
 
   final Map<DateTime, List> _events = {};
    int? day;
   int currentMonth = DateTime.now().month;
+
+  @override
+  void initState() {
+    super.initState();
+    random = Random();
+    // refreshList();
+  }
+
+  Future<Null> refreshList() async {
+    refreshKey.currentState?.show(atTop: false);
+    await Future.delayed(Duration(seconds: 2));
+    await _getTask(getDate: date1);
+    return null;
+  }
+
+  Future<String> _getTask({bool? isCompleted,String? getDate}) {
+    return Future.delayed(Duration()).then((_) {
+      ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<AddTaskBloc>(context).add(
+          GetTaskEvent(
+              date: (getDate == null || getDate == "")
+                  ? getFormatedDate(DateTime.now().toString())
+                  : getDate,
+              isCompleted: isCompleted));
+      return "";
+    });
+  }
+
 
   getFormatedDate(date) {
     var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
@@ -41,13 +76,16 @@ class _MonthPageState extends State<MonthPage> {
   void getDate(String date) { widget.callback(date); }
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return  RefreshIndicator(
+      key: refreshKey,
+      onRefresh: refreshList,
+      child: Container(
       child: Column(
         children: [
           Card(
             margin: EdgeInsets.all(0),
             shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
             child: Calendar(
               startOnMonday: false,
               weekDays: const ["M", "T", "W", "T", "F", "S", "S"],
@@ -87,15 +125,15 @@ class _MonthPageState extends State<MonthPage> {
                     "${day.day}",
                     style: CustomTextStyle.styleBold.copyWith(
                         fontSize:
-                            currentMonth == day.month && day.day == this.day
-                                ? 16
-                                : 12,
+                        currentMonth == day.month && day.day == this.day
+                            ? 16
+                            : 12,
                         color: currentMonth == day.month
                             ? day.day == DateTime.now().day
-                                ? Colors.red
-                                : day.day == this.day
-                                    ? Colors.white
-                                    : Colors.black
+                            ? Colors.red
+                            : day.day == this.day
+                            ? Colors.white
+                            : Colors.black
                             : Colors.grey),
                   ),
                 );
@@ -112,6 +150,7 @@ class _MonthPageState extends State<MonthPage> {
           ),
         ],
       ),
+    ),
     );
   }
 }

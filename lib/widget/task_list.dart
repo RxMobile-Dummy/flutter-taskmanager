@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
@@ -14,7 +15,6 @@ import '../ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
 import '../ui/home/fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
 import '../ui/home/fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
 import '../ui/home/fab_menu_option/add_task/presentation/pages/update_task.dart';
-import '../ui/home/pages/Project/presentation/bloc/project_bloc.dart';
 import '../ui/home/pages/comment/presentation/bloc/comment_bloc.dart';
 import '../ui/home/task/task_details.dart';
 import '../utils/colors.dart';
@@ -72,10 +72,20 @@ class _TaskListState extends State<TaskList> {
           }
         }else if (state is StateErrorGeneral) {
           ProgressDialog.hideLoadingDialog(context);
-          ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-            content: Text(state.message),
-          ));
+          Fluttertoast.showToast(
+              msg: state.message,
+              toastLength: Toast.LENGTH_LONG,
+              fontSize: 20,
+              backgroundColor: CustomColors.colorBlue,
+              textColor: Colors.white
+          );
           return const SizedBox();
+        }else if (state is DeleteTaskState) {
+          ProgressDialog.hideLoadingDialog(context);
+          DeleteTaskModel? model = state.model;
+          print(model!.message ?? "");
+          // Navigator.of(context).pop();
+          // await _getTask();
         }
         return Center(
           child: Text(
@@ -216,9 +226,6 @@ class _TaskListState extends State<TaskList> {
                           builder: (context) => MultiBlocProvider(providers: [
                             BlocProvider<AddTaskBloc>(
                               create: (context) => Sl.Sl<AddTaskBloc>(),
-                            ),
-                            BlocProvider<ProjectBloc>(
-                              create: (context) => Sl.Sl<ProjectBloc>(),
                             ),
                           ], child: UpdateTask(
                             titleController: titleController,

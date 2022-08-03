@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/delete_note_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/get_note_model.dart';
@@ -36,7 +37,7 @@ class _QuickNotesState extends State<QuickNotes> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var id = prefs.getString('access');
       print(id);
-      _getNote();
+      await _getNote();
     });
 
   }
@@ -44,7 +45,7 @@ class _QuickNotesState extends State<QuickNotes> {
   Future<String> _getNote() {
     //loginBloc = BlocProvider.of<LoginBloc>(context);
   return Future.delayed(Duration()).then((_) {
-      //ProgressDialog.showLoadingDialog(context);
+      ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddNoteBloc>(context).add(
           GetNoteEvent());
       return "";
@@ -66,22 +67,31 @@ class _QuickNotesState extends State<QuickNotes> {
       ),
       body: BlocListener<AddNoteBloc, BaseState>(
         listener: (context, state) {
+          print("________ $state");
           if (state is StateOnSuccess) {
             ProgressDialog.hideLoadingDialog(context);
           }else if (state is GetNoteState) {
             ProgressDialog.hideLoadingDialog(context);
             getNoteModel = state.model!;
-            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-              content: Text(getNoteModel.message??""),
-            ));
+            Fluttertoast.showToast(
+                msg: getNoteModel.message ?? "",
+                toastLength: Toast.LENGTH_LONG,
+                fontSize: 20,
+                backgroundColor: CustomColors.colorBlue,
+                textColor: Colors.white
+            );
             print(getNoteModel.message??"");
           }else if (state is UpdateNoteState) {
             ProgressDialog.hideLoadingDialog(context);
              UpdateNoteModel? model = state.model;
-            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-              content: Text(getNoteModel.message??""),
-            ));
-            print(model?.message??"");
+            Fluttertoast.showToast(
+                msg: model!.message ?? "",
+                toastLength: Toast.LENGTH_LONG,
+                fontSize: 20,
+                backgroundColor: CustomColors.colorBlue,
+                textColor: Colors.white
+            );
+            print(model.message??"");
             if(getNoteModel.success == true){
               Navigator.of(context).pop();
               _getNote();
@@ -89,22 +99,30 @@ class _QuickNotesState extends State<QuickNotes> {
           }else if (state is DeleteNoteState) {
             ProgressDialog.hideLoadingDialog(context);
             DeleteNoteModel? model = state.model;
-            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-              content: Text(getNoteModel.message??""),
-            ));
-            print(model?.message??"");
+            Fluttertoast.showToast(
+                msg: model!.message ?? "",
+                toastLength: Toast.LENGTH_LONG,
+                fontSize: 20,
+                backgroundColor: CustomColors.colorBlue,
+                textColor: Colors.white
+            );
+            print(model.message??"");
             if(getNoteModel.success == true){
               _getNote();
             }
           }else if (state is StateErrorGeneral) {
             ProgressDialog.hideLoadingDialog(context);
-            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-              content: Text(state.message),
-            ));
+            Fluttertoast.showToast(
+                msg: state.message,
+                toastLength: Toast.LENGTH_LONG,
+                fontSize: 20,
+                backgroundColor: CustomColors.colorBlue,
+                textColor: Colors.white
+            );
           }
         },
-        bloc: BlocProvider.of<AddNoteBloc>(context),
         child:  BlocBuilder<AddNoteBloc, BaseState>(builder: (context, state) {
+          print(state);
           return (getNoteModel.data != null && getNoteModel.data!.isNotEmpty)
               ? buildWidget()  :  Center(
             child: Text(

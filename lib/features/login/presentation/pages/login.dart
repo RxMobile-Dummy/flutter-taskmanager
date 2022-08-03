@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/features/login/data/model/forgot_password_model.dart';
@@ -11,6 +12,7 @@ import 'package:task_management/features/login/presentation/pages/sign_up.dart';
 import '../../../../core/base/base_bloc.dart';
 import '../../../../custom/progress_bar.dart';
 import '../../../../ui/forgot_password.dart';
+import '../../../../ui/home/fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
 import '../../../../ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import '../../../../ui/home/home.dart';
 import '../../../../utils/colors.dart';
@@ -50,9 +52,13 @@ class _LoginState extends State<Login> {
           }else if (state is LoginState) {
             ProgressDialog.hideLoadingDialog(context);
             LoginModel? model = state.model;
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(model!.message??""),
-            ));
+            Fluttertoast.showToast(
+                msg: model!.message ?? "",
+                toastLength: Toast.LENGTH_LONG,
+                fontSize: 20,
+                backgroundColor: CustomColors.colorBlue,
+                textColor: Colors.white
+            );
             if(model.success == true){
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setString('access', model.data!.authenticationToken!.access ?? "");
@@ -62,10 +68,9 @@ class _LoginState extends State<Login> {
               prefs.setString('userData', user);
               Navigator.pushAndRemoveUntil<dynamic>(
                 context,
-                MaterialPageRoute(builder: (context) =>BlocProvider<AddTaskBloc>(
-                  create: (context) => Sl.Sl<AddTaskBloc>(),
-                  child: Home(),
-                )),
+                MaterialPageRoute(builder: (context) {
+                  return Home();
+                },),
                     (route) => false,
               );
             }/*else {
@@ -75,9 +80,13 @@ class _LoginState extends State<Login> {
             }*/
           } else if (state is StateErrorGeneral) {
             ProgressDialog.hideLoadingDialog(context);
-            ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-              content: Text(state.message),
-            ));
+            Fluttertoast.showToast(
+                msg: state.message,
+                toastLength: Toast.LENGTH_LONG,
+                fontSize: 20,
+                backgroundColor: CustomColors.colorBlue,
+                textColor: Colors.white
+            );
           }
         },
         bloc: BlocProvider.of<LoginBloc>(context),

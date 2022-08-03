@@ -1,8 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
+import 'package:task_management/utils/colors.dart';
 import 'package:task_management/widget/task_list.dart';
 
 
@@ -78,15 +82,32 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                 } else if (state is GetTaskState) {
                   ProgressDialog.hideLoadingDialog(context);
                   getTaskModel = state.model!;
-                  ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                  Fluttertoast.showToast(
+                      msg: getTaskModel.message ?? "",
+                      toastLength: Toast.LENGTH_LONG,
+                      fontSize: 20,
+                      backgroundColor: CustomColors.colorBlue,
+                      textColor: Colors.white
+                  );
+                  /*ScaffoldMessenger.of(context).showSnackBar( SnackBar(
                     content: Text(getTaskModel.message ?? ""),
-                  ));
+                  ));*/
                   print(getTaskModel.message??"");
+                }else if (state is DeleteTaskState) {
+                  ProgressDialog.hideLoadingDialog(context);
+                  DeleteTaskModel? model = state.model;
+                  print(model!.message ?? "");
+                  // Navigator.of(context).pop();
+                  // await _getTask();
                 }else if (state is StateErrorGeneral) {
                   ProgressDialog.hideLoadingDialog(context);
-                  ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                    content: Text(state.message),
-                  ));
+                  Fluttertoast.showToast(
+                      msg: getTaskModel.message ?? "",
+                      toastLength: Toast.LENGTH_LONG,
+                      fontSize: 20,
+                      backgroundColor: CustomColors.colorBlue,
+                      textColor: Colors.white
+                  );
                 }
               },
               bloc: BlocProvider.of<AddTaskBloc>(context),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:task_management/ui/reset_password.dart';
 
@@ -11,6 +12,7 @@ import '../features/login/presentation/bloc/login_bloc.dart';
 import '../features/login/presentation/bloc/login_event.dart';
 import '../features/login/presentation/bloc/login_state.dart';
 import '../features/login/presentation/pages/login.dart';
+import '../utils/colors.dart';
 import '../widget/button.dart';
 import '../widget/rounded_corner_page.dart';
 import '../widget/textfield.dart';
@@ -34,9 +36,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             }else if (state is ForgotPasswordStatus) {
               ProgressDialog.hideLoadingDialog(context);
               ForgotPasswordModel? model = state.model;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(model!.message??""),
-              ));
+              Fluttertoast.showToast(
+                  msg: model!.message ?? "",
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: 20,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
               if(model.success == true){
                 Navigator.pushAndRemoveUntil<dynamic>(
                   context,
@@ -50,9 +56,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
              // Get.off(ResetPassword());
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
-              ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                content: Text(state.message),
-              ));
+              Fluttertoast.showToast(
+                  msg: state.message,
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: 20,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
             }
           },
           bloc: BlocProvider.of<LoginBloc>(context),
