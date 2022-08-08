@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/datasource/add_note_data_source.dart';
@@ -11,7 +12,9 @@ import 'package:task_management/ui/home/fab_menu_option/add_note/domain/usecases
 import 'package:task_management/ui/home/fab_menu_option/add_note/domain/usecases/get_note_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/domain/usecases/update_note_usecase.dart';
 
+import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/api_call/baseClient.dart';
+import '../../../../../../core/failure/failure.dart';
 
 class AddNotesDataSourceImpl implements AddNoteDataSource {
 

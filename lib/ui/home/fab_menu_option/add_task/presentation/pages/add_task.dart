@@ -15,6 +15,7 @@ import '../../../../../../core/base/base_bloc.dart';
 import '../../../../../../custom/progress_bar.dart';
 import '../../../../../../utils/border.dart';
 import '../../../../../../utils/colors.dart';
+import '../../../../../../utils/device_file.dart';
 import '../../../../../../utils/style.dart';
 import '../../../../../../widget/button.dart';
 import '../../../../../../widget/decoration.dart';
@@ -36,6 +37,7 @@ class _AddNoteState extends State<AddTask> {
   TextEditingController commentController = TextEditingController();
   TextEditingController startDate = TextEditingController();
   TextEditingController endDate = TextEditingController();
+  final GlobalKey<FormState> _formKey =  GlobalKey<FormState>();
   List<Color> listColors = [
     CustomColors.colorPurple,
     CustomColors.colorBlue,
@@ -49,6 +51,8 @@ class _AddNoteState extends State<AddTask> {
   String? selectProject;
   List<dynamic> listOfProject = [];
   String? projectId;
+  var startDateStore;
+  var endDateStore;
 
   @override
   void initState() {
@@ -84,24 +88,32 @@ class _AddNoteState extends State<AddTask> {
             } else if (state is AddTaskState) {
               ProgressDialog.hideLoadingDialog(context);
               AddTaskModel? model = state.model;
-              Fluttertoast.showToast(
-                  msg: model!.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
              /* BlocProvider.of<AddTaskBloc>(context).add(
                   GetTaskEvent(date: getFormatedDate(DateTime.now().toString()),));*/
-              if(model.success == true){
-                Navigator.of(context).pop(/*model*/);
+              if(model!.success == true){
+                Fluttertoast.showToast(
+                    msg: model.message ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
+                Navigator.of(context).pop(model.data!.startDate);
+              }else{
+                Fluttertoast.showToast(
+                    msg: model.error ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
               }
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
+                  fontSize: DeviceUtil.isTablet ? 20 : 12,
                   backgroundColor: CustomColors.colorBlue,
                   textColor: Colors.white
               );
@@ -109,7 +121,10 @@ class _AddNoteState extends State<AddTask> {
           },
           bloc: BlocProvider.of<AddTaskBloc>(context),
           child:  BlocBuilder<AddTaskBloc, BaseState>(builder: (context, state) {
-            return buildWidget();
+            return Form(
+              key: _formKey,
+              child: buildWidget(),
+            );
           })
       ),
     );
@@ -129,10 +144,12 @@ Widget buildWidget(){
       child: Expanded(
         child: RoundedCornerDecoration(
           SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /*Container(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal:  12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /*Container(
                     margin: const EdgeInsets.only(left: 16, top: 32),
                     child: Row(
                       children: [
@@ -170,82 +187,112 @@ Widget buildWidget(){
                         ),
                       ],
                     )),*/
-                Container(
-                  margin: EdgeInsets.only(top: 24),
-                  color: Colors.grey.shade200,
-                  padding: EdgeInsets.only(left: 4, right: 16),
-                  child: TextField(
-                    style: CustomTextStyle.styleSemiBold,
-                    controller: titleController,
-                    decoration: InputDecoration(
-                        border: titleBorder(color: Colors.grey.shade200),
-                        hintText: "Title",
-                        hintStyle: CustomTextStyle.styleSemiBold,
-                        labelStyle: CustomTextStyle.styleSemiBold,
-                        enabledBorder:
-                        titleBorder(color: Colors.grey.shade200),
-                        focusedBorder:
-                        titleBorder(color: Colors.grey.shade200)),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 24),
-                  color: Colors.grey.shade200,
-                  padding: EdgeInsets.only(left: 4, right: 16),
-                  child: TextField(
-                    style: CustomTextStyle.styleSemiBold,
-                    controller: descriptionController,
-                    decoration: InputDecoration(
-                        border: titleBorder(color: Colors.grey.shade200),
-                        hintText: "Description",
-                        hintStyle: CustomTextStyle.styleSemiBold,
-                        labelStyle: CustomTextStyle.styleSemiBold,
-                        enabledBorder:
-                        titleBorder(color: Colors.grey.shade200),
-                        focusedBorder:
-                        titleBorder(color: Colors.grey.shade200)),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 16, right: 16, top: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: Colors.grey.shade200),
-                  ),
-                  child: Column(
-                    children: [
-                      TextField(
-                        style: CustomTextStyle.styleSemiBold,
-                        maxLines: 3,
-                        controller: commentController,
-                        decoration: InputDecoration(
-                            labelStyle: CustomTextStyle.styleSemiBold,
-                            enabledBorder:
-                            titleBorder(color: Colors.transparent),
-                            focusedBorder:
-                            titleBorder(color: Colors.transparent)),
+                  Container(
+                    margin: EdgeInsets.only(top: 16),
+                    color: Colors.grey.shade200,
+                    padding: EdgeInsets.only(left: 4, right: 16),
+                    child: TextFormField(
+                      style: CustomTextStyle.styleSemiBold.copyWith(
+                          fontSize: DeviceUtil.isTablet ? 16 : 14
                       ),
-                      Container(
-                        color: Colors.grey.shade100,
-                        padding: const EdgeInsets.only(
-                            left: 16, top: 16, right: 16, bottom: 16),
-                        child: Row(
-                          children: [
-                            Transform.rotate(
-                              angle: 2.5,
-                              child: const Icon(
-                                Icons.attachment,
-                                color: Colors.grey,
+                      controller: titleController,
+                      validator: (value) {
+                        if (value == null || value == "") {
+                          return 'Please enter task name';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                          hintText: "Title",
+                          hintStyle: CustomTextStyle.styleSemiBold.copyWith(
+                            fontSize: DeviceUtil.isTablet ? 16 : 14
+                          ),
+                          labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                              fontSize: DeviceUtil.isTablet ? 16 : 14
+                          ),
+                          enabledBorder:
+                          titleBorder(color: Colors.transparent),
+                          focusedBorder:
+                          titleBorder(color: Colors.transparent)),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 16),
+                    color: Colors.grey.shade200,
+                    padding: EdgeInsets.only(left: 4, right: 16),
+                    child: TextFormField(
+                      style: CustomTextStyle.styleSemiBold.copyWith(
+                          fontSize: DeviceUtil.isTablet ? 16 : 14
+                      ),
+                      maxLines: 5,
+                      controller: descriptionController,
+                      validator: (value) {
+                        if (value == null || value == "") {
+                          return 'Please enter description';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                          hintText: "Description",
+                          hintStyle: CustomTextStyle.styleSemiBold.copyWith(
+                              fontSize: DeviceUtil.isTablet ? 16 : 14
+                          ),
+                          labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                          fontSize: DeviceUtil.isTablet ? 16 : 14
+                      ),
+                          enabledBorder:
+                          titleBorder(color: Colors.transparent),
+                          focusedBorder:
+                          titleBorder(color: Colors.transparent)),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(/*left: 16, right: 16, */top: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: Column(
+                      children: [
+                        TextField(
+                          style: CustomTextStyle.styleSemiBold.copyWith(
+                    fontSize: DeviceUtil.isTablet ? 16 : 14
+                    ),
+                          maxLines: 3,
+                          controller: commentController,
+                          decoration: InputDecoration(
+                              hintStyle: CustomTextStyle.styleSemiBold.copyWith(
+                                  fontSize: DeviceUtil.isTablet ? 16 : 14
                               ),
-                            ),
-                          ],
+                              labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                                  fontSize: DeviceUtil.isTablet ? 16 : 14
+                              ),
+                              hintText: "Enter Comment",
+                              enabledBorder:
+                              titleBorder(color: Colors.transparent),
+                              focusedBorder:
+                              titleBorder(color: Colors.transparent)),
                         ),
-                      ),
-                    ],
+                        Container(
+                          color: Colors.grey.shade100,
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Transform.rotate(
+                                angle: 2.5,
+                                child: const SizedBox()/*Icon(
+                                  Icons.attachment,
+                                  color: Colors.grey,
+                                ),*/
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-               /* Container(
+                  /* Container(
                     width: double.infinity,
                     margin: EdgeInsets.only(top: 24),
                     color: Colors.grey.shade200,
@@ -273,7 +320,7 @@ Widget buildWidget(){
                         )
                       ],
                     )),*/
-               /* Container(
+                  /* Container(
                   margin: EdgeInsets.only(left: 16, top: 24),
                   child: Text(
                     "Add Member",
@@ -281,200 +328,279 @@ Widget buildWidget(){
                         .copyWith(color: Colors.grey),
                   ),
                 ),*/
-                Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 25),
-                    child: Center(
-                        child: TextField(
-                          controller: startDate,
-                          decoration:  InputDecoration(
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: CustomColors.colorBlue)),
-                            focusedBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: CustomColors.colorBlue)),
-                            icon: const Icon(Icons.calendar_today,
-                              color: CustomColors.colorBlue,),
-                            labelText: "Enter Start Date",
-                            labelStyle: CustomTextStyle.styleSemiBold,
-                          ),
-                          readOnly: true,
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                builder: (BuildContext context, Widget ?child) {
-                                  return Theme(
-                                    data: ThemeData(
-                                      primarySwatch: Colors.grey,
-                                      splashColor: Colors.black,
-                                      textTheme: const TextTheme(
-                                        subtitle1: TextStyle(color: Colors.black),
-                                        button: TextStyle(color: Colors.black),
-                                      ),
-                                      accentColor: Colors.black,
-                                      colorScheme: const ColorScheme.light(
-                                          primary: CustomColors.colorBlue,
-                                          primaryVariant: Colors.black,
-                                          secondaryVariant: Colors.black,
-                                          onSecondary: Colors.black,
-                                          onPrimary: Colors.white,
-                                          surface: Colors.black,
-                                          onSurface: Colors.black,
-                                          secondary: Colors.black),
-                                      dialogBackgroundColor: Colors.white,
-                                    ),
-                                    child: child ??const Text(""),
-                                  );
-                                },
-                                firstDate: DateTime(1950),
-                                lastDate: DateTime(2100));
-
-                            if (pickedDate != null) {
-                              print(
-                                  pickedDate);
-                              String formattedDate =
-                              DateFormat('dd/MM/yyyy').format(pickedDate);
-                              print(
-                                  formattedDate);
-                              setState(() {
-                                startDate.text =
-                                    formattedDate;
-                              });
-                            } else {}
-                          },
-                        ))),
-                Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 25),
-                    //height: MediaQuery.of(context).size.width / 3,
-                    child: Center(
-                        child: TextField(
-                          controller: endDate,
-                          decoration:  InputDecoration(
-                            enabledBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: CustomColors.colorBlue)),
-                            focusedBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(color: CustomColors.colorBlue)),
-                              icon: const Icon(Icons.calendar_today,color: CustomColors.colorBlue,),
-                              labelText: "Enter End Date",
-                            labelStyle: CustomTextStyle.styleSemiBold,
-                          ),
-                          readOnly: true,
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                builder: (BuildContext context, Widget ?child) {
-                                  return Theme(
-                                    data: ThemeData(
-                                      primarySwatch: Colors.grey,
-                                      splashColor: Colors.black,
-                                      textTheme: const TextTheme(
-                                        subtitle1: TextStyle(color: Colors.black),
-                                        button: TextStyle(color: Colors.black),
-                                      ),
-                                      accentColor: Colors.black,
-                                      colorScheme: const ColorScheme.light(
-                                          primary: CustomColors.colorBlue,
-                                          primaryVariant: Colors.black,
-                                          secondaryVariant: Colors.black,
-                                          onSecondary: Colors.black,
-                                          onPrimary: Colors.white,
-                                          surface: Colors.black,
-                                          onSurface: Colors.black,
-                                          secondary: Colors.black),
-                                      dialogBackgroundColor: Colors.white,
-                                    ),
-                                    child: child ??const Text(""),
-                                  );
-                                },
-                                firstDate: DateTime(1950),
-                                lastDate: DateTime(2100));
-
-                            if (pickedDate != null) {
-                              print(
-                                  pickedDate);
-                              String formattedDate =
-                              DateFormat('dd/MM/yyyy').format(pickedDate);
-                              print(
-                                  formattedDate);
-                              setState(() {
-                                endDate.text =
-                                    formattedDate;
-                              });
-                            } else {}
-                          },
-                        ))),
-            const SizedBox(
-              height: 24,
-            ),
-            BlocBuilder<ProjectBloc, BaseState>(
-              builder: (context, state) {
-                if (state is GetAllProjectsState) {
-                  ProgressDialog.hideLoadingDialog(context);
-                    projectList = [];
-                    listOfProject = state.model!.data!;
-                    for (int i = 0; i < state.model!.data!.length; i++) {
-                      projectList.add(state.model!.data![i].name ?? "");
-                    }
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField(
-                              isExpanded: true,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: CustomColors.colorBlue),
-                                ),
-                              ),
-                              validator: (value) {
-                                if (value == null || value == "") {
-                                  return 'Please Select User role.';
-                                }
-                                return null;
-                              },
-                              borderRadius: BorderRadius.circular(5),
-                              hint: const Text('Please choose a Role'),
-                              value: selectProject,
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  selectProject = newValue!;
-                                });
-                                for(int i=0;i<listOfProject.length;i++){
-                                  if(selectProject == listOfProject[i].name){
-                                    projectId = listOfProject[i].id.toString();
-                                    break;
-                                  }
-                                }
-                              },
-                              items: projectList.map((userRole) {
-                                return DropdownMenuItem(
-                                  child: Text(userRole),
-                                  value: userRole,
-                                );
-                              }).toList(),
+                  Container(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Center(
+                          child: TextFormField(
+                            controller: startDate,
+                            style: CustomTextStyle.styleSemiBold.copyWith(
+                                fontSize: DeviceUtil.isTablet ? 16 : 14
                             ),
-                          )
-                        ],
-                      ),
-                    );
-                }else if (state is StateErrorGeneral) {
-                  ProgressDialog.hideLoadingDialog(context);
-                  Fluttertoast.showToast(
-                      msg: state.message,
-                      toastLength: Toast.LENGTH_LONG,
-                      fontSize: 20,
-                      backgroundColor: CustomColors.colorBlue,
-                      textColor: Colors.white
-                  );
-                  return const SizedBox();
-                } else {
-                  return const SizedBox();
-                }
-              },
-            ),
-             /*   Container(
+                            decoration:  InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                              ),
+                              suffixIcon: const Icon(Icons.calendar_today,
+                                color: CustomColors.colorBlue,),
+                              disabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                              ),
+                              labelText: "Enter Start Date",
+                              hintStyle: CustomTextStyle.styleSemiBold.copyWith(
+                                  fontSize: DeviceUtil.isTablet ? 16 : 14
+                              ),
+                              labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                                fontSize: DeviceUtil.isTablet ? 16 : 14
+                              ),
+                            ),
+                            readOnly: true,
+                            validator: (value) {
+                              if (value == null || value == "") {
+                                return 'Please Select Start date.';
+                              }
+                              return null;
+                            },
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  builder: (BuildContext context, Widget ?child) {
+                                    return Theme(
+                                      data: ThemeData(
+                                        primarySwatch: Colors.grey,
+                                        splashColor: Colors.black,
+                                        textTheme: const TextTheme(
+                                          subtitle1: TextStyle(color: Colors.black),
+                                          button: TextStyle(color: Colors.black),
+                                        ),
+                                        accentColor: Colors.black,
+                                        colorScheme: const ColorScheme.light(
+                                            primary: CustomColors.colorBlue,
+                                            primaryVariant: Colors.black,
+                                            secondaryVariant: Colors.black,
+                                            onSecondary: Colors.black,
+                                            onPrimary: Colors.white,
+                                            surface: Colors.black,
+                                            onSurface: Colors.black,
+                                            secondary: Colors.black),
+                                        dialogBackgroundColor: Colors.white,
+                                      ),
+                                      child: child ??const Text(""),
+                                    );
+                                  },
+                                  firstDate: DateTime(1950),
+                                  lastDate: DateTime(2100));
+
+                              if (pickedDate != null) {
+                                startDateStore = pickedDate;
+                                print(
+                                    pickedDate);
+                                String formattedDate =
+                                DateFormat('dd/MM/yyyy').format(pickedDate);
+                                print(
+                                    formattedDate);
+                                setState(() {
+                                  startDate.text =
+                                      formattedDate;
+                                });
+                              } else {}
+                            },
+                          ))),
+                  Container(
+                      padding: const EdgeInsets.only(top: 16),
+                      //height: MediaQuery.of(context).size.width / 3,
+                      child: Center(
+                          child: TextFormField(
+                            controller: endDate,
+                            style: CustomTextStyle.styleSemiBold.copyWith(
+                                fontSize: DeviceUtil.isTablet ? 16 : 14
+                            ),
+                            decoration:  InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                              ),
+                              suffixIcon: const Icon(Icons.calendar_today,
+                                color: CustomColors.colorBlue,),
+                              disabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                              ),
+                              labelText: "Enter End Date",
+                              hintStyle: CustomTextStyle.styleSemiBold.copyWith(
+                                  fontSize: DeviceUtil.isTablet ? 16 : 14
+                              ),
+                              labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                                  fontSize: DeviceUtil.isTablet ? 16 : 14
+                              ),
+                            ),
+                            readOnly: true,
+                            validator: (value) {
+                              if (value == null || value == "") {
+                                return 'Please Select End date.';
+                              }else if(endDateStore.isBefore(startDateStore)){
+                                return "Select End Date after Start Date";
+                              }
+                              return null;
+                            },
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  builder: (BuildContext context, Widget ?child) {
+                                    return Theme(
+                                      data: ThemeData(
+                                        primarySwatch: Colors.grey,
+                                        splashColor: Colors.black,
+                                        textTheme: const TextTheme(
+                                          subtitle1: TextStyle(color: Colors.black),
+                                          button: TextStyle(color: Colors.black),
+                                        ),
+                                        accentColor: Colors.black,
+                                        colorScheme: const ColorScheme.light(
+                                            primary: CustomColors.colorBlue,
+                                            primaryVariant: Colors.black,
+                                            secondaryVariant: Colors.black,
+                                            onSecondary: Colors.black,
+                                            onPrimary: Colors.white,
+                                            surface: Colors.black,
+                                            onSurface: Colors.black,
+                                            secondary: Colors.black),
+                                        dialogBackgroundColor: Colors.white,
+                                      ),
+                                      child: child ??const Text(""),
+                                    );
+                                  },
+                                  firstDate: (startDateStore != null && startDateStore != "")
+                                      ? startDateStore
+                                      :DateTime.now(),
+                                  lastDate: DateTime(2100));
+
+                              if (pickedDate != null) {
+                                endDateStore = pickedDate;
+                                print(
+                                    pickedDate);
+                                String formattedDate =
+                                DateFormat('dd/MM/yyyy').format(pickedDate);
+                                print(
+                                    formattedDate);
+                                setState(() {
+                                  endDate.text =
+                                      formattedDate;
+                                });
+                              } else {}
+                            },
+                          ))),
+                  BlocBuilder<ProjectBloc, BaseState>(
+                    builder: (context, state) {
+                      if (state is GetAllProjectsState) {
+                        ProgressDialog.hideLoadingDialog(context);
+                        projectList = [];
+                        listOfProject = state.model!.data!;
+                        for (int i = 0; i < state.model!.data!.length; i++) {
+                          projectList.add(state.model!.data![i].name ?? "");
+                        }
+                        return projectList.isEmpty
+                            ? SizedBox()
+                            :  Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: DropdownButtonFormField(
+                                  isExpanded: true,
+                                  style: CustomTextStyle.styleSemiBold.copyWith(
+                                      fontSize: DeviceUtil.isTablet ? 16 : 14
+                                  ),
+                                  decoration:  InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                      borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                      borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                                    ),
+                                    disabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                      borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                      borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                                    ),
+                                    hintStyle: CustomTextStyle.styleSemiBold.copyWith(
+                                        fontSize: DeviceUtil.isTablet ? 16 : 14
+                                    ),
+                                    labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                                        fontSize: DeviceUtil.isTablet ? 16 : 14
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value == "") {
+                                      return 'Please Select Project.';
+                                    }
+                                    return null;
+                                  },
+                                  borderRadius: BorderRadius.circular(5),
+                                  hint: const Text('Please choose a Project'),
+                                  value: selectProject,
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      selectProject = newValue!;
+                                    });
+                                    for(int i=0;i<listOfProject.length;i++){
+                                      if(selectProject == listOfProject[i].name){
+                                        projectId = listOfProject[i].id.toString();
+                                        break;
+                                      }
+                                    }
+                                  },
+                                  items: projectList.map((project) {
+                                    return DropdownMenuItem(
+                                      child: Text(project),
+                                      value: project,
+                                    );
+                                  }).toList(),
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      }else if (state is StateErrorGeneral) {
+                        ProgressDialog.hideLoadingDialog(context);
+                        Fluttertoast.showToast(
+                            msg: state.message,
+                            toastLength: Toast.LENGTH_LONG,
+                            fontSize: DeviceUtil.isTablet ? 20 : 12,
+                            backgroundColor: CustomColors.colorBlue,
+                            textColor: Colors.white
+                        );
+                        return const SizedBox();
+                      } else {
+                        return const SizedBox();
+                      }
+                    },
+                  ),
+                  /*   Container(
                   margin: EdgeInsets.only(left: 16, top: 16),
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -482,26 +608,54 @@ Widget buildWidget(){
                       borderRadius: BorderRadius.circular(100)),
                   child: Text("Anyone"),
                 ),*/
-                Button(
-                  "Add Task",
-                  onPress: () {
-                    _addTask(
-                      start_date: startDate.text.toString(),
-                      end_date: endDate.text.toString(),
-                      task_status: "",
-                      tag_id: "",
-                      reviewer_id: "",
-                      project_id: projectId,
-                      priority: "Urgent",
-                      is_private: "false",
-                      comment: commentController.text,
-                      assignee_id: "",
-                      description: descriptionController.text,
-                      name: titleController.text,
-                    );
-                  },
-                ),
-              ],
+                  const SizedBox(
+                    height: 24,
+                  ),
+                  Button(
+                    "Add Task",
+                    verticalMargin: 10,
+                    horizontalMargin: 0,
+                    onPress: () {
+                      FocusScope.of(context).unfocus();
+                     if(_formKey.currentState!.validate()){
+                       _formKey.currentState?.save();
+                     if(projectId == null || projectId == ""){
+                       Fluttertoast.showToast(
+                           msg: "Please Add Project before adding task.",
+                           toastLength: Toast.LENGTH_LONG,
+                           fontSize: DeviceUtil.isTablet ? 20 : 12,
+                           backgroundColor: CustomColors.colorBlue,
+                           textColor: Colors.white
+                       );
+                     }else{
+                       _addTask(
+                         start_date: startDate.text.toString(),
+                         end_date: endDate.text.toString(),
+                         task_status: "",
+                         tag_id: "",
+                         reviewer_id: "",
+                         project_id: projectId,
+                         priority: "Urgent",
+                         is_private: "false",
+                         comment: commentController.text,
+                         assignee_id: "",
+                         description: descriptionController.text,
+                         name: titleController.text,
+                       );
+                     }
+                     }else{
+                       Fluttertoast.showToast(
+                           msg: "Please fill all the details.",
+                           toastLength: Toast.LENGTH_LONG,
+                           fontSize: DeviceUtil.isTablet ? 20 : 12,
+                           backgroundColor: CustomColors.colorBlue,
+                           textColor: Colors.white
+                       );
+                     }
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

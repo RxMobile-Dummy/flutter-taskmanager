@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/device_file.dart';
+
 class ProgressDialog {
   static GlobalKey<State> keyLoader = new GlobalKey<State>();
   static bool isDialogVisible = false;
@@ -14,19 +16,21 @@ class ProgressDialog {
           return Dialog(
             backgroundColor: (Theme.of(context).brightness == Brightness.dark)? Colors.black :  Colors.white,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              padding:  EdgeInsets.symmetric(vertical: DeviceUtil.isTablet ? 20 : 10,horizontal: 5),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children:  [
                   const CircularProgressIndicator(
                     color: Colors.deepOrange,
                   ),
-                  const SizedBox(
-                    height: 15,
+                   SizedBox(
+                    height: DeviceUtil.isTablet ? 15 : 10,
                   ),
                   Text(
                     'Loading...',
-                    style: TextStyle(color: (Theme.of(context).brightness == Brightness.dark)? Colors.white :  Colors.black,fontSize: 20,fontWeight: FontWeight.w500),
+                    style:
+                    TextStyle(color: (Theme.of(context).brightness == Brightness.dark)? Colors.white :  Colors.black,
+                        fontSize: DeviceUtil.isTablet ? 20 : 15,fontWeight: FontWeight.w500),
                   )
                 ],
               ),

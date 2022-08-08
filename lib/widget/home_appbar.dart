@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/colors.dart';
+import '../utils/device_file.dart';
 import '../utils/style.dart';
 
 class HomeAppBar {
@@ -17,9 +18,11 @@ class HomeAppBar {
       elevation: 0,
       backgroundColor: CustomColors.colorBlue,
       leading: leading,
+
       title: Text(
         title ?? "",
-        style: CustomTextStyle.styleBold.copyWith(color: Colors.white,fontSize: 18),
+        style: CustomTextStyle.styleBold.copyWith(color: Colors.white,
+            fontSize: DeviceUtil.isTablet ? 18 : 15),
       ),
       centerTitle: true,
       actions: actions,

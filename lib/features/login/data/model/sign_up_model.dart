@@ -2,13 +2,15 @@ class SignUpModel {
   bool? success;
   Data? data;
   String? message;
+  String? error;
 
-  SignUpModel({this.success, this.data, this.message});
+  SignUpModel({this.success, this.data, this.message,this.error});
 
   SignUpModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     data = json['data'] != null ? new Data.fromJson(json['data']) : null;
     message = json['message'];
+    error = json['error'];
   }
 
   Map<String, dynamic> toJson() {
@@ -18,6 +20,7 @@ class SignUpModel {
       data['data'] = this.data!.toJson();
     }
     data['message'] = this.message;
+    data['error'] = this.error;
     return data;
   }
 }
@@ -33,6 +36,7 @@ class Data {
   String? role;
   String? createdAt;
   String? updatedAt;
+  AuthenticationToken? authenticationToken;
 
   Data(
       {this.id,
@@ -44,7 +48,8 @@ class Data {
         this.mobileNumber,
         this.role,
         this.createdAt,
-        this.updatedAt});
+        this.updatedAt,
+        this.authenticationToken});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -57,6 +62,9 @@ class Data {
     role = json['role'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    authenticationToken = json['authentication_token'] != null
+        ? new AuthenticationToken.fromJson(json['authentication_token'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -71,6 +79,28 @@ class Data {
     data['role'] = this.role;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
+    if (this.authenticationToken != null) {
+      data['authentication_token'] = this.authenticationToken!.toJson();
+    }
+    return data;
+  }
+}
+
+class AuthenticationToken {
+  String? refresh;
+  String? access;
+
+  AuthenticationToken({this.refresh, this.access});
+
+  AuthenticationToken.fromJson(Map<String, dynamic> json) {
+    refresh = json['refresh'];
+    access = json['access'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['refresh'] = this.refresh;
+    data['access'] = this.access;
     return data;
   }
 }

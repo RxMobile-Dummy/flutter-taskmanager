@@ -2,8 +2,9 @@ class GetAllProjectsModel {
   bool? success;
   List<Data>? data;
   String? message;
+  String? error;
 
-  GetAllProjectsModel({this.success, this.data, this.message});
+  GetAllProjectsModel({this.success, this.data, this.message,this.error});
 
   GetAllProjectsModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
@@ -14,6 +15,7 @@ class GetAllProjectsModel {
       });
     }
     message = json['message'];
+    error = json['error'];
   }
 
   Map<String, dynamic> toJson() {
@@ -23,6 +25,7 @@ class GetAllProjectsModel {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     data['message'] = this.message;
+    data['error'] = this.error;
     return data;
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../utils/colors.dart';
+import '../utils/device_file.dart';
 import '../utils/style.dart';
 
 
@@ -18,6 +19,8 @@ class CustomTextField extends StatelessWidget {
   Key? key;
   int minLines;
   int? lengthLimit = 5000;
+  bool? isEmail = false;
+  bool? isMobile = false;
 
   CustomTextField(
       {this.key,
@@ -30,18 +33,20 @@ class CustomTextField extends StatelessWidget {
       this.minLines = 1,
         this.initialValue,
       this.isObscureText = false,
-      this.errorMessage,});
+      this.errorMessage,this.isEmail = false,this.isMobile = false});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(left: 16, right: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label!,
-            style: CustomTextStyle.styleBold,
+            style: CustomTextStyle.styleBold.copyWith(
+                fontSize: DeviceUtil.isTablet ? 16 : 14
+            ),
           ),
           TextFormField(
             //initialValue: textEditingController?.text,
@@ -53,9 +58,22 @@ class CustomTextField extends StatelessWidget {
             validator: (value) {
               if (value!.isEmpty) {
                 return errorMessage;
+              }else if(isEmail!){
+                bool emailValid = RegExp(r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$').hasMatch(value);
+                if(!emailValid){
+                  return "Please enter valid email.";
+                }
+              }else if(isMobile!){
+                bool mobileValid = RegExp(r'^(?:[+0]9)?[0-9]{10}$').hasMatch(value);
+                if(!mobileValid){
+                  return "Please enter valid mobile number.";
+                }
               }
+              return null;
             },
-            style: CustomTextStyle.styleMedium,
+            style: CustomTextStyle.styleMedium.copyWith(
+                fontSize: DeviceUtil.isTablet ? 16 : 14
+            ),
               inputFormatters: [
                 LengthLimitingTextInputFormatter(lengthLimit),
               ],
@@ -69,7 +87,7 @@ class CustomTextField extends StatelessWidget {
               errorStyle:CustomTextStyle.styleMedium
                   .copyWith(fontSize: 12, color: Colors.red),
               suffixIcon: icon,
-              errorText: errorMessage,
+             // errorText: errorMessage,
               enabledBorder: border(),
               alignLabelWithHint: true,
             ),

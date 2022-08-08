@@ -14,6 +14,7 @@ import '../../../../../../core/base/base_bloc.dart';
 import '../../../../../../custom/progress_bar.dart';
 import '../../../../../../utils/border.dart';
 import '../../../../../../utils/colors.dart';
+import '../../../../../../utils/device_file.dart';
 import '../../../../../../utils/style.dart';
 import '../../../../../../widget/button.dart';
 import '../../../../../../widget/decoration.dart';
@@ -52,6 +53,7 @@ class _UpdateTaskState extends State<UpdateTask> {
   List<String> projectList = [];
   String? selectProject;
   List<dynamic> listOfProject = [];
+  final GlobalKey<FormState> _formKey =  GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -85,22 +87,30 @@ class _UpdateTaskState extends State<UpdateTask> {
             } else if (state is UpdateTaskState) {
               ProgressDialog.hideLoadingDialog(context);
               AddTaskModel? model = state.model;
-              Fluttertoast.showToast(
-                  msg: model!.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              if(model.success == true){
-                Navigator.of(context).pop();
+              if(model!.success == true){
+                Fluttertoast.showToast(
+                    msg: model.message ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
+                Navigator.of(context).pop(model.data!.startDate);
+              }else{
+                Fluttertoast.showToast(
+                    msg: model.error ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
               }
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
+                  fontSize: DeviceUtil.isTablet ? 20 : 12,
                   backgroundColor: CustomColors.colorBlue,
                   textColor: Colors.white
               );
@@ -108,7 +118,10 @@ class _UpdateTaskState extends State<UpdateTask> {
           },
           bloc: BlocProvider.of<AddTaskBloc>(context),
           child:  BlocBuilder<AddTaskBloc, BaseState>(builder: (context, state) {
-            return buildWidget();
+            return Form(
+              key: _formKey,
+              child: buildWidget(),
+            );
           })
       ),
     );
@@ -119,7 +132,9 @@ class _UpdateTaskState extends State<UpdateTask> {
       child: Expanded(
         child: RoundedCornerDecoration(
           SingleChildScrollView(
-            child: Column(
+            child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal:  12),
+    child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 /*Container(
@@ -161,39 +176,62 @@ class _UpdateTaskState extends State<UpdateTask> {
                       ],
                     )),*/
                 Container(
-                  margin: EdgeInsets.only(top: 24),
+                  margin: EdgeInsets.only(top: 16),
                   color: Colors.grey.shade200,
                   padding: EdgeInsets.only(left: 4, right: 16),
-                  child: TextField(
-                    style: CustomTextStyle.styleSemiBold,
+                  child: TextFormField(
+                    style: CustomTextStyle.styleSemiBold.copyWith(
+                        fontSize: DeviceUtil.isTablet ? 16 : 14
+                    ),
                     controller: widget.titleController,
+                    validator: (value) {
+                      if (value == null || value == "") {
+                        return 'Please enter task name';
+                      }
+                      return null;
+                    },
                     decoration: InputDecoration(
-                        border: titleBorder(color: Colors.grey.shade200),
-                        hintText: "Title",
-                        hintStyle: CustomTextStyle.styleSemiBold,
-                        labelStyle: CustomTextStyle.styleSemiBold,
+                        hintStyle: CustomTextStyle.styleSemiBold.copyWith(
+                            fontSize: DeviceUtil.isTablet ? 16 : 14
+                        ),
+                        labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                            fontSize: DeviceUtil.isTablet ? 16 : 14
+                        ),
+                        labelText: "Title",
                         enabledBorder:
-                        titleBorder(color: Colors.grey.shade200),
+                        titleBorder(color: Colors.transparent),
                         focusedBorder:
-                        titleBorder(color: Colors.grey.shade200)),
+                        titleBorder(color: Colors.transparent)),
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: 24),
+                  margin: EdgeInsets.only(top: 16),
                   color: Colors.grey.shade200,
                   padding: EdgeInsets.only(left: 4, right: 16),
-                  child: TextField(
-                    style: CustomTextStyle.styleSemiBold,
+                  child: TextFormField(
+                    style: CustomTextStyle.styleSemiBold.copyWith(
+                        fontSize: DeviceUtil.isTablet ? 16 : 14
+                    ),
+                    maxLines: 5,
                     controller: widget.descriptionController,
+                    validator: (value) {
+                      if (value == null || value == "") {
+                        return 'Please enter description';
+                      }
+                      return null;
+                    },
                     decoration: InputDecoration(
-                        border: titleBorder(color: Colors.grey.shade200),
-                        hintText: "Description",
-                        hintStyle: CustomTextStyle.styleSemiBold,
-                        labelStyle: CustomTextStyle.styleSemiBold,
+                        hintStyle: CustomTextStyle.styleSemiBold.copyWith(
+                            fontSize: DeviceUtil.isTablet ? 16 : 14
+                        ),
+                        labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                            fontSize: DeviceUtil.isTablet ? 16 : 14
+                        ),
+                        labelText: "Description",
                         enabledBorder:
-                        titleBorder(color: Colors.grey.shade200),
+                        titleBorder(color: Colors.transparent),
                         focusedBorder:
-                        titleBorder(color: Colors.grey.shade200)),
+                        titleBorder(color: Colors.transparent)),
                   ),
                 ),
                 /* Container(
@@ -205,7 +243,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                   ),
                 ),*/
                 Container(
-                  margin: EdgeInsets.only(left: 16, right: 16, top: 16),
+                  margin:EdgeInsets.only(/*left: 16, right: 16, */top: 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(4),
@@ -214,11 +252,19 @@ class _UpdateTaskState extends State<UpdateTask> {
                   child: Column(
                     children: [
                       TextField(
-                        style: CustomTextStyle.styleSemiBold,
-                        maxLines: 3,
+                        style: CustomTextStyle.styleSemiBold.copyWith(
+                            fontSize: DeviceUtil.isTablet ? 16 : 14
+                        ),
+                        maxLines: 5,
                         controller: widget.commentController,
                         decoration: InputDecoration(
-                            labelStyle: CustomTextStyle.styleSemiBold,
+                            hintStyle: CustomTextStyle.styleSemiBold.copyWith(
+                                fontSize: DeviceUtil.isTablet ? 16 : 14
+                            ),
+                            labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                                fontSize: DeviceUtil.isTablet ? 16 : 14
+                            ),
+                            labelText: "Enter Comment",
                             enabledBorder:
                             titleBorder(color: Colors.transparent),
                             focusedBorder:
@@ -226,8 +272,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                       ),
                       Container(
                         color: Colors.grey.shade100,
-                        padding: const EdgeInsets.only(
-                            left: 16, top: 16, right: 16, bottom: 16),
+                        padding: const EdgeInsets.all(16),
                         child: Row(
                           children: [
                             Transform.rotate(
@@ -244,20 +289,44 @@ class _UpdateTaskState extends State<UpdateTask> {
                   ),
                 ),
           Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 25),
+              padding: const EdgeInsets.only(top: 16),
               child: Center(
-                  child: TextField(
+                  child: TextFormField(
                     controller: widget.startDate,
+                    style: CustomTextStyle.styleSemiBold.copyWith(
+                        fontSize: DeviceUtil.isTablet ? 16 : 14
+                    ),
                     decoration:  InputDecoration(
-                      enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(color: CustomColors.colorBlue)),
-                      focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(color: CustomColors.colorBlue)),
-                        icon: const Icon(Icons.calendar_today,color: CustomColors.colorBlue,),
-                        labelText: "Enter Start Date",
-                      labelStyle: CustomTextStyle.styleSemiBold,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                      ),
+                      suffixIcon: const Icon(Icons.calendar_today,
+                        color: CustomColors.colorBlue,),
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                      ),
+                      labelText: "Enter Start Date",
+                      labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                          fontSize: DeviceUtil.isTablet ? 16 : 14
+                      ),
                     ),
                     readOnly: true,
+                    validator: (value) {
+                      if (value == null || value == "") {
+                        return 'Please Select Start date.';
+                      }
+                      return null;
+                    },
                     onTap: () async {
                       DateTime? pickedDate = await showDatePicker(
                           context: context,
@@ -300,21 +369,45 @@ class _UpdateTaskState extends State<UpdateTask> {
                     },
                   ))),
           Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 25),
+              padding: const EdgeInsets.only(top: 16),
               //height: MediaQuery.of(context).size.width / 3,
               child: Center(
-                  child: TextField(
+                  child: TextFormField(
                     controller: widget.endDate,
+                    style: CustomTextStyle.styleSemiBold.copyWith(
+                        fontSize: DeviceUtil.isTablet ? 16 : 14
+                    ),
                     decoration:  InputDecoration(
-                      enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(color: CustomColors.colorBlue)),
-                      focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(color: CustomColors.colorBlue)),
-                        icon: const Icon(Icons.calendar_today,color: CustomColors.colorBlue,),
-                        labelText: "Enter End Date",
-                      labelStyle: CustomTextStyle.styleSemiBold,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                      ),
+                      suffixIcon: const Icon(Icons.calendar_today,
+                        color: CustomColors.colorBlue,),
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                      ),
+                      labelText: "Enter End Date",
+                      labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                          fontSize: DeviceUtil.isTablet ? 16 : 14
+                      ),
                     ),
                     readOnly: true,
+                    validator: (value) {
+                      if (value == null || value == "") {
+                        return 'Please Select End date.';
+                      }
+                      return null;
+                    },
                     onTap: () async {
                       DateTime? pickedDate = await showDatePicker(
                           context: context,
@@ -361,35 +454,6 @@ class _UpdateTaskState extends State<UpdateTask> {
                       } else {}
                     },
                   ))),
-                ListTile(
-                  leading: Radio<String>(
-                    value: 'Completed',
-                    groupValue: widget.selectedRadio,
-                    activeColor: CustomColors.colorBlue,
-                    onChanged: (value) {
-                      setState(() {
-                        widget.selectedRadio = value!;
-                      });
-                    },
-                  ),
-                  title: const Text('Completed'),
-                ),
-                ListTile(
-                  leading: Radio<String>(
-                    value: 'InCompleted',
-                    groupValue: widget.selectedRadio,
-                    activeColor: CustomColors.colorBlue,
-                    onChanged: (value) {
-                      setState(() {
-                        widget.selectedRadio = value!;
-                      });
-                    },
-                  ),
-                  title: const Text('InCompleted'),
-                ),
-                const SizedBox(
-                  height: 24,
-                ),
                 BlocBuilder<ProjectBloc, BaseState>(
                   builder: (context, state) {
                     if (state is GetAllProjectsState) {
@@ -405,16 +469,31 @@ class _UpdateTaskState extends State<UpdateTask> {
                         }
                       }
                       return Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        padding: const EdgeInsets.only(top: 16),
                         child: Row(
                           children: [
                             Expanded(
                               child: DropdownButtonFormField(
                                 isExpanded: true,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
+                                style: CustomTextStyle.styleSemiBold.copyWith(
+                                    fontSize: DeviceUtil.isTablet ? 16 : 14
+                                ),
+                                decoration:  InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                    borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                                  ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: CustomColors.colorBlue),
+                                    borderRadius: BorderRadius.circular(5),
+                                    borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                                  ),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                    borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                    borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
                                   ),
                                 ),
                                 validator: (value) {
@@ -453,7 +532,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                       Fluttertoast.showToast(
                           msg: state.message,
                           toastLength: Toast.LENGTH_LONG,
-                          fontSize: 20,
+                          fontSize: DeviceUtil.isTablet ? 20 : 12,
                           backgroundColor: CustomColors.colorBlue,
                           textColor: Colors.white
                       );
@@ -462,6 +541,34 @@ class _UpdateTaskState extends State<UpdateTask> {
                       return const SizedBox();
                     }
                   },
+                ),
+                ListTile(
+                  leading: Radio<String>(
+                    value: 'Completed',
+                    groupValue: widget.selectedRadio,
+                    activeColor: CustomColors.colorBlue,
+                    onChanged: (value) {
+                      setState(() {
+                        widget.selectedRadio = value!;
+                      });
+                    },
+                  ),
+                  title: const Text(
+                      'Completed',
+                  ),
+                ),
+                ListTile(
+                  leading: Radio<String>(
+                    value: 'InCompleted',
+                    groupValue: widget.selectedRadio,
+                    activeColor: CustomColors.colorBlue,
+                    onChanged: (value) {
+                      setState(() {
+                        widget.selectedRadio = value!;
+                      });
+                    },
+                  ),
+                  title: const Text('InCompleted'),
                 ),
              /*   Container(
                     width: double.infinity,
@@ -507,26 +614,43 @@ class _UpdateTaskState extends State<UpdateTask> {
                       borderRadius: BorderRadius.circular(100)),
                   child: Text("Anyone"),
                 ),*/
+                const SizedBox(
+                  height: 12,
+                ),
                 Button(
                   "Update Task",
+                  verticalMargin: 10,
+                  horizontalMargin: 0,
                   onPress: () {
-                    _updateTask(
-                      context,
-                      id: widget.taskId,
-                      start_date: widget.startDate.text.toString(),
-                      end_date: widget.endDate.text.toString(),
-                      task_status: "",
-                      tag_id: "",
-                      reviewer_id: "",
-                      project_id: widget.projectId,
-                      priority: "Urgent",
-                      is_private: "false",
-                      comment: widget.commentController.text,
-                      assignee_id: "",
-                      description: widget.descriptionController.text,
-                      name: widget.titleController.text,
-                      isCompleted: widget.selectedRadio == "Completed" ? true : false,
-                    );
+                    FocusScope.of(context).unfocus();
+                    if(_formKey.currentState!.validate()){
+                      _formKey.currentState?.save();
+                      _updateTask(
+                        context,
+                        id: widget.taskId,
+                        start_date: widget.startDate.text.toString(),
+                        end_date: widget.endDate.text.toString(),
+                        task_status: "",
+                        tag_id: "",
+                        reviewer_id: "",
+                        project_id: widget.projectId,
+                        priority: "Urgent",
+                        is_private: "false",
+                        comment: widget.commentController.text,
+                        assignee_id: "",
+                        description: widget.descriptionController.text,
+                        name: widget.titleController.text,
+                        isCompleted: widget.selectedRadio == "Completed" ? true : false,
+                      );
+                    }else{
+                      Fluttertoast.showToast(
+                          msg: "Please fill all the details.",
+                          toastLength: Toast.LENGTH_LONG,
+                          fontSize: DeviceUtil.isTablet ? 20 : 12,
+                          backgroundColor: CustomColors.colorBlue,
+                          textColor: Colors.white
+                      );
+                    }
                   },
                 ),
               ],
@@ -534,7 +658,7 @@ class _UpdateTaskState extends State<UpdateTask> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Future<String> _updateTask(BuildContext context,{

@@ -146,6 +146,7 @@ class _MonthPageState extends State<MonthPage> {
           Expanded(
             child: TaskList(
                 isFilterApply: widget.isFilterApply,
+                selectedDate : date1,
                 isCompleted: widget.isCompleted), /*TaskList(),*/
           ),
         ],

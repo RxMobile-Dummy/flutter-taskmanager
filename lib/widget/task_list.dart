@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
@@ -18,14 +19,16 @@ import '../ui/home/fab_menu_option/add_task/presentation/pages/update_task.dart'
 import '../ui/home/pages/comment/presentation/bloc/comment_bloc.dart';
 import '../ui/home/task/task_details.dart';
 import '../utils/colors.dart';
+import '../utils/device_file.dart';
 import '../utils/style.dart';
 import 'package:task_management/injection_container.dart' as Sl;
 
 class TaskList extends StatefulWidget {
   bool isFilterApply;
   bool isCompleted;
+  String? selectedDate;
 
-  TaskList({required this.isCompleted, required this.isFilterApply});
+  TaskList({required this.isCompleted, required this.isFilterApply,this.selectedDate});
 
   @override
   _TaskListState createState() => _TaskListState();
@@ -59,23 +62,75 @@ class _TaskListState extends State<TaskList> {
   //   });
   // }
 
+
+  getFormatedDate(date) {
+    var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+    var inputDate = inputFormat.parse(date);
+    var outputFormat = DateFormat('dd/MM/yyyy');
+    print(outputFormat.format(inputDate));
+    return outputFormat.format(inputDate);
+  }
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AddTaskBloc, BaseState>(
       bloc: BlocProvider.of<AddTaskBloc>(context),
       builder: (context, state) {
         print("dataasdasdasd");
+        print(state);
         if (state is GetTaskState) {
           if (state.model?.data != null &&
               (state.model?.data?.isNotEmpty ?? false)) {
-            return buildWidget(state.model?.data);
+            GetTaskModel? model = state.model;
+            return buildWidget(model!.data);
+          }else{
+            return  Center(
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "No Task",
+                        style: CustomTextStyle.styleSemiBold
+                            .copyWith(color: CustomColors.colorBlue,
+                            fontSize: DeviceUtil.isTablet ? 18 : 14),
+                      ),
+                      const SizedBox(height: 10,),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          primary: Colors.white,
+                          backgroundColor: CustomColors.colorBlue,
+                          onSurface: Colors.grey,
+                        ),
+                        onPressed: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddTask()),
+                          ).then((value) {
+                            print(value);
+                            (value != null) ? BlocProvider.of<AddTaskBloc>(context).add(GetTaskEvent(
+                              date: value ?? "",
+                            )) : const SizedBox();
+                          });
+                        }, child: Text(
+                        "Add Task",
+                        style: CustomTextStyle.styleSemiBold
+                            .copyWith(color: Colors.white,
+                            fontSize: DeviceUtil.isTablet ? 18 : 14),
+                      ),)
+                    ],
+                  ),
+                )
+            );
           }
-        }else if (state is StateErrorGeneral) {
+        } else if (state is StateErrorGeneral) {
           ProgressDialog.hideLoadingDialog(context);
           Fluttertoast.showToast(
               msg: state.message,
               toastLength: Toast.LENGTH_LONG,
-              fontSize: 20,
+              fontSize: DeviceUtil.isTablet ? 20 : 12,
               backgroundColor: CustomColors.colorBlue,
               textColor: Colors.white
           );
@@ -83,17 +138,23 @@ class _TaskListState extends State<TaskList> {
         }else if (state is DeleteTaskState) {
           ProgressDialog.hideLoadingDialog(context);
           DeleteTaskModel? model = state.model;
-          print(model!.message ?? "");
+          Fluttertoast.showToast(
+              msg: model!.message ?? "",
+              toastLength: Toast.LENGTH_LONG,
+              fontSize: DeviceUtil.isTablet ? 20 : 12,
+              backgroundColor: CustomColors.colorBlue,
+              textColor: Colors.white
+          );
+          print(model.message ?? "");
+          BlocProvider.of<AddTaskBloc>(context).add(GetTaskEvent(
+              date: (widget.selectedDate == null || widget.selectedDate == "")
+                  ? getFormatedDate(DateTime.now().toString())
+                  : widget.selectedDate,
+          ));
           // Navigator.of(context).pop();
           // await _getTask();
         }
-        return Center(
-          child: Text(
-            "No Task found for this user",
-            style: CustomTextStyle.styleSemiBold
-                .copyWith(color: CustomColors.colorBlue, fontSize: 18),
-          ),
-        );
+        return SizedBox();
       },
     );
     //_getTask(isCompleted: widget.isCompleted,isFilterApply: widget.isFilterApply);
@@ -141,6 +202,7 @@ class _TaskListState extends State<TaskList> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListView.builder(
         padding: const EdgeInsets.only(bottom: 72),
+        physics: AlwaysScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           /* if (index % 6 == 0) {
             return headerItem();
@@ -223,11 +285,7 @@ class _TaskListState extends State<TaskList> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => MultiBlocProvider(providers: [
-                            BlocProvider<AddTaskBloc>(
-                              create: (context) => Sl.Sl<AddTaskBloc>(),
-                            ),
-                          ], child: UpdateTask(
+                          builder: (context) => UpdateTask(
                             titleController: titleController,
                             commentController: commentController,
                             descriptionController: descriptionController,
@@ -236,8 +294,13 @@ class _TaskListState extends State<TaskList> {
                             startDate: startDate,
                             selectedRadio: taskStatus,
                             projectId: getTaskModel.projectId ?? "",
-                          ),)),
-                    );
+                          )),
+                    ).then((value) {
+                      print(value);
+                      (value != null) ? BlocProvider.of<AddTaskBloc>(context).add(GetTaskEvent(
+                        date: value,
+                      )) : const SizedBox();
+                    });
                   },
                   icon: const Icon(
                     Icons.edit,
@@ -255,7 +318,40 @@ class _TaskListState extends State<TaskList> {
               iconWidget: Container(
                 child: IconButton(
                   onPressed: () {
-                    _deleteTask(id: getTaskModel.id, context: context);
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title:  Text(
+                          "Delete Task",
+                          style: TextStyle(fontSize:  DeviceUtil.isTablet ? 18 : 14),
+                        ),
+                        titlePadding: EdgeInsets.all(10),
+                        contentPadding: EdgeInsets.all(10),
+                        content:  Container(
+                          child: Text(
+                            "Are you sure you want to delete?",
+                            softWrap: true,
+                            overflow: TextOverflow.fade,
+                            style:  CustomTextStyle.styleMedium.copyWith(
+                                fontSize: DeviceUtil.isTablet ? 18 : 14
+                            ),
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              _deleteTask(id: getTaskModel.id, context: context);
+                              Navigator.of(ctx).pop();
+                            },
+                            child: Text(
+                                "Okay",
+                                style: CustomTextStyle.styleSemiBold
+                                    .copyWith(color: CustomColors.colorBlue, fontSize:
+                                DeviceUtil.isTablet ? 18 : 16),),
+                            ),
+                        ],
+                      ),
+                    );
                   },
                   icon: const Icon(
                     Icons.delete,
@@ -301,18 +397,24 @@ class _TaskListState extends State<TaskList> {
                                     : Colors.black,
                                 decoration: getTaskModel.isCompleted ?? false
                                     ? TextDecoration.lineThrough
-                                    : TextDecoration.none),
+                                    : TextDecoration.none,
+                              fontSize: DeviceUtil.isTablet ? 16 : 14
+                            ),
                           ),
                           Text(
                             getTaskModel.name ??
                                 "" /*"Go fishing with Stephen"*/,
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
                             style: CustomTextStyle.styleSemiBold.copyWith(
                                 color: getTaskModel.isCompleted ?? false
                                     ? Colors.grey
                                     : Colors.black,
                                 decoration: getTaskModel.isCompleted ?? false
                                     ? TextDecoration.lineThrough
-                                    : TextDecoration.none),
+                                    : TextDecoration.none,
+                                fontSize: DeviceUtil.isTablet ? 16 : 14
+                            ),
                           ),
                         ],
                       ),
@@ -329,18 +431,24 @@ class _TaskListState extends State<TaskList> {
                                     : Colors.black,
                                 decoration: getTaskModel.isCompleted ?? false
                                     ? TextDecoration.lineThrough
-                                    : TextDecoration.none),
+                                    : TextDecoration.none,
+                                fontSize: DeviceUtil.isTablet ? 16 : 14
+                            ),
                           ),
                           Text(
                             getTaskModel.description ??
                                 "" /*"Go fishing with Stephen"*/,
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
                             style: CustomTextStyle.styleSemiBold.copyWith(
                                 color: getTaskModel.isCompleted ?? false
                                     ? Colors.grey
                                     : Colors.black,
                                 decoration: getTaskModel.isCompleted ?? false
                                     ? TextDecoration.lineThrough
-                                    : TextDecoration.none),
+                                    : TextDecoration.none,
+                                fontSize: DeviceUtil.isTablet ? 16 : 14
+                            ),
                           ),
                         ],
                       ),
@@ -357,18 +465,24 @@ class _TaskListState extends State<TaskList> {
                                     : Colors.black,
                                 decoration: getTaskModel.isCompleted ?? false
                                     ? TextDecoration.lineThrough
-                                    : TextDecoration.none),
+                                    : TextDecoration.none,
+                                fontSize: DeviceUtil.isTablet ? 16 : 14
+                            ),
                           ),
                           Text(
                             getTaskModel.comment ??
                                 "" /*"Go fishing with Stephen"*/,
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
                             style: CustomTextStyle.styleSemiBold.copyWith(
                                 color: getTaskModel.isCompleted ?? false
                                     ? Colors.grey
                                     : Colors.black,
                                 decoration: getTaskModel.isCompleted ?? false
                                     ? TextDecoration.lineThrough
-                                    : TextDecoration.none),
+                                    : TextDecoration.none,
+                                fontSize: DeviceUtil.isTablet ? 16 : 14
+                            ),
                           ),
                         ],
                       ),
@@ -376,9 +490,11 @@ class _TaskListState extends State<TaskList> {
                         height: 8,
                       ),
                       Text(
-                        "09:00 AM",
+                         getTaskModel.startDate ?? "",
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
                         style: CustomTextStyle.styleMedium.copyWith(
-                            color: Colors.grey,
+                            color: Colors.grey.shade800,
                             decoration: getTaskModel.isCompleted ?? false
                                 ? TextDecoration.lineThrough
                                 : TextDecoration.none,

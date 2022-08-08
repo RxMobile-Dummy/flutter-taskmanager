@@ -2,8 +2,9 @@ class GetTaskModel {
   bool? success;
   List<Data>? data;
   String? message;
+  String? error;
 
-  GetTaskModel({this.success, this.data, this.message});
+  GetTaskModel({this.success, this.data, this.message,this.error});
 
   GetTaskModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
@@ -14,6 +15,7 @@ class GetTaskModel {
       });
     }
     message = json['message'];
+    error = json['error'];
   }
 
   Map<String, dynamic> toJson() {
@@ -23,6 +25,7 @@ class GetTaskModel {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     data['message'] = this.message;
+    data['error'] = this.error;
     return data;
   }
 }

@@ -11,6 +11,7 @@ import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/base/base_bloc.dart';
 import '../../../../../../custom/progress_bar.dart';
 import '../../../../../../utils/colors.dart';
+import '../../../../../../utils/device_file.dart';
 import '../../../../../../utils/style.dart';
 import '../../../../../../widget/profile_pi.dart';
 import '../../../../../../widget/size.dart';
@@ -64,22 +65,30 @@ class _GetAllUserListState extends State<GetAllUserList> {
             } else if (state is InviteProjectAssignState) {
               ProgressDialog.hideLoadingDialog(context);
               InviteProjectAssignModel? model = state.model;
-              Fluttertoast.showToast(
-                  msg: model!.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              if(model.status == true){
+              if(model!.status == true){
+                Fluttertoast.showToast(
+                    msg: model.message ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
                 Navigator.of(context).pop();
+              }else{
+                Fluttertoast.showToast(
+                    msg: model.error ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
               }
             } else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
+                  fontSize: DeviceUtil.isTablet ? 20 : 12,
                   backgroundColor: CustomColors.colorBlue,
                   textColor: Colors.white
               );
@@ -97,7 +106,7 @@ class _GetAllUserListState extends State<GetAllUserList> {
                 Fluttertoast.showToast(
                     msg: state.message,
                     toastLength: Toast.LENGTH_LONG,
-                    fontSize: 20,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
                     backgroundColor: CustomColors.colorBlue,
                     textColor: Colors.white
                 );
@@ -137,26 +146,37 @@ class _GetAllUserListState extends State<GetAllUserList> {
                          mainAxisAlignment: MainAxisAlignment.start,
                          crossAxisAlignment: CrossAxisAlignment.start,
                          children: [
-                           Text(
-                             list[index].firstName ?? "",
-                             style: CustomTextStyle.styleSemiBold
-                                 .copyWith(fontSize: 15),
-                           ),
-                           const SizedBox(height: 5),
-                           Text(
-                             list[index].lastName ?? "",
-                             style: CustomTextStyle.styleSemiBold
-                                 .copyWith(fontSize: 15),
-                           ),
+                          Row(
+                            children: [
+                              Text(
+                                list[index].firstName ?? "",
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                                style: CustomTextStyle.styleSemiBold
+                                    .copyWith(fontSize: 15),
+                              ),
+                              Text(
+                                " ${list[index].lastName}",
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                                style: CustomTextStyle.styleSemiBold
+                                    .copyWith(fontSize: 15),
+                              ),
+                            ],
+                          ),
                            const SizedBox(height: 5),
                            Text(
                              list[index].email ?? "",
+                             softWrap: true,
+                             overflow: TextOverflow.ellipsis,
                              style: CustomTextStyle.styleSemiBold
                                  .copyWith(fontSize: 15),
                            ),
                            const SizedBox(height: 5),
                            Text(
                              list[index].mobileNumber.toString().substring(3),
+                             softWrap: true,
+                             overflow: TextOverflow.ellipsis,
                              style: CustomTextStyle.styleSemiBold
                                  .copyWith(fontSize: 15),
                            ),
@@ -174,9 +194,10 @@ class _GetAllUserListState extends State<GetAllUserList> {
                             );
                           },
                           child: Text(
-                              "Add Member",
+                              "Add",
                             style: CustomTextStyle.styleSemiBold
-                                .copyWith(fontSize: 18,color: CustomColors.colorBlue),
+                                .copyWith(
+                                fontSize: DeviceUtil.isTablet ? 18 : 16,color: CustomColors.colorBlue),
                           ),
                         )
                       ],

@@ -2,8 +2,9 @@ class AddMemberModel {
   bool? success;
   List<Data>? data;
   String? message;
+  String? error;
 
-  AddMemberModel({this.success, this.data, this.message});
+  AddMemberModel({this.success, this.data, this.message,this.error});
 
   AddMemberModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
@@ -14,6 +15,7 @@ class AddMemberModel {
       });
     }
     message = json['message'];
+    error = json['error'];
   }
 
   Map<String, dynamic> toJson() {
@@ -23,6 +25,7 @@ class AddMemberModel {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     data['message'] = this.message;
+    data['error'] = this.error;
     return data;
   }
 }

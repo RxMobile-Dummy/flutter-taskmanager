@@ -13,6 +13,7 @@ import '../features/login/presentation/bloc/login_event.dart';
 import '../features/login/presentation/bloc/login_state.dart';
 import '../features/login/presentation/pages/login.dart';
 import '../utils/colors.dart';
+import '../utils/device_file.dart';
 import '../widget/button.dart';
 import '../widget/rounded_corner_page.dart';
 import '../widget/textfield.dart';
@@ -25,6 +26,10 @@ class ForgotPassword extends StatefulWidget {
 
 class _ForgotPasswordState extends State<ForgotPassword> {
   TextEditingController emailController = TextEditingController();
+  final GlobalKey<FormState> _formKey =  GlobalKey<FormState>();
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,14 +41,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             }else if (state is ForgotPasswordStatus) {
               ProgressDialog.hideLoadingDialog(context);
               ForgotPasswordModel? model = state.model;
-              Fluttertoast.showToast(
-                  msg: model!.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              if(model.success == true){
+              if(model!.success == true){
+                Fluttertoast.showToast(
+                    msg: model.message ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
                 Navigator.pushAndRemoveUntil<dynamic>(
                   context,
                   MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
@@ -52,6 +57,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   )),
                       (route) => false,
                 );
+              }else{
+                Fluttertoast.showToast(
+                    msg: model.error ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
               }
              // Get.off(ResetPassword());
             }else if (state is StateErrorGeneral) {
@@ -59,7 +72,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
+                  fontSize: DeviceUtil.isTablet ? 20 : 12,
                   backgroundColor: CustomColors.colorBlue,
                   textColor: Colors.white
               );
@@ -67,7 +80,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           },
           bloc: BlocProvider.of<LoginBloc>(context),
           child:  BlocBuilder<LoginBloc, BaseState>(builder: (context, state) {
-            return buildWidget();
+            return Form(
+                key: _formKey,
+                child: buildWidget());
           })
       ),
     );
@@ -94,6 +109,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     key: const Key("tefUsername"),
                     label: "Username",
                     hint: "Enter username",
+                    isEmail: true,
+                    errorMessage: "Please enter email.",
                     textEditingController: emailController,
                     textInputType: TextInputType.emailAddress,
                   ),
@@ -101,7 +118,19 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     height: 24,
                   ),
                   Button("Send Request",onPress: (){
-                    _forgotPassward(emailController.text);
+                    FocusScope.of(context).unfocus();
+                    if(_formKey.currentState!.validate()){
+                      _formKey.currentState?.save();
+                      _forgotPassward(emailController.text);
+                    }else{
+                      Fluttertoast.showToast(
+                          msg: "Please fill all the details.",
+                          toastLength: Toast.LENGTH_LONG,
+                          fontSize: DeviceUtil.isTablet ? 20 : 12,
+                          backgroundColor: CustomColors.colorBlue,
+                          textColor: Colors.white
+                      );
+                    }
                    // Get.to(ResetPassword());
                   },),
                   const SizedBox(

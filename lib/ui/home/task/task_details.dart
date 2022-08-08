@@ -1,3 +1,4 @@
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ import '../../../core/base/base_bloc.dart';
 import '../../../custom/progress_bar.dart';
 import '../../../utils/border.dart';
 import '../../../utils/colors.dart';
+import '../../../utils/device_file.dart';
 import '../../../utils/style.dart';
 import '../../../widget/button.dart';
 import '../../../widget/decoration.dart';
@@ -50,6 +52,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   int selectedMenu = 0;
   GetCommentModel getCommentModel = GetCommentModel();
   TextEditingController commentController = TextEditingController();
+  TextEditingController commentControllerForAdd = TextEditingController();
   var authToken;
   File? imageFile;
   File? imageFileForEdit;
@@ -78,22 +81,30 @@ class _TaskDetailsState extends State<TaskDetails> {
             } else if (state is DeleteTaskState) {
               ProgressDialog.hideLoadingDialog(context);
               DeleteTaskModel? model = state.model;
-              Fluttertoast.showToast(
-                  msg: model!.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              if(model.success == true){
+              if(model!.success == true){
+                Fluttertoast.showToast(
+                    msg: model.message ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
                 Navigator.of(context).pop();
+              }else{
+                Fluttertoast.showToast(
+                    msg: model.error ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
               }
             } else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
+                  fontSize: DeviceUtil.isTablet ? 20 : 12,
                   backgroundColor: CustomColors.colorBlue,
                   textColor: Colors.white
               );
@@ -129,13 +140,14 @@ class _TaskDetailsState extends State<TaskDetails> {
                   widget.getTaskModel
                       .name /*"Meeting according with design team in Central Park"*/,
                   maxLines: 3,
+                  softWrap: true,
                   overflow: TextOverflow.ellipsis,
                   style: CustomTextStyle.styleBold.copyWith(
-                    fontSize: 20,
+                    fontSize: DeviceUtil.isTablet ? 20 : 16,
                   ),
                 ),
                 sized_16(size: 32.0),
-                item(
+            /*    item(
                     Row(
                       children: [
                         userProfilePic(),
@@ -154,11 +166,11 @@ class _TaskDetailsState extends State<TaskDetails> {
                         ),
                       ],
                     ),
-                    isFirst: true),
+                    isFirst: true),*/
                 item(Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
+                     Icon(
                       Icons.date_range,
                       color: Colors.grey,
                     ),
@@ -171,7 +183,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                         Text(
                           widget.getTaskModel.startDate,
                           style: CustomTextStyle.styleSemiBold
-                              .copyWith(fontSize: 16),
+                              .copyWith(fontSize: DeviceUtil.isTablet ? 16 : 14,),
                         )
                       ],
                     ),
@@ -194,13 +206,15 @@ class _TaskDetailsState extends State<TaskDetails> {
                           widget.getTaskModel
                               .description /*"Lorem ipsum dolor sit amet,\nconsectetur adipiscing."*/,
                           style: CustomTextStyle.styleSemiBold
-                              .copyWith(fontSize: 16),
+                              .copyWith(fontSize: DeviceUtil.isTablet ? 16 : 14),
+                          softWrap: true,
+                          overflow: TextOverflow.ellipsis,
                         )
                       ],
                     ),
                   ],
                 )),
-                item(Row(
+            /*    item(Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Icon(
@@ -227,7 +241,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                       ],
                     ),
                   ],
-                )),
+                )),*/
                 /*  item(Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -264,61 +278,96 @@ class _TaskDetailsState extends State<TaskDetails> {
                         ProgressDialog.hideLoadingDialog(context);
                         // GetCommentModel? model = state.model;
                         getCommentModel = state.model!;
-                        Fluttertoast.showToast(
-                            msg: getCommentModel.message ?? "",
-                            toastLength: Toast.LENGTH_LONG,
-                            fontSize: 20,
-                            backgroundColor: CustomColors.colorBlue,
-                            textColor: Colors.white
-                        );
+                       if(getCommentModel.success == true){
+                         Fluttertoast.showToast(
+                             msg: getCommentModel.message ?? "",
+                             toastLength: Toast.LENGTH_LONG,
+                             fontSize: DeviceUtil.isTablet ? 20 : 12,
+                             backgroundColor: CustomColors.colorBlue,
+                             textColor: Colors.white
+                         );
+                       }else{
+                         Fluttertoast.showToast(
+                             msg: getCommentModel.error ?? "",
+                             toastLength: Toast.LENGTH_LONG,
+                             fontSize: DeviceUtil.isTablet ? 20 : 12,
+                             backgroundColor: CustomColors.colorBlue,
+                             textColor: Colors.white
+                         );
+                       }
                         // Navigator.of(context).pop();
                       } else if (state is AddCommentState) {
                         ProgressDialog.hideLoadingDialog(context);
                         AddCommentModel? model = state.model;
-                        Fluttertoast.showToast(
-                            msg: model!.message ?? "",
-                            toastLength: Toast.LENGTH_LONG,
-                            fontSize: 20,
-                            backgroundColor: CustomColors.colorBlue,
-                            textColor: Colors.white
-                        );
-                        if(model.success == true){
+                        if(model!.success == true){
+                          Fluttertoast.showToast(
+                              msg: model.message ?? "",
+                              toastLength: Toast.LENGTH_LONG,
+                              fontSize: DeviceUtil.isTablet ? 20 : 12,
+                              backgroundColor: CustomColors.colorBlue,
+                              textColor: Colors.white
+                          );
+                          imageFile = null;
                           await _getComment(comment_user_id: authToken);
+                        }else{
+                          Fluttertoast.showToast(
+                              msg: model.error ?? "",
+                              toastLength: Toast.LENGTH_LONG,
+                              fontSize: DeviceUtil.isTablet ? 20 : 12,
+                              backgroundColor: CustomColors.colorBlue,
+                              textColor: Colors.white
+                          );
                         }
                         //Navigator.of(context).pop();
                       } else if (state is UpdateCommentState) {
                         ProgressDialog.hideLoadingDialog(context);
                         UpdateCommentModel? model = state.model;
-                        Fluttertoast.showToast(
-                            msg: model!.message ?? "",
-                            toastLength: Toast.LENGTH_LONG,
-                            fontSize: 20,
-                            backgroundColor: CustomColors.colorBlue,
-                            textColor: Colors.white
-                        );
-                        if(model.success == true){
+                        if(model!.success == true){
+                          Fluttertoast.showToast(
+                              msg: model.message ?? "",
+                              toastLength: Toast.LENGTH_LONG,
+                              fontSize: DeviceUtil.isTablet ? 20 : 12,
+                              backgroundColor: CustomColors.colorBlue,
+                              textColor: Colors.white
+                          );
                           Navigator.of(context).pop();
                           await _getComment(comment_user_id: authToken);
+                        }else{
+                          Fluttertoast.showToast(
+                              msg: model.error ?? "",
+                              toastLength: Toast.LENGTH_LONG,
+                              fontSize: DeviceUtil.isTablet ? 20 : 12,
+                              backgroundColor: CustomColors.colorBlue,
+                              textColor: Colors.white
+                          );
                         }
                       } else if (state is DeleteCommentState) {
                         ProgressDialog.hideLoadingDialog(context);
                         DeleteCommentModel? model = state.model;
-                        Fluttertoast.showToast(
-                            msg: model!.message ?? "",
-                            toastLength: Toast.LENGTH_LONG,
-                            fontSize: 20,
-                            backgroundColor: CustomColors.colorBlue,
-                            textColor: Colors.white
-                        );
-                        if(model.success == true){
+                        if(model!.success == true){
+                          Fluttertoast.showToast(
+                              msg: model.message ?? "",
+                              toastLength: Toast.LENGTH_LONG,
+                              fontSize: DeviceUtil.isTablet ? 20 : 12,
+                              backgroundColor: CustomColors.colorBlue,
+                              textColor: Colors.white
+                          );
                           await _getComment(comment_user_id: authToken);
+                        }else{
+                          Fluttertoast.showToast(
+                              msg: model.error ?? "",
+                              toastLength: Toast.LENGTH_LONG,
+                              fontSize: DeviceUtil.isTablet ? 20 : 12,
+                              backgroundColor: CustomColors.colorBlue,
+                              textColor: Colors.white
+                          );
                         }
                       } else if (state is StateErrorGeneral) {
                         ProgressDialog.hideLoadingDialog(context);
                         Fluttertoast.showToast(
                             msg: state.message,
                             toastLength: Toast.LENGTH_LONG,
-                            fontSize: 20,
+                            fontSize: DeviceUtil.isTablet ? 20 : 12,
                             backgroundColor: CustomColors.colorBlue,
                             textColor: Colors.white
                         );
@@ -330,12 +379,12 @@ class _TaskDetailsState extends State<TaskDetails> {
                       return Column(
                         children: [
                           commentSection(context),
-                          Button(
+                        /*  Button(
                             "Complete Task",
                             onPress: () {},
                             horizontalMargin: 0,
                             verticalMargin: 8,
-                          ),
+                          ),*/
                           GestureDetector(
                             onTap: () {
                               setState(() {
@@ -404,83 +453,157 @@ class _TaskDetailsState extends State<TaskDetails> {
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(color: Colors.grey.shade200),
               ),
-              child: Column(
-                children: [
-                  TextField(
-                    style: CustomTextStyle.styleMedium,
-                    controller: commentController,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                        hintStyle: CustomTextStyle.styleMedium
-                            .copyWith(color: Colors.grey),
-                        hintText: "Write a comment",
-                        labelStyle: CustomTextStyle.styleSemiBold,
-                        enabledBorder: titleBorder(color: Colors.transparent),
-                        focusedBorder: titleBorder(color: Colors.transparent)),
-                  ),
-                  Container(
-                    color: Colors.grey.shade100,
-                    padding: const EdgeInsets.only(
-                        left: 16, top: 10, right: 16, bottom: 10),
-                    child: Row(
-                      children: [
-                        IconButton(
+              child:Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16,vertical: 5),
+                child:  Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: (){
+                        FocusScope.of(context).unfocus();
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (context1) => GestureDetector(
+                              onTap: () => Navigator.of(context1).pop(),
+                              child: Theme(
+                                  data: ThemeData(
+                                      bottomSheetTheme:
+                                      const BottomSheetThemeData(
+                                          backgroundColor:
+                                          Colors.black,
+                                          modalBackgroundColor:
+                                          Colors.grey)),
+                                  child: showSheetForImage(context)),
+                            ));
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(width: 2, color: Colors.grey),
+                            borderRadius: BorderRadius.circular(10,)),
+                        child:
+                        (imageFile == null || imageFile == "")
+                            ? Image.asset(
+                          'assets/images/image_holder.png',
+                          height: DeviceUtil.isTablet ? 120 : 80,
+                          width: DeviceUtil.isTablet ? 120 : 80,
+                          fit: BoxFit.fill,
+                        )
+                            : imageFile.toString().contains("static")
+                            ? Image.network(
+                            "${Strings.baseUrl}${imageFile?.path}",
+                            height: DeviceUtil.isTablet ? 120 : 80,
+                            width: DeviceUtil.isTablet ? 120 : 80,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace){
+                              return const Text("IMAGE GET ERROR....");
+                            }
+                        )
+                            : Image.file(
+                          imageFile!,
+                          height:  DeviceUtil.isTablet ? 120 : 80,
+                          width:  DeviceUtil.isTablet ? 120 : 80,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    TextField(
+                      style: CustomTextStyle.styleMedium.copyWith(
+                          fontSize: DeviceUtil.isTablet ? 16 : 14
+                      ),
+                      controller: commentControllerForAdd,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                          hintStyle: CustomTextStyle.styleMedium
+                              .copyWith(color: Colors.grey,
+                              fontSize: DeviceUtil.isTablet ? 16 : 14),
+                          hintText: "Write a comment",
+                          labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                              fontSize: DeviceUtil.isTablet ? 16 : 14
+                          ),
+                          enabledBorder: titleBorder(color: Colors.transparent),
+                          focusedBorder: titleBorder(color: Colors.transparent)),
+                    ),
+                   Row(
+                     mainAxisAlignment: MainAxisAlignment.end,
+                     children: [
+                       GestureDetector(
+                         onTap: () async {
+                           FocusScope.of(context).unfocus();
+                           SharedPreferences prefs =
+                           await SharedPreferences.getInstance();
+                           var authToken = prefs.getString('id');
+                           print(authToken);
+                           imageList = [];
+                           imageList?.add(imageFile!.path);
+                           _addComment(
+                             comment_user_id: authToken,
+                             description: commentControllerForAdd.text,
+                             files: imageList,
+                           );
+                           commentControllerForAdd.clear();
+                         },
+                         child: Text(
+                           "Send",
+                           style: CustomTextStyle.styleBold
+                               .copyWith(color: CustomColors.colorBlue),
+                         ),
+                       )
+                     ],
+                   )
+                   /* Container(
+                      color: Colors.grey.shade100,
+                      padding: const EdgeInsets.only(
+                          left: 16, top: 10, right: 16, bottom: 10),
+                      child: Row(
+                        children: [
+                          *//* IconButton(
                           icon: Icon(
                             Icons.add_photo_alternate,
                             color: Colors.grey.shade400,
                           ),
                           onPressed: () {
-                            showModalBottomSheet(
-                                context: context,
-                                builder: (context1) => GestureDetector(
-                                      onTap: () => Navigator.of(context1).pop(),
-                                      child: Theme(
-                                          data: ThemeData(
-                                              bottomSheetTheme:
-                                                  const BottomSheetThemeData(
-                                                      backgroundColor:
-                                                          Colors.black,
-                                                      modalBackgroundColor:
-                                                          Colors.grey)),
-                                          child: showSheetForImage(context)),
-                                    ));
                           },
-                        ),
-                        sized_16(size: 8.0),
-                        /* Transform.rotate(
+                        ),*//*
+
+                          sized_16(size: 8.0),
+                          *//* Transform.rotate(
                           angle: 2.5,
                           child: Icon(
                             Icons.attachment,
                             color: Colors.grey.shade400,
                           ),
-                        ),*/
-                        Expanded(
-                          child: Container(),
-                        ),
-                        GestureDetector(
-                          onTap: () async {
-                            SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            var authToken = prefs.getString('id');
-                            print(authToken);
-                            imageList = [];
-                            imageList?.add(imageFile!.path);
-                            _addComment(
-                              comment_user_id: authToken,
-                              description: commentController.text,
-                              files: imageList,
-                            );
-                          },
-                          child: Text(
-                            "Send",
-                            style: CustomTextStyle.styleBold
-                                .copyWith(color: CustomColors.colorBlue),
+                        ),*//*
+                          Expanded(
+                            child: Container(),
                           ),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
+                          GestureDetector(
+                            onTap: () async {
+                              FocusScope.of(context).unfocus();
+                              SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                              var authToken = prefs.getString('id');
+                              print(authToken);
+                              imageList = [];
+                              imageList?.add(imageFile!.path);
+                              _addComment(
+                                comment_user_id: authToken,
+                                description: commentController.text,
+                                files: imageList,
+                              );
+                              commentController.clear();
+                            },
+                            child: Text(
+                              "Send",
+                              style: CustomTextStyle.styleBold
+                                  .copyWith(color: CustomColors.colorBlue),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),*/
+                  ],
+                ),
               ),
             ),
             getCommentModel.data != null
@@ -509,9 +632,9 @@ class _TaskDetailsState extends State<TaskDetails> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: const Icon(
+                  icon:  Icon(
                     Icons.camera,
-                    size: 35,
+                    size: DeviceUtil.isTablet ? 35 : 25,
                   ),
                   onPressed: () {
                     Get.back();
@@ -521,7 +644,9 @@ class _TaskDetailsState extends State<TaskDetails> {
                 ),
                 Text(
                   "Camera",
-                  style: CustomTextStyle.styleBold,
+                  style: CustomTextStyle.styleBold.copyWith(
+                    fontSize: DeviceUtil.isTablet ? 16 : 12
+                  ),
                 )
               ],
             ),
@@ -531,9 +656,9 @@ class _TaskDetailsState extends State<TaskDetails> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: const Icon(
+                    icon:  Icon(
                       Icons.image_outlined,
-                      size: 35,
+                      size: DeviceUtil.isTablet ? 35 : 25,
                     ),
                     onPressed: () {
                       Get.back();
@@ -542,7 +667,9 @@ class _TaskDetailsState extends State<TaskDetails> {
                   ),
                   Text(
                     "Gallery",
-                    style: CustomTextStyle.styleBold,
+                    style: CustomTextStyle.styleBold.copyWith(
+                        fontSize: DeviceUtil.isTablet ? 16 : 12
+                    ),
                   )
                 ],
               ),
@@ -630,14 +757,16 @@ class _TaskDetailsState extends State<TaskDetails> {
                   Text(
                     "${getCommentModel.data![index].userData?.firstName}"
                     " ${getCommentModel.data![index].userData?.lastName}",
-                    style: CustomTextStyle.styleSemiBold.copyWith(fontSize: 16),
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                    style: CustomTextStyle.styleSemiBold.copyWith(fontSize: DeviceUtil.isTablet ? 16 : 14),
                   ),
                   sized_16(size: 4.0),
-                  Text(
-                    "3 Days ago",
+                  /*Text(
+                    "${getCommentModel.data![index].userData?.email}",
                     style: CustomTextStyle.styleMedium
                         .copyWith(fontSize: 14, color: Colors.grey),
-                  ),
+                  ),*/
                 ],
               ),
             ],
@@ -650,8 +779,12 @@ class _TaskDetailsState extends State<TaskDetails> {
                 child: Text(
                   getCommentModel.data![index].description ??
                       "Lorem ipsum dolor sit amet,consectetur\nadipiscing.",
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
                   style:
-                      CustomTextStyle.styleMedium.copyWith(color: Colors.black),
+                      CustomTextStyle.styleMedium.copyWith(color: Colors.black,
+                        fontSize: DeviceUtil.isTablet ? 16 : 14
+                      ),
                 ),
               ),
               Container(
@@ -659,11 +792,14 @@ class _TaskDetailsState extends State<TaskDetails> {
                 child: Row(
                   children: [
                     GestureDetector(
-                      child: Text(
+                      child:  Icon(
+                        Icons.edit,color: CustomColors.colorBlue,
+                        size:DeviceUtil.isTablet ? 22 : 18,
+                      ),/*Text(
                         "Edit",
                         style: CustomTextStyle.styleBold
                             .copyWith(color: CustomColors.colorBlue),
-                      ),
+                      ),*/
                       onTap: () {
                         commentController.text =
                             getCommentModel.data![index].description ?? "";
@@ -682,11 +818,14 @@ class _TaskDetailsState extends State<TaskDetails> {
                     Padding(
                       padding: EdgeInsets.only(left: 5),
                       child: GestureDetector(
-                        child: Text(
+                        child:  Icon(
+                          Icons.delete,color: CustomColors.colorBlue,
+                          size: DeviceUtil.isTablet ? 22 : 18,
+                        ),/*Text(
                           "Delete",
                           style: CustomTextStyle.styleBold
                               .copyWith(color: CustomColors.colorBlue),
-                        ),
+                        ),*/
                         onTap: () {
                           _deleteComment(
                             comment_user_id:
@@ -725,7 +864,7 @@ class _TaskDetailsState extends State<TaskDetails> {
     showModalBottomSheet(
         context: context,
         builder: (context1) {
-          return StatefulBuilder(
+          return  StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
             return Theme(
                 data: ThemeData(
@@ -738,13 +877,15 @@ class _TaskDetailsState extends State<TaskDetails> {
                 //     getCommentModel.data![index].id ?? 0,
                 //     getCommentModel.data![index].commentUserId ?? "",
                 //     context1)
-                child: Container(
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(16),
-                          topLeft: Radius.circular(16)),
-                      color: Colors.white),
-                  child: SingleChildScrollView(
+                child: Padding(
+                padding: MediaQuery.of(context).viewInsets,
+                child: SingleChildScrollView(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(16),
+                            topLeft: Radius.circular(16)),
+                        color: Colors.white),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -763,28 +904,28 @@ class _TaskDetailsState extends State<TaskDetails> {
                                           width: 2, color: Colors.grey),
                                       borderRadius: BorderRadius.circular(10)),
                                   child: (imageFileForEdit == null ||
-                                          imageFileForEdit == "")
+                                      imageFileForEdit == "")
                                       ? Image.asset(
-                                          'assets/images/image_holder.png',
-                                          height: 120,
-                                          width: 120,
-                                          fit: BoxFit.fill,
-                                        )
+                                    'assets/images/image_holder.png',
+                                    height: DeviceUtil.isTablet ? 120 : 80,
+                                    width: DeviceUtil.isTablet ? 120 : 80,
+                                    fit: BoxFit.fill,
+                                  )
                                       : imageFileForEdit
-                                              .toString()
-                                              .contains("static")
-                                          ? Image.network(
-                                              "${Strings.baseUrl}${imageFileForEdit?.path}",
-                                              height: 120,
-                                              width: 120,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : Image.file(
-                                              imageFileForEdit!,
-                                              height: 120,
-                                              width: 120,
-                                              fit: BoxFit.cover,
-                                            ),
+                                      .toString()
+                                      .contains("static")
+                                      ? Image.network(
+                                    "${Strings.baseUrl}${imageFileForEdit?.path}",
+                                    height: DeviceUtil.isTablet ? 120 : 80,
+                                    width: DeviceUtil.isTablet ? 120 : 80,
+                                    fit: BoxFit.cover,
+                                  )
+                                      : Image.file(
+                                    imageFileForEdit!,
+                                    height: DeviceUtil.isTablet ? 120 : 80,
+                                    width: DeviceUtil.isTablet ? 120 : 80,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                                 Positioned(
                                   left: 0.5,
@@ -797,13 +938,13 @@ class _TaskDetailsState extends State<TaskDetails> {
                                     child: Row(
                                       mainAxisSize: MainAxisSize.max,
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       children: <Widget>[
                                         InkWell(
                                           onTap: () async {
-                                            Get.back();
+                                            // Get.back();
                                             PickedFile? pickedFile =
-                                                await ImagePicker().getImage(
+                                            await ImagePicker().getImage(
                                               source: ImageSource.camera,
                                               maxWidth: 1800,
                                               maxHeight: 1800,
@@ -826,9 +967,9 @@ class _TaskDetailsState extends State<TaskDetails> {
                                         ),
                                         InkWell(
                                           onTap: () async {
-                                            Get.back();
+                                            //  Get.back();
                                             PickedFile? pickedFile =
-                                                await ImagePicker().getImage(
+                                            await ImagePicker().getImage(
                                               source: ImageSource.gallery,
                                               maxWidth: 1800,
                                               maxHeight: 1800,
@@ -885,14 +1026,18 @@ class _TaskDetailsState extends State<TaskDetails> {
                         Button(
                           "Done",
                           onPress: () {
+                            FocusScope.of(context).unfocus();
                             imageListForEdit = [];
                             imageListForEdit?.add(imageFileForEdit!.path);
+                            if(!imageFileForEdit!.path.contains('static')){
+                              imageList?.add(imageFileForEdit!.path);
+                            }
                             _updateComment(
                               description: textEditingController.text,
                               task_id: "",
                               comment_user_id:
-                                  getCommentModel.data![index].commentUserId ??
-                                      "",
+                              getCommentModel.data![index].commentUserId ??
+                                  "",
                               id: getCommentModel.data![index].id ?? 0,
                               files: imageListForEdit,
                             );
@@ -901,7 +1046,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                       ],
                     ),
                   ),
-                ));
+                )));
           });
         });
   }
@@ -981,12 +1126,10 @@ class _TaskDetailsState extends State<TaskDetails> {
                                   maxHeight: 1800,
                                 );
                                 if (pickedFile != null) {
-                                  setState(() {
                                     imageFileForEdit = File(pickedFile.path);
                                     //  isEdit ? imageFileForEdit : imageFile = File(pickedFile.path);
                                     print(imageFile);
                                     print(imageFileForEdit);
-                                  });
                                 }
                                 // getFromGallery(context,isEdit: true);
                               },
@@ -1038,6 +1181,7 @@ class _TaskDetailsState extends State<TaskDetails> {
             Button(
               "Done",
               onPress: () {
+                FocusScope.of(context).unfocus();
                 imageListForEdit = [];
                 imageListForEdit?.add(imageFileForEdit!.path);
                 _updateComment(
@@ -1059,7 +1203,7 @@ class _TaskDetailsState extends State<TaskDetails> {
     return Text(
       title,
       style: CustomTextStyle.styleMedium
-          .copyWith(color: Colors.grey, fontSize: 16),
+          .copyWith(color: Colors.grey, fontSize: DeviceUtil.isTablet ? 16 : 14,),
     );
   }
 
@@ -1074,22 +1218,24 @@ class _TaskDetailsState extends State<TaskDetails> {
     return PopupMenuButton(
       itemBuilder: (BuildContext c1) {
         return [
-          PopupMenuItem(
+        /*  PopupMenuItem(
             child: Text(
               "Add to Project",
               style: CustomTextStyle.styleMedium,
             ),
             value: 1,
             onTap: () {},
-          ),
+          ),*/
           PopupMenuItem(
             child: Text(
               "Add Member",
-              style: CustomTextStyle.styleMedium,
+              style: CustomTextStyle.styleMedium.copyWith(
+                fontSize: DeviceUtil.isTablet ? 16: 14
+              ),
             ),
             value: 2,
           ),
-          PopupMenuItem(
+        /*  PopupMenuItem(
             child: Text(
               "Delete Task",
               style: CustomTextStyle.styleMedium,
@@ -1098,7 +1244,7 @@ class _TaskDetailsState extends State<TaskDetails> {
             onTap: () {
               _deleteTask(id: 31);
             },
-          ),
+          ),*/
         ];
       },
       onSelected: (int value) {
@@ -1106,7 +1252,7 @@ class _TaskDetailsState extends State<TaskDetails> {
           selectedMenu = value;
         });
 
-        if (value == 1) {
+        if (value == 2) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) =>

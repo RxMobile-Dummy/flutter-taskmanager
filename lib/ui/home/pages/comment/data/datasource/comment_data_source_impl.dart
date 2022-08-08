@@ -63,17 +63,25 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
     // dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
     // var restClient = ApiClient(dio);
     List<MultipartFile> multipartImageList = [];
-    for (var file in params.files!) {
+
+    if(params.files!.isNotEmpty) {
+      if(!params.files![0].contains("static")) {
+        MultipartFile multipartFile =
+        await MultipartFile.fromFile(params.files![0], filename: pathManager.basename(params.files![0]));
+        multipartImageList.add(multipartFile);
+      }
+    }
+   /* for (var file in params.files!) {
       MultipartFile multipartFile =
       await MultipartFile.fromFile(file, filename: pathManager.basename(file.toString()));
       multipartImageList.add(multipartFile);
-    }
+    }*/
     var map = new HashMap<String, dynamic>();
     map['id'] = params.id;
     map['comment_user_id'] = params.comment_user_id;
     map['task_id'] = params.task_id;
     map['description'] = params.description;
-    map['files'] =  multipartImageList;
+    map['files'] =  params.files!.isNotEmpty ? multipartImageList : params.files;
     FormData formData = new FormData.fromMap(map);
     final response = await _apiClient.updateComment(formData);
     var data ;

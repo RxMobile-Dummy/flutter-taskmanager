@@ -36,11 +36,11 @@ class _TodayPageState extends State<TodayPage> {
   }
 
 
-  Future<Null> refreshList() async {
+  Future<dynamic> refreshList() async {
     refreshKey.currentState?.show(atTop: false);
     await Future.delayed(Duration(seconds: 2));
       await _getTask();
-    return null;
+    return "";
   }
 
   Future<String> _getTask({bool? isCompleted,String? getDate}) {
