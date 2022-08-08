@@ -12,6 +12,7 @@ import 'package:task_management/widget/task_list.dart';
 
 import '../../../core/base/base_bloc.dart';
 import '../../../custom/progress_bar.dart';
+import '../../../utils/device_file.dart';
 import '../../../utils/style.dart';
 import '../../../widget/home_appbar.dart';
 import '../fab_menu_option/add_task/data/model/delete_task_model.dart';
@@ -56,7 +57,7 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
   
   
   Future<String> _getTask({bool? isCompleted,String? getDate}) {
-    return Future.delayed(Duration()).then((_) {
+    return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddTaskBloc>(context).add(
           GetTaskEvent(
@@ -82,13 +83,23 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                 } else if (state is GetTaskState) {
                   ProgressDialog.hideLoadingDialog(context);
                   getTaskModel = state.model!;
-                  Fluttertoast.showToast(
-                      msg: getTaskModel.message ?? "",
-                      toastLength: Toast.LENGTH_LONG,
-                      fontSize: 20,
-                      backgroundColor: CustomColors.colorBlue,
-                      textColor: Colors.white
-                  );
+                 if(getTaskModel.success == true){
+                   Fluttertoast.showToast(
+                       msg: getTaskModel.message ?? "",
+                       toastLength: Toast.LENGTH_LONG,
+                       fontSize: DeviceUtil.isTablet ? 20 : 12,
+                       backgroundColor: CustomColors.colorBlue,
+                       textColor: Colors.white
+                   );
+                 }else{
+                   Fluttertoast.showToast(
+                       msg: getTaskModel.error ?? "",
+                       toastLength: Toast.LENGTH_LONG,
+                       fontSize: DeviceUtil.isTablet ? 20 : 10,
+                       backgroundColor: CustomColors.colorBlue,
+                       textColor: Colors.white
+                   );
+                 }
                   /*ScaffoldMessenger.of(context).showSnackBar( SnackBar(
                     content: Text(getTaskModel.message ?? ""),
                   ));*/
@@ -96,7 +107,24 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                 }else if (state is DeleteTaskState) {
                   ProgressDialog.hideLoadingDialog(context);
                   DeleteTaskModel? model = state.model;
-                  print(model!.message ?? "");
+                  if(model!.success == true){
+                    Fluttertoast.showToast(
+                        msg: getTaskModel.message ?? "",
+                        toastLength: Toast.LENGTH_LONG,
+                        fontSize: DeviceUtil.isTablet ? 20 : 12,
+                        backgroundColor: CustomColors.colorBlue,
+                        textColor: Colors.white
+                    );
+                  }else{
+                    Fluttertoast.showToast(
+                        msg: getTaskModel.error ?? "",
+                        toastLength: Toast.LENGTH_LONG,
+                        fontSize: DeviceUtil.isTablet ? 20 : 12,
+                        backgroundColor: CustomColors.colorBlue,
+                        textColor: Colors.white
+                    );
+                  }
+                  print(model.message ?? "");
                   // Navigator.of(context).pop();
                   // await _getTask();
                 }else if (state is StateErrorGeneral) {
@@ -104,7 +132,7 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                   Fluttertoast.showToast(
                       msg: getTaskModel.message ?? "",
                       toastLength: Toast.LENGTH_LONG,
-                      fontSize: 20,
+                      fontSize: DeviceUtil.isTablet ? 20 : 12,
                       backgroundColor: CustomColors.colorBlue,
                       textColor: Colors.white
                   );
@@ -126,7 +154,9 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                         },
                         child: Text(
                           "InCompleted Tasks",
-                          style: CustomTextStyle.styleMedium,
+                          style: CustomTextStyle.styleMedium.copyWith(
+                            fontSize: DeviceUtil.isTablet ? 16 : 13
+                          ),
                         ),
                       ),
                       PopupMenuItem(
@@ -136,7 +166,9 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                         },
                         child: Text(
                           "Completed Tasks",
-                          style: CustomTextStyle.styleMedium,
+                          style: CustomTextStyle.styleMedium.copyWith(
+                              fontSize: DeviceUtil.isTablet ? 16 : 13
+                          ),
                         ),
                       ),
                       PopupMenuItem(
@@ -150,7 +182,9 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                         },
                         child: Text(
                           "All Tasks",
-                          style: CustomTextStyle.styleMedium,
+                          style: CustomTextStyle.styleMedium.copyWith(
+                              fontSize: DeviceUtil.isTablet ? 16 : 13
+                          ),
                         ),
                       ),
                     ];
@@ -231,10 +265,12 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
     return Container(
       child: PageView(
         controller: pageController,
-        onPageChanged: (page) {
-          setState(() {
+        physics: AlwaysScrollableScrollPhysics(),
+        onPageChanged: (page) async {
+          setState(()  {
             tabController.index = page;
           });
+          await _getTask();
         },
         children: [
           TodayPage(isCompleted: isCompleted,isFilterApply: isFilterApply),

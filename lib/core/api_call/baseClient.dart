@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:dio/dio.dart';
 import 'package:task_management/features/login/data/model/forgot_password_model.dart';
+import 'package:task_management/features/login/data/model/get_user_role_model.dart';
 import 'package:task_management/features/login/data/model/login_model.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:task_management/features/login/data/model/refresh_token_model.dart';
@@ -12,24 +13,27 @@ import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/get_
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/invite_project_assign_model.dart';
+import 'package:task_management/ui/home/pages/add_member/data/model/invite_project_assign_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
+import 'package:task_management/ui/home/pages/Profile/data/model/update_profile_model.dart';
 import 'package:task_management/ui/home/pages/Project/data/model/add_project_model.dart';
 import 'package:task_management/ui/home/pages/Project/data/model/delete_project_model.dart';
 import 'package:task_management/ui/home/pages/Project/data/model/get_all_project_model.dart';
 import 'package:task_management/ui/home/pages/Project/data/model/update_project_model.dart';
+import 'package:task_management/ui/home/pages/add_member/data/model/add_member_model.dart';
 import 'package:task_management/ui/home/pages/comment/data/model/add_comment_model.dart';
 import 'package:task_management/ui/home/pages/comment/data/model/delete_comment_model.dart';
 import 'package:task_management/ui/home/pages/comment/data/model/get_comment_model.dart';
 import 'package:task_management/ui/home/pages/comment/data/model/update_comment_model.dart';
 import 'package:task_management/ui/home/pages/tag/data/model/add_tag.dart';
+import 'package:task_management/ui/home/pages/user_status/data/model/get_user_status_model.dart';
 
 import '../../ui/home/fab_menu_option/add_note/data/model/delete_note_model.dart';
 import '../../ui/home/fab_menu_option/add_note/data/model/update_note_model.dart';
 
 part 'baseClient.g.dart';
 
-@RestApi(baseUrl: 'https://2bcf-180-211-112-179.in.ngrok.io/task_app/')
+@RestApi(baseUrl: 'https://e8c5-180-211-112-179.in.ngrok.io/task_app/')
 abstract class  ApiClient {
 
   factory ApiClient(Dio dio) = _ApiClient;
@@ -59,7 +63,7 @@ abstract class  ApiClient {
       @Body() HashMap<String, dynamic> hashMap);
 
   @POST('get_task/')
-  Future<GetTaskModel> getTask();
+  Future<GetTaskModel> getTask(@Body() HashMap<String, dynamic> hashMap);
 
   @POST('add_new_note/')
   Future<AddNotesModel> addNote(
@@ -92,13 +96,16 @@ abstract class  ApiClient {
   Future<InviteProjectAssignModel> inviteProjectAssign(
       @Body() HashMap<String, dynamic> hashMap);
 
+  @POST('get_all_users/')
+  Future<AddMemberModel> getAllUser();
+
   @POST('add_new_comment/')
   Future<AddCommentModel> addComment(
       @Body() FormData formData);
 
   @POST('update_comment/')
   Future<UpdateCommentModel> updateComment(
-      @Body() HashMap<String, dynamic> hashMap);
+      @Body() FormData formData);
 
   @POST('delete_comment/')
   Future<DeleteCommentModel> deleteComment(
@@ -122,6 +129,15 @@ abstract class  ApiClient {
   @POST('delete_note/')
   Future<DeleteNoteModel> deleteNote(
       @Body() HashMap<String, dynamic> hashMap);
+
+  @POST('get_user_role/')
+  Future<GetUserRoleModel> getUserRole();
+
+  @POST('get_user_status/')
+  Future<GetUserStatusModel> getUserStatus();
+
+  @POST('update_profile/')
+  Future<UpdateUserProfileModel> updateUserprofile(@Body() FormData formData);
 /*  factory ApiClient(Dio dio, {String baseUrl}) = _ApiClient;
  // final Dio _dio = Dio();
   String api = "https://8ebf-180-211-112-179.in.ngrok.io/";

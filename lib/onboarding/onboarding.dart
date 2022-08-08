@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/features/login/domain/usecases/login.dart';
 
 import '../../custom/curve_painter.dart';
@@ -119,7 +120,9 @@ class _OnBoardingState extends State<OnBoarding> {
                         elevation: 2,
                         splashColor: listColors[currentPage].withOpacity(.2),
                         padding: EdgeInsets.only(top: 12, bottom: 12),
-                        onPressed: () {
+                        onPressed: () async {
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          prefs.setString("isOnBoardingCompleted", "true");
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(

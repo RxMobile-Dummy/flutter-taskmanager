@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,6 +11,9 @@ import 'package:task_management/utils/colors.dart';
 
 import '../../../../core/base/base_bloc.dart';
 import '../../../../custom/progress_bar.dart';
+import '../../../../ui/home/home.dart';
+import '../../../../utils/device_file.dart';
+import '../../../../utils/style.dart';
 import '../../../../widget/button.dart';
 import '../../../../widget/decoration.dart';
 import '../../../../widget/rounded_corner_page.dart';
@@ -62,24 +67,34 @@ class _SignUpState extends State<SignUp> {
             }else if (state is SignUpState) {
               ProgressDialog.hideLoadingDialog(context);
               SignUpModel? model = state.model;
-              Fluttertoast.showToast(
-                  msg: model!.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              if(model.success == true){
+              if(model!.success == true){
+                Fluttertoast.showToast(
+                    msg: model.message ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
                 SharedPreferences prefs = await SharedPreferences.getInstance();
-                prefs.setString('id', model.data!.id!.toString());
-                prefs.setString('role', model.data!.role ?? "");
+                prefs.setString('access', model.data!.authenticationToken!.access ?? "");
+                prefs.setString('refresh', model.data!.authenticationToken!.refresh ?? "");
+                prefs.setString('id', model.data?.id!.toString() ?? "");
+                String user = jsonEncode(model.data?.toJson());
+                prefs.setString('userData', user);
                 Navigator.pushAndRemoveUntil<dynamic>(
                   context,
-                  MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                    create: (context) => Sl.Sl<LoginBloc>(),
-                    child: Login(),
-                  )),
+                  MaterialPageRoute(builder: (context) {
+                    return Home();
+                  },),
                       (route) => false,
+                );
+              }else {
+                Fluttertoast.showToast(
+                    msg: model.error ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
                 );
               }
             //  Get.off(Login());
@@ -95,7 +110,7 @@ class _SignUpState extends State<SignUp> {
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
+                  fontSize: DeviceUtil.isTablet ? 20 : 12,
                   backgroundColor: CustomColors.colorBlue,
                   textColor: Colors.white
               );
@@ -127,7 +142,7 @@ class _SignUpState extends State<SignUp> {
                 ),
                 CustomTextField(
                   key: const Key("firstName"),
-                  label: "first name",
+                  label: "First name",
                   hint: "Enter first name",
                   errorMessage: "Please Enter first name",
                   textEditingController: firstName,
@@ -138,7 +153,7 @@ class _SignUpState extends State<SignUp> {
                 ),
                 CustomTextField(
                   key: const Key("lastName"),
-                  label: "last name",
+                  label: "Last name",
                   hint: "Enter last name",
                   errorMessage: "Please Enter last name",
                   textEditingController: lastName,
@@ -149,8 +164,9 @@ class _SignUpState extends State<SignUp> {
                 ),
                 CustomTextField(
                   key: const Key("email"),
-                  label: "email",
+                  label: "Email",
                   hint: "Enter email",
+                  isEmail: true,
                   errorMessage: "Please Enter email",
                   textEditingController: email,
                   textInputType: TextInputType.emailAddress,
@@ -160,7 +176,8 @@ class _SignUpState extends State<SignUp> {
                 ),
                 CustomTextField(
                   key: const Key("mobile"),
-                  label: "mobile",
+                  label: "Mobile",
+                  isMobile: true,
                   hint: "Enter mobile number",
                   errorMessage: "Please Enter mobile number",
                   textEditingController: mobile,
@@ -171,7 +188,7 @@ class _SignUpState extends State<SignUp> {
                 ),
                 CustomTextField(
                   key: const Key("password"),
-                  label: "password",
+                  label: "Password",
                   hint: "Enter password",
                   errorMessage: "Please Enter password",
                   icon: IconButton(
@@ -199,10 +216,31 @@ class _SignUpState extends State<SignUp> {
                  Expanded(
                    child: DropdownButtonFormField(
                      isExpanded: true,
-                     decoration:  const InputDecoration(
-                       border: OutlineInputBorder(),
+                     style: CustomTextStyle.styleSemiBold.copyWith(
+                         fontSize: DeviceUtil.isTablet ? 16 : 14
+                     ),
+                     decoration:  InputDecoration(
+                       enabledBorder: OutlineInputBorder(
+                         borderRadius: BorderRadius.circular(5),
+                         borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                       ),
                        focusedBorder: OutlineInputBorder(
-                         borderSide: BorderSide(color: CustomColors.colorBlue),
+                         borderRadius: BorderRadius.circular(5),
+                         borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                       ),
+                       disabledBorder: OutlineInputBorder(
+                         borderRadius: BorderRadius.circular(5),
+                         borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                       ),
+                       border: OutlineInputBorder(
+                         borderRadius: BorderRadius.circular(5),
+                         borderSide: const BorderSide(width: 1, color: CustomColors.colorBlue),
+                       ),
+                       hintStyle: CustomTextStyle.styleSemiBold.copyWith(
+                           fontSize: DeviceUtil.isTablet ? 16 : 14
+                       ),
+                       labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                           fontSize: DeviceUtil.isTablet ? 16 : 14
                        ),
                      ),
                      validator: (value) {
@@ -212,7 +250,7 @@ class _SignUpState extends State<SignUp> {
                        return null;
                      },
                      borderRadius: BorderRadius.circular(5),
-                     hint: const Text('Please choose a Role'), // Not necessary for Option 1
+                     hint: const Text('Please choose a user Role'), // Not necessary for Option 1
                      value: _selectedUserRole,
                      onChanged: (String? newValue) {
                        setState(() {
@@ -246,6 +284,7 @@ class _SignUpState extends State<SignUp> {
                 Button(
                   "Sign Up",
                   onPress: () {
+                    FocusScope.of(context).unfocus();
                     if(_formKey.currentState!.validate()){
                       _formKey.currentState?.save();
                       _signUpUser(
@@ -260,7 +299,7 @@ class _SignUpState extends State<SignUp> {
                       Fluttertoast.showToast(
                           msg: "Please fill all the details.",
                           toastLength: Toast.LENGTH_LONG,
-                          fontSize: 20,
+                          fontSize: DeviceUtil.isTablet ? 20 : 12,
                           backgroundColor: CustomColors.colorBlue,
                           textColor: Colors.white
                       );
@@ -268,9 +307,9 @@ class _SignUpState extends State<SignUp> {
                     //Get.off(Home());
                   },
                 ),
-                const SizedBox(
+                /*const SizedBox(
                   height: 48,
-                )
+                )*/
               ],
             ),
           ),

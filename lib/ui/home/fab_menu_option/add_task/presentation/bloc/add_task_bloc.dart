@@ -18,6 +18,7 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
   UpdateTaskUsecase? updateTaskUsecase;
   DeleteTaskUsecase? deleteTaskUsecase;
   GetTaskUsecase? getTaskUsecase;
+  String? date;
 
   AddTaskBloc(
       {required this.getTaskUsecase,
@@ -28,6 +29,7 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
     on<BaseEvent>((event, emit) {
       if (event is EventRequest) {
       } else if (event is AddTaskEvent) {
+        date = event.start_date;
         addTskCall(
           task_status: event.task_status,
           tag_id: event.tag_id,

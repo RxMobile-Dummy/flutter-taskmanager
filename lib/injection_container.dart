@@ -271,6 +271,8 @@ Future<Dio> createDioClient() async {
                   .add(LogInterceptor(responseBody: true, requestBody: true));
             }
           } catch (err, st) {}
+        }else{
+          handler.reject(err);
         }
       },
     ),

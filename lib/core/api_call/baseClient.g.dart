@@ -10,7 +10,7 @@ part of 'baseClient.dart';
 
 class _ApiClient implements ApiClient {
   _ApiClient(this._dio, {this.baseUrl}) {
-    baseUrl ??= 'http://10.10.10.23:3008/task_app/';
+    baseUrl ??= 'https://e8c5-180-211-112-179.in.ngrok.io/task_app/';
   }
 
   final Dio _dio;
@@ -120,6 +120,23 @@ class _ApiClient implements ApiClient {
   }
 
   @override
+  Future<GetTaskModel> getTask(hashMap) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(hashMap);
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<GetTaskModel>(
+            Options(method: 'POST', headers: _headers, extra: _extra)
+                .compose(_dio.options, 'get_task/',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = GetTaskModel.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
   Future<AddNotesModel> addNote(hashMap) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -137,19 +154,19 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<UpdateTaskModel> updateTask(hashMap) async {
+  Future<AddTaskModel> updateTask(hashMap) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(hashMap);
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<UpdateTaskModel>(
+        _setStreamType<AddTaskModel>(
             Options(method: 'POST', headers: _headers, extra: _extra)
                 .compose(_dio.options, 'update_task/',
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = UpdateTaskModel.fromJson(_result.data!);
+    final value = AddTaskModel.fromJson(_result.data!);
     return value;
   }
 
@@ -255,12 +272,27 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<AddCommentModel> addComment(hashMap) async {
+  Future<AddMemberModel> getAllUser() async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
-    _data.addAll(hashMap);
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<AddMemberModel>(
+            Options(method: 'POST', headers: _headers, extra: _extra)
+                .compose(_dio.options, 'get_all_users/',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = AddMemberModel.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<AddCommentModel> addComment(formData) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = formData;
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<AddCommentModel>(
             Options(method: 'POST', headers: _headers, extra: _extra)
@@ -272,12 +304,11 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<UpdateCommentModel> updateComment(hashMap) async {
+  Future<UpdateCommentModel> updateComment(formData) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
-    _data.addAll(hashMap);
+    final _data = formData;
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<UpdateCommentModel>(
             Options(method: 'POST', headers: _headers, extra: _extra)
@@ -336,6 +367,104 @@ class _ApiClient implements ApiClient {
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = AddTagModel.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<GetNoteModel> getNote() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<GetNoteModel>(
+            Options(method: 'POST', headers: _headers, extra: _extra)
+                .compose(_dio.options, 'get_note/',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = GetNoteModel.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<UpdateNoteModel> updateNote(hashMap) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(hashMap);
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<UpdateNoteModel>(
+            Options(method: 'POST', headers: _headers, extra: _extra)
+                .compose(_dio.options, 'update_note/',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = UpdateNoteModel.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<DeleteNoteModel> deleteNote(hashMap) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(hashMap);
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<DeleteNoteModel>(
+            Options(method: 'POST', headers: _headers, extra: _extra)
+                .compose(_dio.options, 'delete_note/',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = DeleteNoteModel.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<GetUserRoleModel> getUserRole() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<GetUserRoleModel>(
+            Options(method: 'POST', headers: _headers, extra: _extra)
+                .compose(_dio.options, 'get_user_role/',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = GetUserRoleModel.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<GetUserStatusModel> getUserStatus() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<GetUserStatusModel>(
+            Options(method: 'POST', headers: _headers, extra: _extra)
+                .compose(_dio.options, 'get_user_status/',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = GetUserStatusModel.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<UpdateUserProfileModel> updateUserprofile(formData) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = formData;
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<UpdateUserProfileModel>(
+            Options(method: 'POST', headers: _headers, extra: _extra)
+                .compose(_dio.options, 'update_profile/',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = UpdateUserProfileModel.fromJson(_result.data!);
     return value;
   }
 

@@ -1,5 +1,8 @@
 
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 
 import 'package:task_management/ui/home/pages/comment/data/datasource/comment_data_source.dart';
 import 'package:task_management/ui/home/pages/comment/data/model/add_comment_model.dart';
@@ -12,6 +15,7 @@ import 'package:task_management/ui/home/pages/comment/domain/usecases/delete_com
 import 'package:task_management/ui/home/pages/comment/domain/usecases/get_comment_usecase.dart';
 import 'package:task_management/ui/home/pages/comment/domain/usecases/update_comment_usecase.dart';
 
+import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/failure/failure.dart';
 
 
@@ -31,9 +35,31 @@ class AddCommentRepositoriesImpl extends AddCommentRepositories {
         yield Right(response);
       }
     } catch (e, s) {
-      yield Left(FailureMessage(e.toString()));
+      Failure error = await checkErrorState(e);
+      //yield Left(error);
+      yield Left(FailureMessage(error.toString()));
       print(e);
       print("Fail");
+    }
+  }
+
+  Future<Failure> checkErrorState(e) async {
+    if (e is DioError) {
+      if (e.error is SocketException) {
+        return InternetFailure(Strings.kNoInternetConnection);
+      } else if (e.response!.statusCode == 400) {
+        return FailureMessage(e.response!.data.toString());
+      } else if (e.response!.statusCode == 500) {
+        return FailureMessage(Strings.kInternalServerError);
+      } else {
+        return FailureMessage(e.response!.data["error"].toString());
+      }
+    } else {
+      if (e.errors!=null && e.errors[0].error.error is SocketException) {
+        return InternetFailure(Strings.kNoInternetConnection);
+      } else {
+        return FailureMessage(e.response.data["error"].toString());
+      }
     }
   }
 
@@ -45,7 +71,9 @@ class AddCommentRepositoriesImpl extends AddCommentRepositories {
         yield Right(response);
       }
     } catch (e, s) {
-      yield Left(FailureMessage(e.toString()));
+      Failure error = await checkErrorState(e);
+      //yield Left(error);
+      yield Left(FailureMessage(error.toString()));
       print(e);
       print("Fail");
     }
@@ -59,7 +87,9 @@ class AddCommentRepositoriesImpl extends AddCommentRepositories {
         yield Right(response);
       }
     } catch (e, s) {
-      yield Left(FailureMessage(e.toString()));
+      Failure error = await checkErrorState(e);
+      //yield Left(error);
+      yield Left(FailureMessage(error.toString()));
       print(e);
       print("Fail");
     }
@@ -73,7 +103,9 @@ class AddCommentRepositoriesImpl extends AddCommentRepositories {
         yield Right(response);
       }
     } catch (e, s) {
-      yield Left(FailureMessage(e.toString()));
+      Failure error = await checkErrorState(e);
+      //yield Left(error);
+      yield Left(FailureMessage(error.toString()));
       print(e);
       print("Fail");
     }

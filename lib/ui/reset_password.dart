@@ -14,6 +14,7 @@ import '../custom/progress_bar.dart';
 import '../features/login/data/model/forgot_password_model.dart';
 import '../features/login/presentation/bloc/login_bloc.dart';
 import '../features/login/presentation/bloc/login_event.dart';
+import '../utils/device_file.dart';
 import '../utils/style.dart';
 import '../widget/button.dart';
 import '../widget/rounded_corner_page.dart';
@@ -31,6 +32,7 @@ class _ResetPasswordState extends State<ResetPassword> {
   TextEditingController tieNewPassword = TextEditingController();
   TextEditingController tieConfirmPassword = TextEditingController();
   TextEditingController resetCode = TextEditingController();
+  final GlobalKey<FormState> _formKey =  GlobalKey<FormState>();
   int secondsRemaining = 60;
   bool enableResend = false;
   Timer? timer;
@@ -78,33 +80,51 @@ class _ResetPasswordState extends State<ResetPassword> {
             } else if (state is ResetPasswordStatus) {
               ProgressDialog.hideLoadingDialog(context);
               ResetPasswardModel? model = state.model;
-              Fluttertoast.showToast(
-                  msg: model!.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              if(model.success == true){
+              if(model!.success == true){
+                Fluttertoast.showToast(
+                    msg: model.message ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
                 Get.to(ResetSuccess());
+              }else{
+                Fluttertoast.showToast(
+                    msg: model.error ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
               }
             } else if (state is ForgotPasswordStatus) {
               ProgressDialog.hideLoadingDialog(context);
               ForgotPasswordModel? model = state.model;
-              Fluttertoast.showToast(
-                  msg: model!.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
+             if(model!.success == true){
+               Fluttertoast.showToast(
+                   msg: model.message ?? "",
+                   toastLength: Toast.LENGTH_LONG,
+                   fontSize: DeviceUtil.isTablet ? 20 : 12,
+                   backgroundColor: CustomColors.colorBlue,
+                   textColor: Colors.white
+               );
+             }else{
+               Fluttertoast.showToast(
+                   msg: model.error ?? "",
+                   toastLength: Toast.LENGTH_LONG,
+                   fontSize: DeviceUtil.isTablet ? 20 : 12,
+                   backgroundColor: CustomColors.colorBlue,
+                   textColor: Colors.white
+               );
+             }
               // Get.off(ResetPassword());
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
+                  fontSize: DeviceUtil.isTablet ? 20 : 12,
                   backgroundColor: CustomColors.colorBlue,
                   textColor: Colors.white
               );
@@ -112,7 +132,9 @@ class _ResetPasswordState extends State<ResetPassword> {
           },
           bloc: BlocProvider.of<LoginBloc>(context),
           child:  BlocBuilder<LoginBloc, BaseState>(builder: (context, state) {
-            return buildWidget();
+            return Form(
+                key: _formKey,
+                child: buildWidget());
           })
       ),
     );
@@ -139,6 +161,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     key: const Key("tefResetCode"),
                     label: "Reset code",
                     hint: "Enter code",
+                    errorMessage: "Please enter reset code.",
                     textEditingController: resetCode,
                     textInputType: TextInputType.number,
                     lengthLimit: 6,
@@ -147,6 +170,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   CustomTextField(
                     key: const Key("tefPassword"),
                     label: "New password",
+                    errorMessage: "Please enter password",
                     hint: "Enter your password",
                     icon: IconButton(
                         icon: Icon(
@@ -167,6 +191,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   CustomTextField(
                     key: const Key("tefConfirmPassword"),
                     label: "Confirm password",
+                    errorMessage: "Please enter password",
                     hint: "Enter your confirm password",
                     icon: IconButton(
                         icon: Icon(
@@ -189,23 +214,25 @@ class _ResetPasswordState extends State<ResetPassword> {
                   Button(
                     "Change Password",
                     onPress: () {
-                      if(resetCode.text.isNotEmpty){
+                      FocusScope.of(context).unfocus();
+                      if(_formKey.currentState!.validate()){
+                        _formKey.currentState?.save();
                         if(tieNewPassword.text == tieConfirmPassword.text){
                           _resetPassward(tieNewPassword.text,resetCode.text);
                         }else{
                           Fluttertoast.showToast(
                               msg: "Password does not same.",
                               toastLength: Toast.LENGTH_LONG,
-                              fontSize: 20,
+                              fontSize: DeviceUtil.isTablet ? 20 : 12,
                               backgroundColor: CustomColors.colorBlue,
                               textColor: Colors.white
                           );
                         }
-                      }else {
+                      }else{
                         Fluttertoast.showToast(
-                            msg: "Please enter reset code.",
+                            msg: "Please fill all the details.",
                             toastLength: Toast.LENGTH_LONG,
-                            fontSize: 20,
+                            fontSize: DeviceUtil.isTablet ? 20 : 12,
                             backgroundColor: CustomColors.colorBlue,
                             textColor: Colors.white
                         );
@@ -214,6 +241,12 @@ class _ResetPasswordState extends State<ResetPassword> {
                     },
                   ),
                   const SizedBox(height: 20),
+                 Center(
+                   child:  Text(
+                     'after $secondsRemaining seconds',
+                     style: CustomTextStyle.styleBold.copyWith(fontSize: 18,color: Colors.black),
+                   ),
+                 ),
                   Center(
                     child: FlatButton(
                       onPressed: enableResend ? _resendCode : null,
@@ -223,12 +256,6 @@ class _ResetPasswordState extends State<ResetPassword> {
                       ),
                     ),
                   ),
-                 Center(
-                   child:  Text(
-                     'after $secondsRemaining seconds',
-                     style: CustomTextStyle.styleBold.copyWith(fontSize: 18,color: Colors.black),
-                   ),
-                 ),
                   const SizedBox(
                     height: 48,
                   )

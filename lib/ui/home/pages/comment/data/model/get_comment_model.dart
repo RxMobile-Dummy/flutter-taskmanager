@@ -2,8 +2,9 @@ class GetCommentModel {
   bool? success;
   List<Data>? data;
   String? message;
+  String? error;
 
-  GetCommentModel({this.success, this.data, this.message});
+  GetCommentModel({this.success, this.data, this.message,this.error});
 
   GetCommentModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
@@ -14,6 +15,7 @@ class GetCommentModel {
       });
     }
     message = json['message'];
+    error = json['error'];
   }
 
   Map<String, dynamic> toJson() {
@@ -23,6 +25,7 @@ class GetCommentModel {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     data['message'] = this.message;
+    data['error'] = this.error;
     return data;
   }
 }

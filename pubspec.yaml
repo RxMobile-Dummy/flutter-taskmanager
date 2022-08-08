@@ -54,6 +54,7 @@ dependencies:
   shared_preferences: ^2.0.15
   image_picker: ^0.8.5+3
   fluttertoast: ^8.0.9
+  fab_circular_menu: ^1.0.2
 #  date_utils: ^1.1.0
 
 dev_dependencies:

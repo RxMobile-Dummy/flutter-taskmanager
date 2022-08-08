@@ -9,7 +9,9 @@ import 'package:task_management/ui/home/pages/quick_notes.dart';
 
 import '../../../../../../core/base/base_bloc.dart';
 import '../../../../../../custom/progress_bar.dart';
+import '../../../../../../utils/border.dart';
 import '../../../../../../utils/colors.dart';
+import '../../../../../../utils/device_file.dart';
 import '../../../../../../utils/style.dart';
 import '../../../../../../widget/button.dart';
 import '../../../../../../widget/decoration.dart';
@@ -28,6 +30,7 @@ class _AddNoteState extends State<AddNote> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   GetNoteModel getNoteModel = GetNoteModel();
+  final GlobalKey<FormState> _formKey =  GlobalKey<FormState>();
 
   List<Color> listColors = [
     CustomColors.colorPurple,
@@ -49,24 +52,25 @@ class _AddNoteState extends State<AddNote> {
             }else if (state is AddNoteState) {
               ProgressDialog.hideLoadingDialog(context);
               AddNotesModel? model = state.model;
-              Fluttertoast.showToast(
-                  msg: model!.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              if(model.success == true){
+              if(model!.success == true){
+                Fluttertoast.showToast(
+                    msg: model.message ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
                 Navigator.of(context).pop();
-               /* Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>BlocProvider<AddNoteBloc>(
-                    create: (context) => Sl.Sl<AddNoteBloc>(),
-                    child: QuickNotes(),
-                  )),
-                );*/
                 BlocProvider.of<AddNoteBloc>(context).add(
                     GetNoteEvent());
+              }else {
+                Fluttertoast.showToast(
+                    msg: model.error ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
               }
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
@@ -76,7 +80,10 @@ class _AddNoteState extends State<AddNote> {
             }
           },
           child:  BlocBuilder<AddNoteBloc, BaseState>(builder: (context, state) {
-            return buildWidget();
+            return Form(
+              key: _formKey,
+              child: buildWidget(),
+            );
           }),
       ),
     );
@@ -88,23 +95,93 @@ class _AddNoteState extends State<AddNote> {
       child: Expanded(
         child: RoundedCornerDecoration(
           SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 32,
-                ),
-                CustomTextField(
-                  label: "title",
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 32,
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 16),
+                    color: Colors.grey.shade200,
+                    padding: const EdgeInsets.only(left: 4, right: 16),
+                    child: TextFormField(
+                      style: CustomTextStyle.styleSemiBold.copyWith(
+                          fontSize: DeviceUtil.isTablet ? 16 : 14
+                      ),
+                      controller: titleController,
+                      maxLines: 2,
+                      validator: (value) {
+                        if (value == null || value == "") {
+                          return 'Please enter note title';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                          hintStyle: CustomTextStyle.styleSemiBold.copyWith(
+                              fontSize: DeviceUtil.isTablet ? 16 : 14
+                          ),
+                          labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                              fontSize: DeviceUtil.isTablet ? 16 : 14
+                          ),
+                          hintText: "Title",
+                          enabledBorder:
+                          titleBorder(color: Colors.transparent),
+                          focusedBorder:
+                          titleBorder(color: Colors.transparent)),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 16),
+                    color: Colors.grey.shade200,
+                    padding: EdgeInsets.only(left: 4, right: 16),
+                    child: TextFormField(
+                      style: CustomTextStyle.styleSemiBold.copyWith(
+                          fontSize: DeviceUtil.isTablet ? 16 : 14
+                      ),
+                      controller: descriptionController,
+                      maxLines: 5,
+                      validator: (value) {
+                        if (value == null || value == "") {
+                          return 'Please enter description';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                          hintStyle: CustomTextStyle.styleSemiBold.copyWith(
+                              fontSize: DeviceUtil.isTablet ? 16 : 14
+                          ),
+                          labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                              fontSize: DeviceUtil.isTablet ? 16 : 14
+                          ),
+                          hintText: "Description",
+                          enabledBorder:
+                          titleBorder(color: Colors.transparent),
+                          focusedBorder:
+                          titleBorder(color: Colors.transparent)),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  /* CustomTextField(
+                  label: "Title",
                   minLines: 5,
+                  errorMessage: "Please enter title.",
                   textEditingController: titleController,
+                ),
+                const SizedBox(
+                  height: 15,
                 ),
                 CustomTextField(
                   label: "Description",
+                  errorMessage: "Please enter description.",
                   minLines: 5,
                   textEditingController: descriptionController,
-                ),
-                /*Container(
+                ),*/
+                  /*Container(
                   margin: EdgeInsets.only(left: 16, top: 32),
                   child: Text(
                     "Choose Color",
@@ -142,18 +219,33 @@ class _AddNoteState extends State<AddNote> {
                         .toList(),
                   ),
                 ),*/
-                Button(
-                  "Done",
-                  onPress: () {
-                    _addNote(
-                        task_id: "",
-                      title: titleController.text,
-                      project_id: "",
-                      description: descriptionController.text,
-                    );
-                  },
-                ),
-              ],
+                  Button(
+                    "Done",
+                    verticalMargin: 10,
+                    horizontalMargin: 0,
+                    onPress: () {
+                      FocusScope.of(context).unfocus();
+                      if(_formKey.currentState!.validate()){
+                        _formKey.currentState?.save();
+                        _addNote(
+                          task_id: "",
+                          title: titleController.text,
+                          project_id: "",
+                          description: descriptionController.text,
+                        );
+                      }else{
+                        Fluttertoast.showToast(
+                            msg: "Please fill all the details.",
+                            toastLength: Toast.LENGTH_LONG,
+                            fontSize: DeviceUtil.isTablet ? 20 : 12,
+                            backgroundColor: CustomColors.colorBlue,
+                            textColor: Colors.white
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

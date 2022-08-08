@@ -21,6 +21,7 @@ import '../../../../../../custom/progress_bar.dart';
 import '../../../../../../features/login/presentation/bloc/login_bloc.dart';
 import '../../../../../../features/login/presentation/pages/login.dart';
 import '../../../../../../utils/colors.dart';
+import '../../../../../../utils/device_file.dart';
 import '../../../../../../utils/style.dart';
 import '../../../../../../widget/profile_pi.dart';
 import '../../../../../../widget/size.dart';
@@ -121,10 +122,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         backgroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout,color: CustomColors.colorBlue,size: 25,),
+            icon:  Icon(Icons.logout,color: CustomColors.colorBlue,
+              size: DeviceUtil.isTablet ? 25 : 18,),
             onPressed: () async {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.clear();
+              prefs.setString("isOnBoardingCompleted", "true");
               Navigator.pushAndRemoveUntil(
                 context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
                 create: (context) => Sl.Sl<LoginBloc>(),
@@ -199,7 +202,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                         Text(
                                           "${userMap['first_name']}"
                                               " ${userMap['last_name']}",
-                                          style: CustomTextStyle.styleSemiBold,
+                                          softWrap: true,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: CustomTextStyle.styleSemiBold.copyWith(
+                                              fontSize: DeviceUtil.isTablet ? 16 : 14
+                                          ),
                                         ),
                                         BlocBuilder<UserStatusBloc, BaseState>(
                                           builder: (context, state) {
@@ -212,14 +219,18 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                               }
                                               return Text(
                                                 "  ($userStatus)",
-                                                style: CustomTextStyle.styleSemiBold.copyWith(color: CustomColors.colorBlue,fontSize: 20),
+                                                softWrap: true,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: CustomTextStyle.styleSemiBold.copyWith(
+                                                    color: CustomColors.colorBlue,
+                                                    fontSize:DeviceUtil.isTablet? 20 : 10),
                                               );
                                             } else if (state is StateErrorGeneral) {
                                               ProgressDialog.hideLoadingDialog(context);
                                               Fluttertoast.showToast(
                                                   msg: getTaskModel.message ?? "",
                                                   toastLength: Toast.LENGTH_LONG,
-                                                  fontSize: 20,
+                                                  fontSize: DeviceUtil.isTablet ? 20 : 12,
                                                   backgroundColor: CustomColors.colorBlue,
                                                   textColor: Colors.white
                                               );
@@ -234,15 +245,20 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                     sized_16(size: 4.0),
                                     Text(
                                       "${userMap['email']}",
+                                      softWrap: true,
+                                      overflow: TextOverflow.ellipsis,
                                       style: CustomTextStyle.styleMedium
-                                          .copyWith(color: Colors.grey),
+                                          .copyWith(color: Colors.grey,
+                                          fontSize: DeviceUtil.isTablet ? 16 : 14 ),
                                     ),
                                     Text(
                                       userMap['mobile_number']
                                           .toString()
                                           .substring(3),
+                                      softWrap: true,
+                                      overflow: TextOverflow.ellipsis,
                                       style: CustomTextStyle.styleMedium
-                                          .copyWith(color: Colors.grey),
+                                          .copyWith(color: Colors.grey,fontSize: DeviceUtil.isTablet ? 16 : 14),
                                     ),
                                   ],
                                 ),
@@ -255,7 +271,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           child: GestureDetector(
                             child: Text(
                               "Update Profile",
-                              style: CustomTextStyle.styleSemiBold.copyWith(fontSize: 18,color: CustomColors.colorBlue),
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                              style: CustomTextStyle.styleSemiBold.copyWith(
+                                  fontSize: DeviceUtil.isTablet ? 18 : 12,color: CustomColors.colorBlue),
                             ),
                             onTap: (){
                               email.text = userMap['email'];
@@ -288,7 +307,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                           imageFile: imageFile,
                                         ),
                                       )),
-                              );
+                              ).then((value) async {
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                setState(() {
+                                  userMap = jsonDecode(prefs.getString('userData') ?? "");
+                                });
+                              });
 
                             },
                           ),
@@ -310,12 +334,14 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                 children: [
                                   Text(
                                     "${state.model!.data!.length}",
-                                    style: CustomTextStyle.styleMedium,
+                                    style: CustomTextStyle.styleMedium.copyWith(
+                                        fontSize: DeviceUtil.isTablet ? 16 : 14
+                                    ),
                                   ),
                                   Text(
                                     "Create Tasks",
                                     style: CustomTextStyle.styleSemiBold
-                                        .copyWith(color: Colors.grey, fontSize: 14),
+                                        .copyWith(color: Colors.grey, fontSize: 14 ),
                                   ),
                                 ],
                               ),
@@ -325,7 +351,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             Fluttertoast.showToast(
                                 msg: getTaskModel.message ?? "",
                                 toastLength: Toast.LENGTH_LONG,
-                                fontSize: 20,
+                                fontSize: DeviceUtil.isTablet ? 20 : 12,
                                 backgroundColor: CustomColors.colorBlue,
                                 textColor: Colors.white
                             );
@@ -351,7 +377,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                 children: [
                                   Text(
                                     totalTask.toString(),
-                                    style: CustomTextStyle.styleMedium,
+                                    style: CustomTextStyle.styleMedium.copyWith(
+                                        fontSize: DeviceUtil.isTablet ? 16 : 14
+                                    ),
                                   ),
                                   Text(
                                     "Completed Tasks",
@@ -366,7 +394,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             Fluttertoast.showToast(
                                 msg: getTaskModel.message ?? "",
                                 toastLength: Toast.LENGTH_LONG,
-                                fontSize: 20,
+                                fontSize: DeviceUtil.isTablet ? 20 : 12,
                                 backgroundColor: CustomColors.colorBlue,
                                 textColor: Colors.white
                             );
@@ -397,7 +425,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   Fluttertoast.showToast(
                       msg: getTaskModel.message ?? "",
                       toastLength: Toast.LENGTH_LONG,
-                      fontSize: 20,
+                      fontSize: DeviceUtil.isTablet ? 20 : 12,
                       backgroundColor: CustomColors.colorBlue,
                       textColor: Colors.white
                   );
@@ -422,7 +450,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   Fluttertoast.showToast(
                       msg: getTaskModel.message ?? "",
                       toastLength: Toast.LENGTH_LONG,
-                      fontSize: 20,
+                      fontSize: DeviceUtil.isTablet ? 20 : 12,
                       backgroundColor: CustomColors.colorBlue,
                       textColor: Colors.white
                   );
@@ -458,8 +486,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   taskCategory(index, int count,String name) {
     return Container(
-      height: 100,
-      width: 150,
+      height:  DeviceUtil.isTablet ? 100 : 80,
+      width:DeviceUtil.isTablet ?  150 : 130,
       padding: const EdgeInsets.only(left: 12,right:  12),
       margin: EdgeInsets.only(left: index == 0 ? 16 : 16, right: 16),
       decoration: BoxDecoration(
@@ -470,12 +498,16 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         children: [
           Text(
             listCategory[index],
+            softWrap: true,
+            overflow: TextOverflow.ellipsis,
             style: CustomTextStyle.styleSemiBold
-                .copyWith(color: Colors.white, fontSize: 16),
+                .copyWith(color: Colors.white, fontSize: DeviceUtil.isTablet ? 18 : 16),
           ),
           sized_16(size: 4.0),
         Text(
           "$count $name",
+          softWrap: true,
+          overflow: TextOverflow.ellipsis,
           style: CustomTextStyle.styleMedium
               .copyWith(color: Colors.white, fontSize: 14),
           ),
@@ -519,7 +551,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       Fluttertoast.showToast(
                           msg: getTaskModel.message ?? "",
                           toastLength: Toast.LENGTH_LONG,
-                          fontSize: 20,
+                          fontSize: DeviceUtil.isTablet ? 20 : 12,
                           backgroundColor: CustomColors.colorBlue,
                           textColor: Colors.white
                       );
@@ -543,7 +575,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       Fluttertoast.showToast(
                           msg: getTaskModel.message ?? "",
                           toastLength: Toast.LENGTH_LONG,
-                          fontSize: 20,
+                          fontSize: DeviceUtil.isTablet ? 20 : 12,
                           backgroundColor: CustomColors.colorBlue,
                           textColor: Colors.white
                       );
@@ -574,7 +606,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 alignment: Alignment.center,
                 child: Text(
                   "${percentage * 100}%",
-                  style: CustomTextStyle.styleSemiBold.copyWith(fontSize: 18),
+                  style: CustomTextStyle.styleSemiBold.copyWith(
+                      fontSize: DeviceUtil.isTablet? 18 : 13),
                 ),
               ),
               painter: CircleProgressBarPainter(

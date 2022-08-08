@@ -8,6 +8,7 @@ import 'package:task_management/features/login/presentation/bloc/login_bloc.dart
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 
+import '../features/login/presentation/pages/login.dart';
 import '../onboarding/onboarding.dart';
 import '../utils/style.dart';
 import '../widget/size.dart';
@@ -27,13 +28,14 @@ class _SplashState extends State<Splash> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var authToken = prefs.getString('access');
+      var isOnBoardingComplete = prefs.getString("isOnBoardingCompleted");
       Timer(Duration(seconds: 2), () {
         Get.off(
           MultiBlocProvider(providers: [
             BlocProvider<LoginBloc>(
               create: (context) => Sl.Sl<LoginBloc>(),
             ),
-          ], child: authToken == null ? OnBoarding() : Home())
+          ], child: authToken == null ? (isOnBoardingComplete == "true") ? Login() : OnBoarding() : Home())
          /* BlocProvider<LoginBloc>(
             create: (context) =>
                 BlocProvider.of<LoginBloc>(context), child: authToken == null ? OnBoarding() : Home(),),*/

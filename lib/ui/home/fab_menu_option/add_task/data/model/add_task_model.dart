@@ -2,13 +2,15 @@ class AddTaskModel {
   bool? success;
   Data? data;
   String? message;
+  String? error;
 
-  AddTaskModel({this.success, this.data, this.message});
+  AddTaskModel({this.success, this.data, this.message,this.error});
 
   AddTaskModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     data = json['data'] != null ? new Data.fromJson(json['data']) : null;
     message = json['message'];
+    error = json['error'];
   }
 
   Map<String, dynamic> toJson() {
@@ -18,6 +20,7 @@ class AddTaskModel {
       data['data'] = this.data!.toJson();
     }
     data['message'] = this.message;
+    data['error'] = this.error;
     return data;
   }
 }
@@ -39,6 +42,7 @@ class Data {
   String? assigneeId;
   String? startDate;
   String? endDate;
+  bool? isCompleted;
 
   Data(
       {this.id,
@@ -56,7 +60,7 @@ class Data {
         this.reviewerId,
         this.assigneeId,
         this.startDate,
-        this.endDate});
+        this.endDate,this.isCompleted});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -75,6 +79,7 @@ class Data {
     assigneeId = json['assignee_id'];
     startDate = json['start_date'];
     endDate = json['end_date'];
+    isCompleted = json['isCompleted'];
   }
 
   Map<String, dynamic> toJson() {
@@ -95,6 +100,7 @@ class Data {
     data['assignee_id'] = this.assigneeId;
     data['start_date'] = this.startDate;
     data['end_date'] = this.endDate;
+    data['isCompleted'] = this.isCompleted;
     return data;
   }
 }

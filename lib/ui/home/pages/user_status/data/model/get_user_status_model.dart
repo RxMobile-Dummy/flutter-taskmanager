@@ -2,8 +2,9 @@ class GetUserStatusModel {
   bool? success;
   List<Data>? data;
   String? message;
+  String? error;
 
-  GetUserStatusModel({this.success, this.data, this.message});
+  GetUserStatusModel({this.success, this.data, this.message,this.error});
 
   GetUserStatusModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
@@ -14,6 +15,7 @@ class GetUserStatusModel {
       });
     }
     message = json['message'];
+    error = json['error'];
   }
 
   Map<String, dynamic> toJson() {
@@ -23,6 +25,7 @@ class GetUserStatusModel {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     data['message'] = this.message;
+    data['error'] = this.error;
     return data;
   }
 }

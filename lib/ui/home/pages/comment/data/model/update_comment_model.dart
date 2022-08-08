@@ -2,13 +2,15 @@ class UpdateCommentModel {
   bool? success;
   Data? data;
   String? message;
+  String? error;
 
-  UpdateCommentModel({this.success, this.data, this.message});
+  UpdateCommentModel({this.success, this.data, this.message,this.error});
 
   UpdateCommentModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     data = json['data'] != null ? new Data.fromJson(json['data']) : null;
     message = json['message'];
+    error = json['error'];
   }
 
   Map<String, dynamic> toJson() {
@@ -18,6 +20,7 @@ class UpdateCommentModel {
       data['data'] = this.data!.toJson();
     }
     data['message'] = this.message;
+    data['error'] = this.error;
     return data;
   }
 }

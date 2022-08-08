@@ -2,13 +2,15 @@ class LoginModel {
   bool? success;
   Data? data;
   String? message;
+  String? error;
 
-  LoginModel({this.success, this.data, this.message});
+  LoginModel({this.success, this.data, this.message,this.error});
 
   LoginModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     data = json['data'] != null ? new Data.fromJson(json['data']) : null;
     message = json['message'];
+    error = json['error'];
   }
 
   Map<String, dynamic> toJson() {
@@ -18,6 +20,7 @@ class LoginModel {
       data['data'] = this.data!.toJson();
     }
     data['message'] = this.message;
+    data['error'] = this.error;
     return data;
   }
 }

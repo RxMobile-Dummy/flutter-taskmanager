@@ -16,6 +16,7 @@ import '../../../../ui/home/fab_menu_option/add_note/presentation/bloc/add_note_
 import '../../../../ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import '../../../../ui/home/home.dart';
 import '../../../../utils/colors.dart';
+import '../../../../utils/device_file.dart';
 import '../../../../utils/style.dart';
 import '../../../../widget/button.dart';
 import '../../../../widget/decoration.dart';
@@ -40,6 +41,7 @@ class _LoginState extends State<Login> {
   LoginBloc? loginBloc;
   TextEditingController userName = TextEditingController();
   TextEditingController tiePassword = TextEditingController();
+  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -52,14 +54,14 @@ class _LoginState extends State<Login> {
           }else if (state is LoginState) {
             ProgressDialog.hideLoadingDialog(context);
             LoginModel? model = state.model;
-            Fluttertoast.showToast(
-                msg: model!.message ?? "",
-                toastLength: Toast.LENGTH_LONG,
-                fontSize: 20,
-                backgroundColor: CustomColors.colorBlue,
-                textColor: Colors.white
-            );
-            if(model.success == true){
+            if(model!.success == true){
+              Fluttertoast.showToast(
+                  msg: model.message ?? "",
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: DeviceUtil.isTablet ? 20 : 12,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setString('access', model.data!.authenticationToken!.access ?? "");
               prefs.setString('refresh', model.data!.authenticationToken!.refresh ?? "");
@@ -73,17 +75,21 @@ class _LoginState extends State<Login> {
                 },),
                     (route) => false,
               );
-            }/*else {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text("Please check your credentials that you have entered."),
-              ));
-            }*/
+            }else {
+              Fluttertoast.showToast(
+                  msg: model.error ?? "",
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: DeviceUtil.isTablet ? 20 : 12,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
+            }
           } else if (state is StateErrorGeneral) {
             ProgressDialog.hideLoadingDialog(context);
             Fluttertoast.showToast(
                 msg: state.message,
                 toastLength: Toast.LENGTH_LONG,
-                fontSize: 20,
+                fontSize: DeviceUtil.isTablet ? 20 : 12,
                 backgroundColor: CustomColors.colorBlue,
                 textColor: Colors.white
             );
@@ -91,7 +97,9 @@ class _LoginState extends State<Login> {
         },
         bloc: BlocProvider.of<LoginBloc>(context),
         child:  BlocBuilder<LoginBloc, BaseState>(builder: (context, state) {
-          return buildWidget();
+          return Form(
+              key: _formKey,
+              child: buildWidget());
         })
       ),
     );
@@ -113,6 +121,7 @@ class _LoginState extends State<Login> {
                 CustomTextField(
                   key: Key("tefUsername"),
                   label: "Username",
+                  isEmail: true,
                   hint: "Enter username",
                   errorMessage: "Please Enter userName",
                   textEditingController: userName,
@@ -157,14 +166,29 @@ class _LoginState extends State<Login> {
                     alignment: Alignment.centerRight,
                     child: Text(
                       "Forgot Password?",
-                      style: CustomTextStyle.styleBold,
+                      style: CustomTextStyle.styleBold.copyWith(
+                          fontSize: DeviceUtil.isTablet ? 16 : 14
+                      ),
                     ),
                   ),
                 ),
                 Button(
                   "Login",
                   onPress: () {
-                    _loginUser(userName.text,tiePassword.text);
+                    if(_formKey.currentState!.validate()){
+                      _formKey.currentState?.save();
+                      FocusScope.of(context).unfocus();
+                      _loginUser(userName.text,tiePassword.text);
+                    }else{
+                      FocusScope.of(context).unfocus();
+                      Fluttertoast.showToast(
+                          msg: "Please fill all the details.",
+                          toastLength: Toast.LENGTH_LONG,
+                          fontSize: DeviceUtil.isTablet ? 20 : 12,
+                          backgroundColor: CustomColors.colorBlue,
+                          textColor: Colors.white
+                      );
+                    }
                     //Get.off(Home());
                   },
                 ),
@@ -174,7 +198,9 @@ class _LoginState extends State<Login> {
                   children: [
                     Text(
                       "Don't have account ?",
-                      style: CustomTextStyle.styleBold,
+                      style: CustomTextStyle.styleBold.copyWith(
+                          fontSize: DeviceUtil.isTablet ? 16 : 14
+                      ),
                     ),
                     GestureDetector(
                       onTap: () {
@@ -190,7 +216,8 @@ class _LoginState extends State<Login> {
                       child:Text(
                           " Create One",
                           style: CustomTextStyle.styleBold
-                              .copyWith(color: CustomColors.colorBlue),
+                              .copyWith(color: CustomColors.colorBlue,
+                              fontSize: DeviceUtil.isTablet ? 16 : 14),
                         ),
                     ),
                   ],

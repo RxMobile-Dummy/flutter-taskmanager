@@ -19,6 +19,7 @@ import '../../../../../../custom/progress_bar.dart';
 import '../../../../../../features/login/presentation/bloc/login_bloc.dart';
 import '../../../../../../features/login/presentation/bloc/login_event.dart';
 import '../../../../../../utils/colors.dart';
+import '../../../../../../utils/device_file.dart';
 import '../../../../../../utils/style.dart';
 import '../../../../../../widget/button.dart';
 import '../../../../../../widget/decoration.dart';
@@ -112,18 +113,26 @@ class _UpdateProfileState extends State<UpdateProfile> {
             } else if (state is UpdateProfileState) {
               ProgressDialog.hideLoadingDialog(context);
               updateUserProfileModel = state.model!;
-              Fluttertoast.showToast(
-                  msg: updateUserProfileModel.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
               if(updateUserProfileModel.success == true){
+                Fluttertoast.showToast(
+                    msg: updateUserProfileModel.message ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 String user = jsonEncode(updateUserProfileModel.data?.toJson());
                 prefs.setString('userData', user);
                 Navigator.of(context).pop();
+              }else {
+                Fluttertoast.showToast(
+                    msg: updateUserProfileModel.error ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
               }
               //  Get.off(Login());
             } else if (state is StateErrorGeneral) {
@@ -131,7 +140,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
-                  fontSize: 20,
+                  fontSize: DeviceUtil.isTablet ? 20 : 12,
                   backgroundColor: CustomColors.colorBlue,
                   textColor: Colors.white
               );
@@ -172,15 +181,15 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           (widget.imageFile == null || widget.imageFile == "")
                               ? Image.asset(
                                   'assets/images/image_holder.png',
-                                  height: 120,
-                                  width: 120,
+                                  height: DeviceUtil.isTablet ? 120 : 100,
+                                  width: DeviceUtil.isTablet ? 120 : 100,
                                   fit: BoxFit.fill,
                                 )
                               : widget.imageFile.toString().contains("static")
                                   ? Image.network(
                                       "${Strings.baseUrl}${widget.imageFile?.path}",
-                                      height: 120,
-                                      width: 120,
+                                      height: DeviceUtil.isTablet ? 120 : 100,
+                                      width: DeviceUtil.isTablet ? 120 : 100,
                                       fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace){
                                         return const Text("IMAGE GET ERROR....");
@@ -188,8 +197,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                     )
                                   : Image.file(
                                       widget.imageFile!,
-                                      height: 120,
-                                      width: 120,
+                                      height: DeviceUtil.isTablet ? 120 : 100,
+                                      width: DeviceUtil.isTablet ?  120 : 100,
                                       fit: BoxFit.cover,
                                     ),
                     ),
@@ -216,9 +225,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 ),
                 CustomTextField(
                   key: Key("firstName"),
-                  label: "first name",
-                  hint: "Enter first name",
-                  errorMessage: "Please Enter first name",
+                  label: "First name",
+                  hint: "Enter First name",
+                  errorMessage: "Please Enter First name",
                   textEditingController: widget.firstName,
                   textInputType: TextInputType.name,
                 ),
@@ -227,9 +236,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 ),
                 CustomTextField(
                   key: Key("lastName"),
-                  label: "last name",
-                  hint: "Enter last name",
-                  errorMessage: "Please Enter last name",
+                  label: "Last name",
+                  hint: "Enter Last name",
+                  errorMessage: "Please Enter Last name",
                   textEditingController: widget.lastName,
                   textInputType: TextInputType.name,
                 ),
@@ -238,9 +247,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 ),
                 CustomTextField(
                   key: Key("email"),
-                  label: "email",
-                  hint: "Enter email",
-                  errorMessage: "Please Enter email",
+                  label: "Email",
+                  hint: "Enter Email",
+                  isEmail: true,
+                  errorMessage: "Please Enter Email",
                   textEditingController: widget.email,
                   textInputType: TextInputType.emailAddress,
                 ),
@@ -249,9 +259,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 ),
                 CustomTextField(
                   key: Key("mobile"),
-                  label: "mobile",
-                  hint: "Enter mobile number",
-                  errorMessage: "Please Enter mobile number",
+                  label: "Mobile",
+                  hint: "Enter Mobile number",
+                  isMobile: true,
+                  errorMessage: "Please Enter Mobile number",
                   textEditingController: widget.mobile,
                   textInputType: TextInputType.phone,
                 ),
@@ -328,7 +339,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       Fluttertoast.showToast(
                           msg: state.message,
                           toastLength: Toast.LENGTH_LONG,
-                          fontSize: 20,
+                          fontSize: DeviceUtil.isTablet ? 20 : 12,
                           backgroundColor: CustomColors.colorBlue,
                           textColor: Colors.white
                       );
@@ -410,7 +421,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       Fluttertoast.showToast(
                           msg: state.message,
                           toastLength: Toast.LENGTH_LONG,
-                          fontSize: 20,
+                          fontSize: DeviceUtil.isTablet ? 20 : 12,
                           backgroundColor: CustomColors.colorBlue,
                           textColor: Colors.white
                       );
@@ -423,6 +434,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 Button(
                   "Update Profile",
                   onPress: () {
+                    FocusScope.of(context).unfocus();
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState?.save();
                       imageList = [];
@@ -446,7 +458,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       Fluttertoast.showToast(
                           msg: 'Please fill all the details.',
                           toastLength: Toast.LENGTH_LONG,
-                          fontSize: 20,
+                          fontSize: DeviceUtil.isTablet ? 20 : 12,
                           backgroundColor: CustomColors.colorBlue,
                           textColor: Colors.white
                       );
@@ -454,9 +466,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     //Get.off(Home());
                   },
                 ),
-                const SizedBox(
+                /*const SizedBox(
                   height: 48,
-                )
+                )*/
               ],
             ),
           ),
