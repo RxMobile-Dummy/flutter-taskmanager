@@ -160,7 +160,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
   Widget buildWidget() {
     return RoundedCornerPage(
       title: "Update Profile",
-      isFirstPage: true,
+      showBackButton: true,
+      isFirstPage: false,
       child: Expanded(
         child: RoundedCornerDecoration(
           SingleChildScrollView(
@@ -174,11 +175,22 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   padding: const EdgeInsets.only(left: 20),
                   child: GestureDetector(
                     child: Container(
+                      height: DeviceUtil.isTablet ? 120 : 100,
+                      width: DeviceUtil.isTablet ? 120 : 100,
                       decoration: BoxDecoration(
                           border: Border.all(width: 2, color: Colors.grey),
-                          borderRadius: BorderRadius.circular(10)),
-                      child:
-                          (widget.imageFile == null || widget.imageFile == "")
+                          borderRadius: BorderRadius.circular(10),
+                        image:  DecorationImage(
+                            image: (widget.imageFile!.path == null || widget.imageFile!.path == "")
+                                ? AssetImage('assets/images/image_holder.png')
+                                :  widget.imageFile.toString().contains("static")
+                                ? NetworkImage( "${Strings.baseUrl}${widget.imageFile?.path}")
+                                : FileImage(  widget.imageFile!) as ImageProvider,
+                            fit: BoxFit.fill
+                        ),
+                      ),
+                   /*   child:
+                          (widget.imageFile!.path == null || widget.imageFile!.path == "")
                               ? Image.asset(
                                   'assets/images/image_holder.png',
                                   height: DeviceUtil.isTablet ? 120 : 100,
@@ -200,7 +212,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                       height: DeviceUtil.isTablet ? 120 : 100,
                                       width: DeviceUtil.isTablet ?  120 : 100,
                                       fit: BoxFit.cover,
-                                    ),
+                                    ),*/
                     ),
                     onTap: () {
                       showModalBottomSheet(

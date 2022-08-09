@@ -137,7 +137,7 @@ class _OnBoardingState extends State<OnBoarding> {
                                 .copyWith(color: Colors.black, fontSize: 14)),
                       ),
                     ),
-                    SizedBox(
+                  /*  SizedBox(
                       height: 16,
                     ),
                     GestureDetector(
@@ -156,7 +156,7 @@ class _OnBoardingState extends State<OnBoarding> {
                         style: CustomTextStyle.styleBold
                             .copyWith(color: Colors.white),
                       ),
-                    ),
+                    ),*/
                     SizedBox(
                       height: 16,
                     )

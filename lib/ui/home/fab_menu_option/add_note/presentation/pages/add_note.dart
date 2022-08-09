@@ -74,6 +74,13 @@ class _AddNoteState extends State<AddNote> {
               }
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              Fluttertoast.showToast(
+                  msg: state.message,
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: DeviceUtil.isTablet ? 20 : 12,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
               /*ScaffoldMessenger.of(context).showSnackBar( SnackBar(
                 content: Text(state.message),
               ));*/
@@ -92,6 +99,7 @@ class _AddNoteState extends State<AddNote> {
   Widget buildWidget(){
     return RoundedCornerPage(
       title: "Add Note",
+      showBackButton: true,
       child: Expanded(
         child: RoundedCornerDecoration(
           SingleChildScrollView(

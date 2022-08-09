@@ -816,7 +816,7 @@ class _ProjectState extends State<Project> {
                           status_id: getAllProjectsModel.data![index].statusId,
                           duration: 0,
                           archive: getAllProjectsModel.data![index].archive,
-                          color: hexColor,
+                          color: (hexColor == null) ? selectedColorsForEdit.toHex() : hexColor,
                           is_private: getAllProjectsModel.data![index].isPrivate,
                           name: titleController?.text,
                           description: descriptionController?.text

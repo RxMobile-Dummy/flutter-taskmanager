@@ -143,6 +143,7 @@ class _ResetPasswordState extends State<ResetPassword> {
   Widget buildWidget(){
     return RoundedCornerPage(
         title: "Reset Password",
+        showBackButton: true,
         child: Expanded(
           child: Container(
             decoration: const BoxDecoration(

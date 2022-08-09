@@ -66,6 +66,8 @@ class _LoginState extends State<Login> {
               prefs.setString('access', model.data!.authenticationToken!.access ?? "");
               prefs.setString('refresh', model.data!.authenticationToken!.refresh ?? "");
               prefs.setString('id', model.data?.id!.toString() ?? "");
+              String? token = prefs.getString("access");
+              print(token);
               String user = jsonEncode(model.data?.toJson());
               prefs.setString('userData', user);
               Navigator.pushAndRemoveUntil<dynamic>(
@@ -108,7 +110,8 @@ class _LoginState extends State<Login> {
   Widget buildWidget(){
     return RoundedCornerPage(
       title: "Login",
-      isFirstPage: true,
+      isFirstPage: false,
+      showBackButton: false,
       child: Expanded(
         child: RoundedCornerDecoration(
           SingleChildScrollView(

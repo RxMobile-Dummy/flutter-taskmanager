@@ -129,6 +129,7 @@ class _UpdateTaskState extends State<UpdateTask> {
   Widget buildWidget(){
     return RoundedCornerPage(
       title: "Update Task",
+      showBackButton: true,
       child: Expanded(
         child: RoundedCornerDecoration(
           SingleChildScrollView(
@@ -256,11 +257,13 @@ class _UpdateTaskState extends State<UpdateTask> {
                             fontSize: DeviceUtil.isTablet ? 16 : 14
                         ),
                         maxLines: 5,
+                        maxLength: 50,
                         controller: widget.commentController,
                         decoration: InputDecoration(
                             hintStyle: CustomTextStyle.styleSemiBold.copyWith(
                                 fontSize: DeviceUtil.isTablet ? 16 : 14
                             ),
+                            counterText: "${widget.commentController.text.length}/50",
                             labelStyle: CustomTextStyle.styleSemiBold.copyWith(
                                 fontSize: DeviceUtil.isTablet ? 16 : 14
                             ),

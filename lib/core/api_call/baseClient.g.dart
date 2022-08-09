@@ -10,7 +10,7 @@ part of 'baseClient.dart';
 
 class _ApiClient implements ApiClient {
   _ApiClient(this._dio, {this.baseUrl}) {
-    baseUrl ??= 'https://e8c5-180-211-112-179.in.ngrok.io/task_app/';
+    baseUrl ??= 'http://65.0.110.22:8000/task_app/';
   }
 
   final Dio _dio;

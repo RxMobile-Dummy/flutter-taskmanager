@@ -128,6 +128,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.clear();
               prefs.setString("isOnBoardingCompleted", "true");
+              print(prefs);
               Navigator.pushAndRemoveUntil(
                 context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
                 create: (context) => Sl.Sl<LoginBloc>(),
@@ -228,7 +229,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                             } else if (state is StateErrorGeneral) {
                                               ProgressDialog.hideLoadingDialog(context);
                                               Fluttertoast.showToast(
-                                                  msg: getTaskModel.message ?? "",
+                                                  msg: state.message,
                                                   toastLength: Toast.LENGTH_LONG,
                                                   fontSize: DeviceUtil.isTablet ? 20 : 12,
                                                   backgroundColor: CustomColors.colorBlue,
@@ -349,7 +350,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           }else if (state is StateErrorGeneral) {
                             ProgressDialog.hideLoadingDialog(context);
                             Fluttertoast.showToast(
-                                msg: getTaskModel.message ?? "",
+                                msg: state.message,
                                 toastLength: Toast.LENGTH_LONG,
                                 fontSize: DeviceUtil.isTablet ? 20 : 12,
                                 backgroundColor: CustomColors.colorBlue,
@@ -392,7 +393,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           }else if (state is StateErrorGeneral) {
                             ProgressDialog.hideLoadingDialog(context);
                             Fluttertoast.showToast(
-                                msg: getTaskModel.message ?? "",
+                                msg: state.message,
                                 toastLength: Toast.LENGTH_LONG,
                                 fontSize: DeviceUtil.isTablet ? 20 : 12,
                                 backgroundColor: CustomColors.colorBlue,
@@ -423,7 +424,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 }else if (state is StateErrorGeneral) {
                   ProgressDialog.hideLoadingDialog(context);
                   Fluttertoast.showToast(
-                      msg: getTaskModel.message ?? "",
+                      msg: state.message,
                       toastLength: Toast.LENGTH_LONG,
                       fontSize: DeviceUtil.isTablet ? 20 : 12,
                       backgroundColor: CustomColors.colorBlue,
@@ -448,7 +449,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 }else if (state is StateErrorGeneral) {
                   ProgressDialog.hideLoadingDialog(context);
                   Fluttertoast.showToast(
-                      msg: getTaskModel.message ?? "",
+                      msg: state.message,
                       toastLength: Toast.LENGTH_LONG,
                       fontSize: DeviceUtil.isTablet ? 20 : 12,
                       backgroundColor: CustomColors.colorBlue,
@@ -549,7 +550,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     }else if (state is StateErrorGeneral) {
                       ProgressDialog.hideLoadingDialog(context);
                       Fluttertoast.showToast(
-                          msg: getTaskModel.message ?? "",
+                          msg: state.message,
                           toastLength: Toast.LENGTH_LONG,
                           fontSize: DeviceUtil.isTablet ? 20 : 12,
                           backgroundColor: CustomColors.colorBlue,
@@ -573,7 +574,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     }else if (state is StateErrorGeneral) {
                       ProgressDialog.hideLoadingDialog(context);
                       Fluttertoast.showToast(
-                          msg: getTaskModel.message ?? "",
+                          msg: state.message,
                           toastLength: Toast.LENGTH_LONG,
                           fontSize: DeviceUtil.isTablet ? 20 : 12,
                           backgroundColor: CustomColors.colorBlue,

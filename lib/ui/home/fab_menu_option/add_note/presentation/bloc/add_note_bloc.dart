@@ -138,9 +138,9 @@ class AddNoteBloc extends Bloc<BaseEvent, BaseState> {
 
   String? _mapFailureToMessage(Failure failure) {
     if (failure.runtimeType == ServerFailure) {
-      return Strings.k_SERVER_FAILURE_MESSAGE;
+      return Strings.kServerFailureMessage;
     } else if (failure.runtimeType == CacheFailure) {
-      return Strings.k_CACHE_FAILURE_MESSAGE;
+      return Strings.kCacheFailureMessage;
     } else if (failure.runtimeType == FailureMessage) {
       if (failure is FailureMessage) {
         return failure.message;

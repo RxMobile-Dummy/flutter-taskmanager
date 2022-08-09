@@ -42,7 +42,7 @@ class AddTaskRepositoriesImpl extends AddTaskRepositories {
     } catch (e, s) {
       Failure error = await checkErrorState(e);
       //yield Left(error);
-      yield Left(FailureMessage(error.toString()));
+      yield Left(FailureMessage(error.message.toString()));
       print(e);
       print("Fail");
     }
@@ -52,7 +52,7 @@ class AddTaskRepositoriesImpl extends AddTaskRepositories {
   Future<Failure> checkErrorState(e) async {
     if (e is DioError) {
       if (e.error is SocketException) {
-        return InternetFailure(Strings.kNoInternetConnection);
+        return FailureMessage(Strings.kNoInternetConnection);
       } else if (e.response!.statusCode == 400) {
         return FailureMessage(e.response!.data.toString());
       } else if (e.response!.statusCode == 500) {
@@ -78,7 +78,7 @@ class AddTaskRepositoriesImpl extends AddTaskRepositories {
     } catch (e, s) {
       Failure error = await checkErrorState(e);
       //yield Left(error);
-      yield Left(FailureMessage(error.toString()));
+      yield Left(FailureMessage(error.message.toString()));
       print(e);
       print("Fail");
     }
@@ -94,7 +94,7 @@ class AddTaskRepositoriesImpl extends AddTaskRepositories {
     } catch (e, s) {
       Failure error = await checkErrorState(e);
       //yield Left(error);
-      yield Left(FailureMessage(error.toString()));
+      yield Left(FailureMessage(error.message.toString()));
       print(e);
       print("Fail");
     }
@@ -110,7 +110,9 @@ class AddTaskRepositoriesImpl extends AddTaskRepositories {
     } catch (e, s) {
       Failure error = await checkErrorState(e);
       //yield Left(error);
-      yield Left(FailureMessage(error.toString()));
+
+
+      yield Left(FailureMessage(error.message.toString()));
       print(e);
       print("Fail");
     }

@@ -121,6 +121,7 @@ class _TaskDetailsState extends State<TaskDetails> {
     return RoundedCornerPage(
         title: "",
         backButton: false,
+        showBackButton: true,
         actions: Container(
           margin: EdgeInsets.only(right: 8),
           child: popupMenu(),
@@ -197,7 +198,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                       color: Colors.grey,
                     ),
                     sized_16(),
-                    Column(
+                    Flexible(child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         title("Description"),
@@ -211,7 +212,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                           overflow: TextOverflow.ellipsis,
                         )
                       ],
-                    ),
+                    ),)
                   ],
                 )),
             /*    item(Row(
@@ -478,10 +479,28 @@ class _TaskDetailsState extends State<TaskDetails> {
                             ));
                       },
                       child: Container(
+                        height: DeviceUtil.isTablet ? 120 : 80,
+                        width: DeviceUtil.isTablet ? 120 : 80,
                         decoration: BoxDecoration(
-                            border: Border.all(width: 2, color: Colors.grey),
+                            border: Border.all(
+                                width: 2, color: Colors.grey),
+                            image: DecorationImage(
+                              image: (imageFile == null || imageFile == "")
+                                  ? AssetImage(
+                                'assets/images/image_holder.png',
+                              )
+                                  : imageFile.toString().contains("static")
+                                  ? NetworkImage(
+                                "${Strings.baseUrl}${imageFile?.path}",
+
+                              )
+                                  : FileImage(
+                                imageFile!,
+                              )  as ImageProvider,
+                              fit: BoxFit.fill,
+                            ),
                             borderRadius: BorderRadius.circular(10,)),
-                        child:
+                   /*     child:
                         (imageFile == null || imageFile == "")
                             ? Image.asset(
                           'assets/images/image_holder.png',
@@ -504,7 +523,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                           height:  DeviceUtil.isTablet ? 120 : 80,
                           width:  DeviceUtil.isTablet ? 120 : 80,
                           fit: BoxFit.cover,
-                        ),
+                        ),*/
                       ),
                     ),
                     TextField(
@@ -535,7 +554,9 @@ class _TaskDetailsState extends State<TaskDetails> {
                            var authToken = prefs.getString('id');
                            print(authToken);
                            imageList = [];
-                           imageList?.add(imageFile!.path);
+                           if(imageFile != null){
+                             imageList?.add(imageFile!.path);
+                           }
                            _addComment(
                              comment_user_id: authToken,
                              description: commentControllerForAdd.text,
@@ -774,17 +795,19 @@ class _TaskDetailsState extends State<TaskDetails> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                margin: const EdgeInsets.only(left: 0, top: 8),
-                child: Text(
-                  getCommentModel.data![index].description ??
-                      "Lorem ipsum dolor sit amet,consectetur\nadipiscing.",
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                  style:
-                      CustomTextStyle.styleMedium.copyWith(color: Colors.black,
+              Flexible(
+                child: Container(
+                  margin: const EdgeInsets.only(left: 0, top: 8),
+                  child: Text(
+                    getCommentModel.data![index].description ??
+                        "Lorem ipsum dolor sit amet,consectetur\nadipiscing.",
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                    style:
+                    CustomTextStyle.styleMedium.copyWith(color: Colors.black,
                         fontSize: DeviceUtil.isTablet ? 16 : 14
-                      ),
+                    ),
+                  ),
                 ),
               ),
               Container(
@@ -803,8 +826,10 @@ class _TaskDetailsState extends State<TaskDetails> {
                       onTap: () {
                         commentController.text =
                             getCommentModel.data![index].description ?? "";
-                        imageFileForEdit =
-                            File(getCommentModel.data![index].files![0]);
+                        imageFileForEdit = File(
+                            getCommentModel.data![index].files!.isNotEmpty
+                            ? getCommentModel.data![index].files![0]
+                                : "");
                         print(".................");
                         openBottomSheet(context, index, commentController);
                         /*_updateComment(
@@ -899,12 +924,24 @@ class _TaskDetailsState extends State<TaskDetails> {
                             child: Stack(
                               children: [
                                 Container(
+                                  height: DeviceUtil.isTablet ? 120 : 80,
+                                  width: DeviceUtil.isTablet ? 120 : 80,
                                   decoration: BoxDecoration(
                                       border: Border.all(
                                           width: 2, color: Colors.grey),
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: (imageFileForEdit == null ||
-                                      imageFileForEdit == "")
+                                      borderRadius: BorderRadius.circular(10),
+                                    image: DecorationImage(
+                                      image: (imageFileForEdit!.path == null ||
+                                          imageFileForEdit!.path == "")
+                                          ? AssetImage("assets/images/image_holder.png")
+                                     :  imageFileForEdit.toString().contains("static")
+                            ? NetworkImage("${Strings.baseUrl}${imageFileForEdit?.path}")
+                                          : FileImage( imageFileForEdit!) as ImageProvider,
+                                      fit: BoxFit.fill
+                                    ),
+                                  ),
+                         /*         child: (imageFileForEdit!.path == null ||
+                                      imageFileForEdit!.path == "")
                                       ? Image.asset(
                                     'assets/images/image_holder.png',
                                     height: DeviceUtil.isTablet ? 120 : 80,
@@ -925,7 +962,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                     height: DeviceUtil.isTablet ? 120 : 80,
                                     width: DeviceUtil.isTablet ? 120 : 80,
                                     fit: BoxFit.cover,
-                                  ),
+                                  ),*/
                                 ),
                                 Positioned(
                                   left: 0.5,

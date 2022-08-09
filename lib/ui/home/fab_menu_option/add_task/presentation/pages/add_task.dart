@@ -141,6 +141,7 @@ class _AddNoteState extends State<AddTask> {
 Widget buildWidget(){
     return RoundedCornerPage(
       title: "Add Task",
+      showBackButton: true,
       child: Expanded(
         child: RoundedCornerDecoration(
           SingleChildScrollView(
@@ -224,7 +225,7 @@ Widget buildWidget(){
                       style: CustomTextStyle.styleSemiBold.copyWith(
                           fontSize: DeviceUtil.isTablet ? 16 : 14
                       ),
-                      maxLines: 5,
+                      maxLines: 15,
                       controller: descriptionController,
                       validator: (value) {
                         if (value == null || value == "") {
@@ -260,11 +261,13 @@ Widget buildWidget(){
                     fontSize: DeviceUtil.isTablet ? 16 : 14
                     ),
                           maxLines: 3,
+                          maxLength: 50,
                           controller: commentController,
                           decoration: InputDecoration(
                               hintStyle: CustomTextStyle.styleSemiBold.copyWith(
                                   fontSize: DeviceUtil.isTablet ? 16 : 14
                               ),
+                              counterText: "${commentController.text.length}/50",
                               labelStyle: CustomTextStyle.styleSemiBold.copyWith(
                                   fontSize: DeviceUtil.isTablet ? 16 : 14
                               ),

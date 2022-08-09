@@ -435,21 +435,23 @@ class _TaskListState extends State<TaskList> {
                                 fontSize: DeviceUtil.isTablet ? 16 : 14
                             ),
                           ),
-                          Text(
-                            getTaskModel.description ??
-                                "" /*"Go fishing with Stephen"*/,
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
-                            style: CustomTextStyle.styleSemiBold.copyWith(
-                                color: getTaskModel.isCompleted ?? false
-                                    ? Colors.grey
-                                    : Colors.black,
-                                decoration: getTaskModel.isCompleted ?? false
-                                    ? TextDecoration.lineThrough
-                                    : TextDecoration.none,
-                                fontSize: DeviceUtil.isTablet ? 16 : 14
-                            ),
-                          ),
+                         Flexible(
+                           child:  Text(
+                             getTaskModel.description ??
+                                 "" /*"Go fishing with Stephen"*/,
+                             softWrap: true,
+                             overflow: TextOverflow.fade,
+                             style: CustomTextStyle.styleSemiBold.copyWith(
+                                 color: getTaskModel.isCompleted ?? false
+                                     ? Colors.grey
+                                     : Colors.black,
+                                 decoration: getTaskModel.isCompleted ?? false
+                                     ? TextDecoration.lineThrough
+                                     : TextDecoration.none,
+                                 fontSize: DeviceUtil.isTablet ? 16 : 14
+                             ),
+                           ),
+                         )
                         ],
                       ),
                       const SizedBox(

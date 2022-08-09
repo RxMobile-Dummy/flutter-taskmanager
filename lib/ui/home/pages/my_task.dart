@@ -130,7 +130,7 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                 }else if (state is StateErrorGeneral) {
                   ProgressDialog.hideLoadingDialog(context);
                   Fluttertoast.showToast(
-                      msg: getTaskModel.message ?? "",
+                      msg: state.message,
                       toastLength: Toast.LENGTH_LONG,
                       fontSize: DeviceUtil.isTablet ? 20 : 12,
                       backgroundColor: CustomColors.colorBlue,
@@ -203,19 +203,19 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                   elevation: 4,
                   shape:
                   RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                  icon: Icon(Icons.format_list_numbered),
+                  icon: const Icon(Icons.format_list_numbered),
                 );
               })
           ),
         ],
         bottomMenu: PreferredSize(
-          preferredSize: Size(double.infinity, 96),
+          preferredSize: const Size(double.infinity, 96),
           child: DefaultTabController(
             length: 2,
             child: TabBar(
                 onTap: (index) {
                   pageController.animateToPage(index,
-                      duration: Duration(milliseconds: 400),
+                      duration: const Duration(milliseconds: 400),
                       curve: Curves.easeInOut);
                 },
                 controller: tabController,
@@ -265,7 +265,7 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
     return Container(
       child: PageView(
         controller: pageController,
-        physics: AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         onPageChanged: (page) async {
           setState(()  {
             tabController.index = page;

@@ -91,6 +91,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Widget buildWidget(){
     return RoundedCornerPage(
         title: "Forgot Password",
+        showBackButton: true,
         child: Expanded(
           child: Container(
             decoration: const BoxDecoration(

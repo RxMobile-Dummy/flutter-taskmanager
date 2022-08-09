@@ -7,6 +7,7 @@ class CustomAppBar extends StatelessWidget {
   String title;
   String description;
   bool isFirstPage;
+  bool showBackButton;
   bool backButton;
   Widget actions;
 
@@ -15,7 +16,9 @@ class CustomAppBar extends StatelessWidget {
       this.description = "",
       this.isFirstPage = false,
       required this.actions,
-      this.backButton = false});
+      this.backButton = false,
+      this.showBackButton = false,
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +27,8 @@ class CustomAppBar extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          IconButton(
+          showBackButton
+              ? IconButton(
               icon: backButton
                   ? Icon(Icons.keyboard_backspace)
                   : Icon(Icons.close),
@@ -33,7 +37,8 @@ class CustomAppBar extends StatelessWidget {
                   Get.back();
                 }
               },
-              color: Colors.white),
+              color: Colors.white)
+              : SizedBox(),
           Expanded(
             child: Container(
               margin: EdgeInsets.only(left: 16),

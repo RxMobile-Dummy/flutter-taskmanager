@@ -41,7 +41,7 @@ class UserStatusRepositoriesImpl extends UserStatusRepositories {
     } catch (e, s) {
       Failure error = await checkErrorState(e);
       //yield Left(error);
-      yield Left(FailureMessage(error.toString()));
+      yield Left(FailureMessage(error.message.toString()));
       print(e);
       print("Fail");
     }

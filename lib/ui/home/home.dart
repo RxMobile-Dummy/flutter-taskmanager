@@ -295,14 +295,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin{
                 icon:  Icon(Icons.note_add_outlined,
                   size: DeviceUtil.isTablet ? 30 : 20,),
               ),
-              IconButton(
+             /* IconButton(
                 onPressed: (){
                   Get.back();
                   Get.to(AddCheckList());
                 },
                 icon:  Icon(Icons.check_box_outlined,
                   size: DeviceUtil.isTablet ? 30 : 20,),
-              )
+              )*/
             ]
         ));
   }
@@ -404,12 +404,15 @@ class _HomeState extends State<Home> with TickerProviderStateMixin{
     } else if (menuIndex == 2 && selectedWidget != quickNoteWidget) {
       selectedWidget = quickNoteWidget;
       setState(() {});
-    } else {
+    }else if (menuIndex == 3 && selectedWidget != profileWidget) {
+      selectedWidget = profileWidget;
+      setState(() {});
+    }/*  else {
       if (selectedWidget != profileWidget) {
         selectedWidget = profileWidget;
         setState(() {});
       }
-    }
+    }*/
   }
 }
 
