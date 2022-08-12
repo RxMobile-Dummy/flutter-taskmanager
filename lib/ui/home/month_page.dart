@@ -95,6 +95,7 @@ class _MonthPageState extends State<MonthPage> {
               onDateSelected: (date) {
                 setState(() {
                   day = date.day;
+                  
                   getFormatedDate(date.toString());
                   getDate(date1 ?? "");
                   print(date1);

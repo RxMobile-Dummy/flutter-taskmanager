@@ -68,6 +68,7 @@ class _SignUpState extends State<SignUp> {
               ProgressDialog.hideLoadingDialog(context);
               SignUpModel? model = state.model;
               if(model!.success == true){
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.message ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -89,6 +90,7 @@ class _SignUpState extends State<SignUp> {
                       (route) => false,
                 );
               }else {
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.error ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -107,6 +109,7 @@ class _SignUpState extends State<SignUp> {
             print(getUserRoleModel.message??"");
           }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
@@ -130,7 +133,8 @@ class _SignUpState extends State<SignUp> {
   Widget buildWidget(){
     return RoundedCornerPage(
       title: "Sign Up",
-      isFirstPage: true,
+      isFirstPage: false,
+      showBackButton: true,
       child: Expanded(
         child: RoundedCornerDecoration(
           SingleChildScrollView(
@@ -296,6 +300,7 @@ class _SignUpState extends State<SignUp> {
                         email: email.text,
                       );
                     }else{
+                      Fluttertoast.cancel();
                       Fluttertoast.showToast(
                           msg: "Please fill all the details.",
                           toastLength: Toast.LENGTH_LONG,

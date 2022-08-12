@@ -78,6 +78,7 @@ class _QuickNotesState extends State<QuickNotes> {
             ProgressDialog.hideLoadingDialog(context);
             getNoteModel = state.model!;
             if(getNoteModel.success == true){
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: getNoteModel.message ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -86,6 +87,7 @@ class _QuickNotesState extends State<QuickNotes> {
                   textColor: Colors.white
               );
             }else{
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: getNoteModel.error ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -100,6 +102,7 @@ class _QuickNotesState extends State<QuickNotes> {
              UpdateNoteModel? model = state.model;
             print(model!.message??"");
             if(getNoteModel.success == true){
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: model.message ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -110,6 +113,7 @@ class _QuickNotesState extends State<QuickNotes> {
               Navigator.of(context).pop();
               _getNote();
             }else{
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: model.error ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -123,6 +127,7 @@ class _QuickNotesState extends State<QuickNotes> {
             DeleteNoteModel? model = state.model;
             print(model!.message??"");
             if(getNoteModel.success == true){
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: model.message ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -132,6 +137,7 @@ class _QuickNotesState extends State<QuickNotes> {
               );
               _getNote();
             }else{
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: model.error ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -142,6 +148,7 @@ class _QuickNotesState extends State<QuickNotes> {
             }
           }else if (state is StateErrorGeneral) {
             ProgressDialog.hideLoadingDialog(context);
+            Fluttertoast.cancel();
             Fluttertoast.showToast(
                 msg: state.message,
                 toastLength: Toast.LENGTH_LONG,
@@ -259,7 +266,7 @@ class _QuickNotesState extends State<QuickNotes> {
                      showModalBottomSheet(
                          context: context,
                          isScrollControlled: true,
-                         builder: (context) => Theme(
+                         builder: (context) => StatefulBuilder(builder: (BuildContext context, StateSetter mystate) =>  Theme(
                              data: ThemeData(
                                  bottomSheetTheme: const BottomSheetThemeData(
                                      backgroundColor: Colors.black,
@@ -267,11 +274,13 @@ class _QuickNotesState extends State<QuickNotes> {
                              child: Padding(
                                padding: MediaQuery.of(context).viewInsets,
                                child: editNote(
+                                 descriptionController.text,
+                                 mystate,
                                  index,
                                  titleController,
                                  descriptionController,
                                ),
-                             )));
+                             )) ));
                    },
                  ),
                  IconButton(
@@ -280,13 +289,15 @@ class _QuickNotesState extends State<QuickNotes> {
                    onPressed: (){
                      showDialog(
                        context: context,
-                       builder: (ctx) => AlertDialog(
+                       builder: (ctx) => Padding(
+                       padding: EdgeInsets.symmetric(horizontal: 20),
+                       child: AlertDialog(
                          title:  Text(
                            "Delete Note",
                            style: TextStyle(fontSize:  DeviceUtil.isTablet ? 18 : 14),
                          ),
-                         titlePadding: EdgeInsets.all(10),
-                         contentPadding: EdgeInsets.all(10),
+                         /*titlePadding: EdgeInsets.all(10),
+                         contentPadding: EdgeInsets.all(10),*/
                          content:  Container(
                            child: Text(
                              "Are you sure you want to delete?",
@@ -313,7 +324,7 @@ class _QuickNotesState extends State<QuickNotes> {
                            ),
                          ],
                        ),
-                     );
+                     ));
                  /*    showDialog(
                        context: context,
                        builder: (ctx) => AlertDialog(
@@ -343,7 +354,7 @@ class _QuickNotesState extends State<QuickNotes> {
                  )
                ],
              )
-             /* Visibility(
+              /*Visibility(
                   visible: index % 2 == 1,
                   child: Container(
                     child: Column(
@@ -404,7 +415,7 @@ class _QuickNotesState extends State<QuickNotes> {
     });
   }
 
-  editNote(int index,TextEditingController title, TextEditingController description) {
+  editNote( String enterDescriptionText,StateSetter myState,int index,TextEditingController title, TextEditingController description) {
     return Form(
       key: _formKey,
       child: Material(
@@ -462,6 +473,12 @@ class _QuickNotesState extends State<QuickNotes> {
                       style: CustomTextStyle.styleSemiBold.copyWith(
                           fontSize: DeviceUtil.isTablet ? 16 : 14
                       ),
+                      maxLength: 300,
+                      onChanged: (value){
+                        myState(() {
+                          enterDescriptionText = value;
+                        });
+                      },
                       controller: descriptionController,
                       maxLines: 5,
                       validator: (value) {
@@ -474,6 +491,7 @@ class _QuickNotesState extends State<QuickNotes> {
                           border: titleBorder(color: Colors.grey.shade200),
                           // hintText: "Title",
                           labelText: "Description",
+                          counterText: "${enterDescriptionText.length}/300",
                           labelStyle: CustomTextStyle.styleSemiBold
                               .copyWith(fontSize: DeviceUtil.isTablet ? 16 : 14),
                           hintStyle: CustomTextStyle.styleSemiBold.copyWith(
@@ -514,6 +532,7 @@ class _QuickNotesState extends State<QuickNotes> {
                           id: getNoteModel.data![index].id,
                         );
                       }else{
+                        Fluttertoast.cancel();
                         Fluttertoast.showToast(
                             msg: "Please fill all the details.",
                             toastLength: Toast.LENGTH_LONG,

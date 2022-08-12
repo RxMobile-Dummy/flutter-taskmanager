@@ -10,13 +10,14 @@ class RoundedCornerPage extends StatelessWidget {
   bool backButton;
   bool isFirstPage;
   Widget? actions;
+  bool showBackButton;
 
   RoundedCornerPage(
       {required this.title,
       required this.child,
       this.isFirstPage = false,
          this.actions,
-      this.backButton = true});
+      this.backButton = true, this.showBackButton = false});
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +31,7 @@ class RoundedCornerPage extends StatelessWidget {
               isFirstPage: isFirstPage,
               actions: actions ?? SizedBox(),
               backButton: backButton,
+              showBackButton: showBackButton,
             ),
           ),
           child

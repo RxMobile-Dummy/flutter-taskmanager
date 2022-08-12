@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_event.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_state.dart';
-import 'package:task_management/ui/home/pages/quick_notes.dart';
 
 import '../../../../../../core/base/base_bloc.dart';
 import '../../../../../../custom/progress_bar.dart';
@@ -16,12 +14,12 @@ import '../../../../../../utils/style.dart';
 import '../../../../../../widget/button.dart';
 import '../../../../../../widget/decoration.dart';
 import '../../../../../../widget/rounded_corner_page.dart';
-import '../../../../../../widget/textfield.dart';
 import '../../data/model/add_note_model.dart';
 import '../../data/model/get_note_model.dart';
-import 'package:task_management/injection_container.dart' as Sl;
 
 class AddNote extends StatefulWidget {
+  const AddNote({Key? key}) : super(key: key);
+
   @override
   _AddNoteState createState() => _AddNoteState();
 }
@@ -41,6 +39,7 @@ class _AddNoteState extends State<AddNote> {
   ];
 
    Color? selectedColors;
+  String enterDescriptionText = "";
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +52,7 @@ class _AddNoteState extends State<AddNote> {
               ProgressDialog.hideLoadingDialog(context);
               AddNotesModel? model = state.model;
               if(model!.success == true){
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.message ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -64,6 +64,7 @@ class _AddNoteState extends State<AddNote> {
                 BlocProvider.of<AddNoteBloc>(context).add(
                     GetNoteEvent());
               }else {
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.error ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -74,6 +75,14 @@ class _AddNoteState extends State<AddNote> {
               }
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              Fluttertoast.cancel();
+              Fluttertoast.showToast(
+                  msg: state.message,
+                  toastLength: Toast.LENGTH_LONG,
+                  fontSize: DeviceUtil.isTablet ? 20 : 12,
+                  backgroundColor: CustomColors.colorBlue,
+                  textColor: Colors.white
+              );
               /*ScaffoldMessenger.of(context).showSnackBar( SnackBar(
                 content: Text(state.message),
               ));*/
@@ -92,11 +101,12 @@ class _AddNoteState extends State<AddNote> {
   Widget buildWidget(){
     return RoundedCornerPage(
       title: "Add Note",
+      showBackButton: true,
       child: Expanded(
         child: RoundedCornerDecoration(
           SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -134,9 +144,9 @@ class _AddNoteState extends State<AddNote> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 16),
+                    margin: const EdgeInsets.only(top: 16),
                     color: Colors.grey.shade200,
-                    padding: EdgeInsets.only(left: 4, right: 16),
+                    padding: const EdgeInsets.only(left: 4, right: 16),
                     child: TextFormField(
                       style: CustomTextStyle.styleSemiBold.copyWith(
                           fontSize: DeviceUtil.isTablet ? 16 : 14
@@ -149,10 +159,17 @@ class _AddNoteState extends State<AddNote> {
                         }
                         return null;
                       },
+                      maxLength: 300,
+                      onChanged: (value){
+                        setState(() {
+                          enterDescriptionText = value;
+                        });
+                      },
                       decoration: InputDecoration(
                           hintStyle: CustomTextStyle.styleSemiBold.copyWith(
                               fontSize: DeviceUtil.isTablet ? 16 : 14
                           ),
+                          counterText: "${enterDescriptionText.length}/300",
                           labelStyle: CustomTextStyle.styleSemiBold.copyWith(
                               fontSize: DeviceUtil.isTablet ? 16 : 14
                           ),
@@ -234,6 +251,7 @@ class _AddNoteState extends State<AddNote> {
                           description: descriptionController.text,
                         );
                       }else{
+                        Fluttertoast.cancel();
                         Fluttertoast.showToast(
                             msg: "Please fill all the details.",
                             toastLength: Toast.LENGTH_LONG,

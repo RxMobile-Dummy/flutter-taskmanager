@@ -1,8 +1,8 @@
 class Strings{
   static const kNoInternetConnection = "No Internet Connection";
-  static const k_SERVER_FAILURE_MESSAGE = 'Server Failure';
-  static const k_CACHE_FAILURE_MESSAGE = 'Cache Failure';
+  static const kServerFailureMessage = 'Server Failure';
+  static const kCacheFailureMessage = 'Cache Failure';
   static const kInternalServerError = "Internal Server Error";
   static const kNoRecordsFound = "No Records Found";
-  static const baseUrl = "https://e8c5-180-211-112-179.in.ngrok.io/";
+  static const baseUrl = "https://213b-180-211-112-179.in.ngrok.io/";
 }

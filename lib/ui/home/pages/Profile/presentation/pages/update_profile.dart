@@ -114,6 +114,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
               ProgressDialog.hideLoadingDialog(context);
               updateUserProfileModel = state.model!;
               if(updateUserProfileModel.success == true){
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: updateUserProfileModel.message ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -126,6 +127,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 prefs.setString('userData', user);
                 Navigator.of(context).pop();
               }else {
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: updateUserProfileModel.error ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -137,6 +139,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
               //  Get.off(Login());
             } else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
@@ -160,7 +163,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
   Widget buildWidget() {
     return RoundedCornerPage(
       title: "Update Profile",
-      isFirstPage: true,
+      showBackButton: true,
+      isFirstPage: false,
       child: Expanded(
         child: RoundedCornerDecoration(
           SingleChildScrollView(
@@ -174,11 +178,22 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   padding: const EdgeInsets.only(left: 20),
                   child: GestureDetector(
                     child: Container(
+                      height: DeviceUtil.isTablet ? 120 : 100,
+                      width: DeviceUtil.isTablet ? 120 : 100,
                       decoration: BoxDecoration(
                           border: Border.all(width: 2, color: Colors.grey),
-                          borderRadius: BorderRadius.circular(10)),
-                      child:
-                          (widget.imageFile == null || widget.imageFile == "")
+                          borderRadius: BorderRadius.circular(10),
+                        image:  DecorationImage(
+                            image: (widget.imageFile!.path == null || widget.imageFile!.path == "")
+                                ? AssetImage('assets/images/image_holder.png')
+                                :  widget.imageFile.toString().contains("static")
+                                ? NetworkImage( "${Strings.baseUrl}${widget.imageFile?.path}")
+                                : FileImage(  widget.imageFile!) as ImageProvider,
+                            fit: BoxFit.fill
+                        ),
+                      ),
+                   /*   child:
+                          (widget.imageFile!.path == null || widget.imageFile!.path == "")
                               ? Image.asset(
                                   'assets/images/image_holder.png',
                                   height: DeviceUtil.isTablet ? 120 : 100,
@@ -200,7 +215,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                       height: DeviceUtil.isTablet ? 120 : 100,
                                       width: DeviceUtil.isTablet ?  120 : 100,
                                       fit: BoxFit.cover,
-                                    ),
+                                    ),*/
                     ),
                     onTap: () {
                       showModalBottomSheet(
@@ -336,6 +351,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       );
                     }else if (state is StateErrorGeneral) {
                       ProgressDialog.hideLoadingDialog(context);
+                      Fluttertoast.cancel();
                       Fluttertoast.showToast(
                           msg: state.message,
                           toastLength: Toast.LENGTH_LONG,
@@ -418,6 +434,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       );
                     } else if (state is StateErrorGeneral) {
                       ProgressDialog.hideLoadingDialog(context);
+                      Fluttertoast.cancel();
                       Fluttertoast.showToast(
                           msg: state.message,
                           toastLength: Toast.LENGTH_LONG,
@@ -438,7 +455,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState?.save();
                       imageList = [];
-                     if(!widget.imageFile!.path.contains('static')){
+                     if(widget.imageFile!.path.isNotEmpty && !widget.imageFile!.path.contains('static')){
                        imageList?.add(widget.imageFile!.path);
                      }
                       _updateProfile(
@@ -455,6 +472,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         profilePic:  imageList,
                       );
                     } else {
+                      Fluttertoast.cancel();
                       Fluttertoast.showToast(
                           msg: 'Please fill all the details.',
                           toastLength: Toast.LENGTH_LONG,

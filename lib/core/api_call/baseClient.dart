@@ -33,7 +33,7 @@ import '../../ui/home/fab_menu_option/add_note/data/model/update_note_model.dart
 
 part 'baseClient.g.dart';
 
-@RestApi(baseUrl: 'https://e8c5-180-211-112-179.in.ngrok.io/task_app/')
+@RestApi(baseUrl: 'http://65.0.110.22:8000/task_app/')
 abstract class  ApiClient {
 
   factory ApiClient(Dio dio) = _ApiClient;

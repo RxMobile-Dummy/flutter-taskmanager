@@ -246,7 +246,8 @@ Future<Dio> createDioClient() async {
     InterceptorsWrapper(
       onRequest: (request, handler) async {
         if (authToken != null && authToken != ''){
-          request.headers['Authorization'] = 'Bearer $authToken';
+          var authToken1 = prefs.getString('access');
+          request.headers['Authorization'] = 'Bearer $authToken1';
         }else {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           var authToken = prefs.getString('access');

@@ -42,6 +42,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               ProgressDialog.hideLoadingDialog(context);
               ForgotPasswordModel? model = state.model;
               if(model!.success == true){
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.message ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -58,6 +59,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       (route) => false,
                 );
               }else{
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.error ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -69,6 +71,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
              // Get.off(ResetPassword());
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
@@ -91,6 +94,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Widget buildWidget(){
     return RoundedCornerPage(
         title: "Forgot Password",
+        showBackButton: true,
         child: Expanded(
           child: Container(
             decoration: const BoxDecoration(
@@ -123,6 +127,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       _formKey.currentState?.save();
                       _forgotPassward(emailController.text);
                     }else{
+                      Fluttertoast.cancel();
                       Fluttertoast.showToast(
                           msg: "Please fill all the details.",
                           toastLength: Toast.LENGTH_LONG,

@@ -81,6 +81,7 @@ class _ResetPasswordState extends State<ResetPassword> {
               ProgressDialog.hideLoadingDialog(context);
               ResetPasswardModel? model = state.model;
               if(model!.success == true){
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.message ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -90,6 +91,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                 );
                 Get.to(ResetSuccess());
               }else{
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.error ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -102,6 +104,7 @@ class _ResetPasswordState extends State<ResetPassword> {
               ProgressDialog.hideLoadingDialog(context);
               ForgotPasswordModel? model = state.model;
              if(model!.success == true){
+               Fluttertoast.cancel();
                Fluttertoast.showToast(
                    msg: model.message ?? "",
                    toastLength: Toast.LENGTH_LONG,
@@ -110,6 +113,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                    textColor: Colors.white
                );
              }else{
+               Fluttertoast.cancel();
                Fluttertoast.showToast(
                    msg: model.error ?? "",
                    toastLength: Toast.LENGTH_LONG,
@@ -121,6 +125,7 @@ class _ResetPasswordState extends State<ResetPassword> {
               // Get.off(ResetPassword());
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
@@ -143,6 +148,7 @@ class _ResetPasswordState extends State<ResetPassword> {
   Widget buildWidget(){
     return RoundedCornerPage(
         title: "Reset Password",
+        showBackButton: true,
         child: Expanded(
           child: Container(
             decoration: const BoxDecoration(
@@ -220,6 +226,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                         if(tieNewPassword.text == tieConfirmPassword.text){
                           _resetPassward(tieNewPassword.text,resetCode.text);
                         }else{
+                          Fluttertoast.cancel();
                           Fluttertoast.showToast(
                               msg: "Password does not same.",
                               toastLength: Toast.LENGTH_LONG,
@@ -229,6 +236,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                           );
                         }
                       }else{
+                        Fluttertoast.cancel();
                         Fluttertoast.showToast(
                             msg: "Please fill all the details.",
                             toastLength: Toast.LENGTH_LONG,

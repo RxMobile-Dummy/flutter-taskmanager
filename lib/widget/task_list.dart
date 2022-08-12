@@ -127,6 +127,7 @@ class _TaskListState extends State<TaskList> {
           }
         } else if (state is StateErrorGeneral) {
           ProgressDialog.hideLoadingDialog(context);
+          Fluttertoast.cancel();
           Fluttertoast.showToast(
               msg: state.message,
               toastLength: Toast.LENGTH_LONG,
@@ -138,6 +139,7 @@ class _TaskListState extends State<TaskList> {
         }else if (state is DeleteTaskState) {
           ProgressDialog.hideLoadingDialog(context);
           DeleteTaskModel? model = state.model;
+          Fluttertoast.cancel();
           Fluttertoast.showToast(
               msg: model!.message ?? "",
               toastLength: Toast.LENGTH_LONG,
@@ -290,7 +292,7 @@ class _TaskListState extends State<TaskList> {
                             commentController: commentController,
                             descriptionController: descriptionController,
                             taskId: getTaskModel.id ?? 0,
-                            endDate: startDate,
+                            endDate: endDate,
                             startDate: startDate,
                             selectedRadio: taskStatus,
                             projectId: getTaskModel.projectId ?? "",
@@ -320,18 +322,20 @@ class _TaskListState extends State<TaskList> {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (ctx) => AlertDialog(
+                      builder: (ctx) => Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: AlertDialog(
                         title:  Text(
                           "Delete Task",
                           style: TextStyle(fontSize:  DeviceUtil.isTablet ? 18 : 14),
                         ),
-                        titlePadding: EdgeInsets.all(10),
-                        contentPadding: EdgeInsets.all(10),
+                       /* titlePadding: EdgeInsets.all(10),
+                        contentPadding: EdgeInsets.all(10),*/
                         content:  Container(
                           child: Text(
                             "Are you sure you want to delete?",
-                            softWrap: true,
-                            overflow: TextOverflow.fade,
+                            softWrap: false,
+                            overflow: TextOverflow.ellipsis,
                             style:  CustomTextStyle.styleMedium.copyWith(
                                 fontSize: DeviceUtil.isTablet ? 18 : 14
                             ),
@@ -351,7 +355,7 @@ class _TaskListState extends State<TaskList> {
                             ),
                         ],
                       ),
-                    );
+                    ));
                   },
                   icon: const Icon(
                     Icons.delete,
@@ -435,21 +439,23 @@ class _TaskListState extends State<TaskList> {
                                 fontSize: DeviceUtil.isTablet ? 16 : 14
                             ),
                           ),
-                          Text(
-                            getTaskModel.description ??
-                                "" /*"Go fishing with Stephen"*/,
-                            softWrap: true,
-                            overflow: TextOverflow.ellipsis,
-                            style: CustomTextStyle.styleSemiBold.copyWith(
-                                color: getTaskModel.isCompleted ?? false
-                                    ? Colors.grey
-                                    : Colors.black,
-                                decoration: getTaskModel.isCompleted ?? false
-                                    ? TextDecoration.lineThrough
-                                    : TextDecoration.none,
-                                fontSize: DeviceUtil.isTablet ? 16 : 14
-                            ),
-                          ),
+                         Flexible(
+                           child:  Text(
+                             getTaskModel.description ??
+                                 "" /*"Go fishing with Stephen"*/,
+                             softWrap: true,
+                             overflow: TextOverflow.fade,
+                             style: CustomTextStyle.styleSemiBold.copyWith(
+                                 color: getTaskModel.isCompleted ?? false
+                                     ? Colors.grey
+                                     : Colors.black,
+                                 decoration: getTaskModel.isCompleted ?? false
+                                     ? TextDecoration.lineThrough
+                                     : TextDecoration.none,
+                                 fontSize: DeviceUtil.isTablet ? 16 : 14
+                             ),
+                           ),
+                         )
                         ],
                       ),
                       const SizedBox(

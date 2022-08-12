@@ -29,15 +29,15 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
     var restClient = ApiClient(dio);*/
     var map = new HashMap<String, String>();
-    map['project_id'] = params.project_id;
+    map['project'] = params.project_id;
     map['name'] = params.name;
     map['comment'] = params.comment;
     map['task_status'] = params.task_status;
     map['description'] = params.description;
     map['is_private'] = params.is_private;
     map['priority'] = params.priority;
-    map['assignee_id'] = params.assignee_id;
-    map['reviewer_id'] = params.reviewer_id;
+    map['assignee'] = params.assignee_id;
+    map['reviewer'] = params.reviewer_id;
     map['tag_id'] = params.tag_id;
     map['start_date'] = params.start_date;
     map['end_date'] = params.end_date;
@@ -81,15 +81,15 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
     var restClient = ApiClient(dio);*/
     var map = HashMap<String, dynamic>();
     map['id'] = params.id;
-    map['project_id'] = params.project_id;
+    map['project'] = params.project_id;
     map['name'] = params.name;
     map['comment'] = params.comment;
     map['task_status'] = params.task_status;
     map['description'] = params.description;
     map['is_private'] = params.is_private;
     map['priority'] = params.priority;
-    map['assignee_id'] = params.assignee_id;
-    map['reviewer_id'] = params.reviewer_id;
+    map['assignee'] = params.assignee_id;
+    map['reviewer'] = params.reviewer_id;
     map['tag_id'] = params.tag_id;
     map['start_date'] = params.start_date;
     map['end_date'] = params.end_date;

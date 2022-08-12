@@ -66,6 +66,7 @@ class _GetAllUserListState extends State<GetAllUserList> {
               ProgressDialog.hideLoadingDialog(context);
               InviteProjectAssignModel? model = state.model;
               if(model!.status == true){
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.message ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -75,6 +76,7 @@ class _GetAllUserListState extends State<GetAllUserList> {
                 );
                 Navigator.of(context).pop();
               }else{
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.error ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -85,6 +87,7 @@ class _GetAllUserListState extends State<GetAllUserList> {
               }
             } else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
@@ -103,6 +106,7 @@ class _GetAllUserListState extends State<GetAllUserList> {
                 return buildWidget(addMemberModel.data ?? []);
               } else if (state is StateErrorGeneral) {
                 ProgressDialog.hideLoadingDialog(context);
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: state.message,
                     toastLength: Toast.LENGTH_LONG,

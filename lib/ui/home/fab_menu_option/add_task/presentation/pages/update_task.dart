@@ -53,6 +53,8 @@ class _UpdateTaskState extends State<UpdateTask> {
   List<String> projectList = [];
   String? selectProject;
   List<dynamic> listOfProject = [];
+  String enterDescriptionText = "";
+  String enterCommentText = "";
   final GlobalKey<FormState> _formKey =  GlobalKey<FormState>();
 
   @override
@@ -88,6 +90,7 @@ class _UpdateTaskState extends State<UpdateTask> {
               ProgressDialog.hideLoadingDialog(context);
               AddTaskModel? model = state.model;
               if(model!.success == true){
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.message ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -97,6 +100,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                 );
                 Navigator.of(context).pop(model.data!.startDate);
               }else{
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.error ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -107,6 +111,7 @@ class _UpdateTaskState extends State<UpdateTask> {
               }
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
@@ -129,6 +134,7 @@ class _UpdateTaskState extends State<UpdateTask> {
   Widget buildWidget(){
     return RoundedCornerPage(
       title: "Update Task",
+      showBackButton: true,
       child: Expanded(
         child: RoundedCornerDecoration(
           SingleChildScrollView(
@@ -213,7 +219,11 @@ class _UpdateTaskState extends State<UpdateTask> {
                         fontSize: DeviceUtil.isTablet ? 16 : 14
                     ),
                     maxLines: 5,
+                    maxLength: 300,
                     controller: widget.descriptionController,
+                    onChanged: (value){
+                      enterDescriptionText = value;
+                    },
                     validator: (value) {
                       if (value == null || value == "") {
                         return 'Please enter description';
@@ -227,6 +237,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                         labelStyle: CustomTextStyle.styleSemiBold.copyWith(
                             fontSize: DeviceUtil.isTablet ? 16 : 14
                         ),
+                        counterText: "${enterDescriptionText.length}/300",
                         labelText: "Description",
                         enabledBorder:
                         titleBorder(color: Colors.transparent),
@@ -256,11 +267,18 @@ class _UpdateTaskState extends State<UpdateTask> {
                             fontSize: DeviceUtil.isTablet ? 16 : 14
                         ),
                         maxLines: 5,
+                        maxLength: 50,
+                        onChanged: (value){
+                          setState(() {
+                            enterCommentText = value;
+                          });
+                        },
                         controller: widget.commentController,
                         decoration: InputDecoration(
                             hintStyle: CustomTextStyle.styleSemiBold.copyWith(
                                 fontSize: DeviceUtil.isTablet ? 16 : 14
                             ),
+                            counterText: "${enterCommentText.length}/50",
                             labelStyle: CustomTextStyle.styleSemiBold.copyWith(
                                 fontSize: DeviceUtil.isTablet ? 16 : 14
                             ),
@@ -529,6 +547,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                       );
                     }else if (state is StateErrorGeneral) {
                       ProgressDialog.hideLoadingDialog(context);
+                      Fluttertoast.cancel();
                       Fluttertoast.showToast(
                           msg: state.message,
                           toastLength: Toast.LENGTH_LONG,
@@ -643,6 +662,7 @@ class _UpdateTaskState extends State<UpdateTask> {
                         isCompleted: widget.selectedRadio == "Completed" ? true : false,
                       );
                     }else{
+                      Fluttertoast.cancel();
                       Fluttertoast.showToast(
                           msg: "Please fill all the details.",
                           toastLength: Toast.LENGTH_LONG,
