@@ -30,8 +30,8 @@ class AddMemberDataSourceImpl implements AddMemberDataSource {
   @override
   Future<InviteProjectAssignModel> inviteProjectAssignCall(
       InviteProjectAssignParams params) async {
-    var map = new HashMap<String, String>();
-    map['project_id'] = params.project_id;
+    var map =  HashMap<String, String>();
+    map['project'] = params.project_id;
     map['assignee_ids'] = params.assignee_ids;
     final response = await _apiClient.inviteProjectAssign(map);
     var data;

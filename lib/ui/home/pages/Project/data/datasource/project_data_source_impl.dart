@@ -83,7 +83,7 @@ class ProjectDataSourceImpl implements ProjectDataSource {
     map['duration'] = params.duration;
     map['is_private'] = params.is_private;
     map['archive'] = params.archive;
-    map['status_id'] = params.status_id;
+    map['status'] = params.status_id;
     final response = await _apiClient.updateProject(map);
     var data;
     if(response != null ){

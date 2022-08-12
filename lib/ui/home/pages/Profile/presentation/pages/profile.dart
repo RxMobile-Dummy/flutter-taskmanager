@@ -124,17 +124,52 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           IconButton(
             icon:  Icon(Icons.logout,color: CustomColors.colorBlue,
               size: DeviceUtil.isTablet ? 25 : 18,),
-            onPressed: () async {
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.clear();
-              prefs.setString("isOnBoardingCompleted", "true");
-              print(prefs);
-              Navigator.pushAndRemoveUntil(
-                context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                create: (context) => Sl.Sl<LoginBloc>(),
-                child: Login(),
-              )),
-                    (route) => false,
+            onPressed: ()  {
+              showDialog(
+                context: context,
+                builder: (ctx) => Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child:  AlertDialog(
+                    title:  Text(
+                      "Logout",
+                      style: TextStyle(fontSize:  DeviceUtil.isTablet ? 18 : 14),
+                    ),
+                    /*titlePadding: EdgeInsets.all(10),
+                    contentPadding: EdgeInsets.all(10),*/
+                    content:  Container(
+                      child: Text(
+                        "Are you sure you want to logout?",
+                        softWrap: true,
+                        overflow: TextOverflow.fade,
+                        style:  CustomTextStyle.styleMedium.copyWith(
+                            fontSize: DeviceUtil.isTablet ? 18 : 14
+                        ),
+                      ),
+                    ),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () async {
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          prefs.clear();
+                          prefs.setString("isOnBoardingCompleted", "true");
+                          print(prefs);
+                          Navigator.pushAndRemoveUntil(
+                            context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                            create: (context) => Sl.Sl<LoginBloc>(),
+                            child: Login(),
+                          )),
+                                (route) => false,
+                          );
+                        },
+                        child: Text(
+                          "Okay",
+                          style: CustomTextStyle.styleSemiBold
+                              .copyWith(color: CustomColors.colorBlue, fontSize:
+                          DeviceUtil.isTablet ? 18 : 16),),
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
           )
@@ -193,7 +228,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             child: Row(
                               children: [
                                 sized_16(),
-                                userProfilePic(radius: 30.0,imagePath: "${Strings.baseUrl}${userMap['profile_pic']}"),
+                                userProfilePic(radius: 30.0,
+                                    imagePath:
+                                    (userMap['profile_pic'] != null && userMap['profile_pic'] != "")
+                                    ? "${Strings.baseUrl}${userMap['profile_pic']}"
+                                        : "",),
                                 sized_16(size: 16.0),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,6 +267,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                               );
                                             } else if (state is StateErrorGeneral) {
                                               ProgressDialog.hideLoadingDialog(context);
+                                              Fluttertoast.cancel();
                                               Fluttertoast.showToast(
                                                   msg: state.message,
                                                   toastLength: Toast.LENGTH_LONG,
@@ -349,6 +389,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             );
                           }else if (state is StateErrorGeneral) {
                             ProgressDialog.hideLoadingDialog(context);
+                            Fluttertoast.cancel();
                             Fluttertoast.showToast(
                                 msg: state.message,
                                 toastLength: Toast.LENGTH_LONG,
@@ -392,6 +433,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             );
                           }else if (state is StateErrorGeneral) {
                             ProgressDialog.hideLoadingDialog(context);
+                            Fluttertoast.cancel();
                             Fluttertoast.showToast(
                                 msg: state.message,
                                 toastLength: Toast.LENGTH_LONG,
@@ -411,56 +453,62 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 ],
               ),
             ),
-            BlocBuilder<AddTaskBloc, BaseState>(
-              builder: (context, state) {
-                if (state is GetTaskState) {
-                  ProgressDialog.hideLoadingDialog(context);
-                  return Container(
-                    width: 150,
-                    margin: const EdgeInsets.only(top: 16),
-                    height: 100,
-                    child:  taskCategory(0,state.model?.data?.length ?? 0,"Tasks"),
-                  );
-                }else if (state is StateErrorGeneral) {
-                  ProgressDialog.hideLoadingDialog(context);
-                  Fluttertoast.showToast(
-                      msg: state.message,
-                      toastLength: Toast.LENGTH_LONG,
-                      fontSize: DeviceUtil.isTablet ? 20 : 12,
-                      backgroundColor: CustomColors.colorBlue,
-                      textColor: Colors.white
-                  );
-                  return const SizedBox();
-                } else {
-                  return const SizedBox();
-                }
-              },
-            ),
-            BlocBuilder<AddNoteBloc, BaseState>(
-              builder: (context, state) {
-                if (state is GetNoteState) {
-                  ProgressDialog.hideLoadingDialog(context);
-                  return Container(
-                    width: 150,
-                    margin: const EdgeInsets.only(top: 16),
-                    height: 100,
-                    child:  taskCategory(1,state.model?.data?.length ?? 0,"Notes"),
-                  );
-                }else if (state is StateErrorGeneral) {
-                  ProgressDialog.hideLoadingDialog(context);
-                  Fluttertoast.showToast(
-                      msg: state.message,
-                      toastLength: Toast.LENGTH_LONG,
-                      fontSize: DeviceUtil.isTablet ? 20 : 12,
-                      backgroundColor: CustomColors.colorBlue,
-                      textColor: Colors.white
-                  );
-                  return const SizedBox();
-                } else {
-                  return const SizedBox();
-                }
-              },
-            ),
+           Row(
+             children: [
+               BlocBuilder<AddTaskBloc, BaseState>(
+                 builder: (context, state) {
+                   if (state is GetTaskState) {
+                     ProgressDialog.hideLoadingDialog(context);
+                     return Container(
+                       width:  DeviceUtil.isTablet ? 150 : 130,
+                       margin: const EdgeInsets.only(top: 16),
+                       height:  DeviceUtil.isTablet ? 100 : 80,
+                       child:  taskCategory(0,state.model?.data?.length ?? 0,"Tasks"),
+                     );
+                   }else if (state is StateErrorGeneral) {
+                     ProgressDialog.hideLoadingDialog(context);
+                     Fluttertoast.cancel();
+                     Fluttertoast.showToast(
+                         msg: state.message,
+                         toastLength: Toast.LENGTH_LONG,
+                         fontSize: DeviceUtil.isTablet ? 20 : 12,
+                         backgroundColor: CustomColors.colorBlue,
+                         textColor: Colors.white
+                     );
+                     return const SizedBox();
+                   } else {
+                     return const SizedBox();
+                   }
+                 },
+               ),
+               BlocBuilder<AddNoteBloc, BaseState>(
+                 builder: (context, state) {
+                   if (state is GetNoteState) {
+                     ProgressDialog.hideLoadingDialog(context);
+                     return Container(
+                       width:  DeviceUtil.isTablet ? 150 : 130,
+                       margin: const EdgeInsets.only(top: 16),
+                       height:DeviceUtil.isTablet ? 100 : 80,
+                       child:  taskCategory(1,state.model?.data?.length ?? 0,"Notes"),
+                     );
+                   }else if (state is StateErrorGeneral) {
+                     ProgressDialog.hideLoadingDialog(context);
+                     Fluttertoast.cancel();
+                     Fluttertoast.showToast(
+                         msg: state.message,
+                         toastLength: Toast.LENGTH_LONG,
+                         fontSize: DeviceUtil.isTablet ? 20 : 12,
+                         backgroundColor: CustomColors.colorBlue,
+                         textColor: Colors.white
+                     );
+                     return const SizedBox();
+                   } else {
+                     return const SizedBox();
+                   }
+                 },
+               ),
+             ],
+           ),
             statistics()
           ],
         ),
@@ -502,7 +550,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             softWrap: true,
             overflow: TextOverflow.ellipsis,
             style: CustomTextStyle.styleSemiBold
-                .copyWith(color: Colors.white, fontSize: DeviceUtil.isTablet ? 18 : 16),
+                .copyWith(color: Colors.white,
+                fontSize: DeviceUtil.isTablet ? 18 : 15),
           ),
           sized_16(size: 4.0),
         Text(
@@ -510,7 +559,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           softWrap: true,
           overflow: TextOverflow.ellipsis,
           style: CustomTextStyle.styleMedium
-              .copyWith(color: Colors.white, fontSize: 14),
+              .copyWith(color: Colors.white, fontSize: DeviceUtil.isTablet ? 14 : 12),
           ),
         ],
       ),
@@ -549,6 +598,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           double.parse(state.model?.data?.length.toString() ?? ""), "Tasks", CustomColors.colorRed);
                     }else if (state is StateErrorGeneral) {
                       ProgressDialog.hideLoadingDialog(context);
+                      Fluttertoast.cancel();
                       Fluttertoast.showToast(
                           msg: state.message,
                           toastLength: Toast.LENGTH_LONG,
@@ -573,6 +623,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           "Quick Notes", CustomColors.colorPurple);
                     }else if (state is StateErrorGeneral) {
                       ProgressDialog.hideLoadingDialog(context);
+                      Fluttertoast.cancel();
                       Fluttertoast.showToast(
                           msg: state.message,
                           toastLength: Toast.LENGTH_LONG,
@@ -602,8 +653,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           children: [
             CustomPaint(
               child: Container(
-                width: 86,
-                height: 86,
+                width: DeviceUtil.isTablet? 86 : 70,
+                height:  DeviceUtil.isTablet? 86 : 70,
                 alignment: Alignment.center,
                 child: Text(
                   "${percentage * 100}%",
@@ -620,7 +671,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             sized_16(size: 6.0),
             Text(
               title,
-              style: CustomTextStyle.styleSemiBold,
+              style: CustomTextStyle.styleSemiBold.copyWith(
+                  fontSize: DeviceUtil.isTablet? 18 : 13),
             )
           ],
         ));

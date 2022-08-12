@@ -48,8 +48,9 @@ class _ProjectState extends State<Project> {
     Colors.green,
   ];
   var selectedColors;
-  var selectedColorsForEdit;
+  Color? selectedColorsForEdit;
   var hexColor;
+  String enterDescriptionText = "";
 
   @override
   void initState() {
@@ -85,6 +86,7 @@ class _ProjectState extends State<Project> {
               listTitle.add(getAllProjectsModel.data![i].name ?? "");
             }*/
             if(getAllProjectsModel.success == true){
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: getAllProjectsModel.message ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -93,6 +95,7 @@ class _ProjectState extends State<Project> {
                   textColor: Colors.white
               );
             }else{
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: getAllProjectsModel.error ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -106,6 +109,7 @@ class _ProjectState extends State<Project> {
             ProgressDialog.hideLoadingDialog(context);
             DeleteProjectModel? model = state.model;
             if(model!.success == true){
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: model.message ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -115,6 +119,7 @@ class _ProjectState extends State<Project> {
               );
               _getProject();
             }else{
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: model.error ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -129,6 +134,7 @@ class _ProjectState extends State<Project> {
            /* SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.setString('project_id', model?.data?.id.toString() ?? "");*/
             if(model!.success == true){
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: model.message ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -139,6 +145,7 @@ class _ProjectState extends State<Project> {
               Navigator.of(context).pop();
               _getProject();
             }else{
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: model.error ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -151,6 +158,7 @@ class _ProjectState extends State<Project> {
             ProgressDialog.hideLoadingDialog(context);
             UpdateProjectModel? model = state.model;
             if(model!.success == true){
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: model.message ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -161,6 +169,7 @@ class _ProjectState extends State<Project> {
               Navigator.of(context).pop();
               _getProject();
             }else{
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: model.error ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -171,6 +180,7 @@ class _ProjectState extends State<Project> {
             }
           }else if (state is StateErrorGeneral) {
             ProgressDialog.hideLoadingDialog(context);
+            Fluttertoast.cancel();
             Fluttertoast.showToast(
                 msg: state.message,
                 toastLength: Toast.LENGTH_LONG,
@@ -215,6 +225,7 @@ class _ProjectState extends State<Project> {
                 titleController!.clear();
                 descriptionController!.clear();
                 selectedColors = "";
+                hexColor = "";
                 showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
@@ -265,6 +276,7 @@ class _ProjectState extends State<Project> {
                 titleController!.text = "";
                 descriptionController!.text = "";
                 selectedColors = "";
+                hexColor = "";
                 showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
@@ -334,8 +346,9 @@ class _ProjectState extends State<Project> {
           ),
           Text(
             projectName,
-            softWrap: true,
             overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            softWrap: true,
             style: CustomTextStyle.styleSemiBold
                 .copyWith(color: Colors.black, fontSize: DeviceUtil.isTablet ? 18 : 16),
           ),
@@ -345,6 +358,7 @@ class _ProjectState extends State<Project> {
           Text(
             description,
             softWrap: true,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: CustomTextStyle.styleSemiBold
                 .copyWith(color: Colors.black, fontSize: DeviceUtil.isTablet ? 18 : 14),
@@ -374,6 +388,8 @@ class _ProjectState extends State<Project> {
                     titleController?.text = getAllProjectsModel.data![index].name ?? "";
                     descriptionController?.text = getAllProjectsModel.data![index].description ?? "abc";
                     selectedColorsForEdit = HexColor.fromHex(getAllProjectsModel.data![index].color ?? "");
+                    hexColor = "";
+                    print(selectedColorsForEdit);
                     showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
@@ -387,6 +403,7 @@ class _ProjectState extends State<Project> {
                                 child: Padding(
                                     padding: MediaQuery.of(context).viewInsets,
                                     child: editProjectDialog(
+                                      descriptionController!.text,
                                       mystate,
                                       index,
                                       titleController!,
@@ -404,13 +421,15 @@ class _ProjectState extends State<Project> {
                   onPressed: (){
                     showDialog(
                       context: context,
-                      builder: (ctx) => AlertDialog(
+                      builder: (ctx) => Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: AlertDialog(
                         title:  Text(
                           "Delete Project",
                           style: TextStyle(fontSize:  DeviceUtil.isTablet ? 18 : 14),
                         ),
-                        titlePadding: EdgeInsets.all(10),
-                        contentPadding: EdgeInsets.all(10),
+                       /* titlePadding: EdgeInsets.all(10),
+                        contentPadding: EdgeInsets.all(10),*/
                         content:  Container(
                           child: Text(
                             "Are you sure you want to delete?",
@@ -437,7 +456,7 @@ class _ProjectState extends State<Project> {
                           ),
                         ],
                       ),
-                    );
+                    ));
                   /*  showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
@@ -534,6 +553,12 @@ class _ProjectState extends State<Project> {
                       ),
                       controller: descriptionController,
                       maxLines: 5,
+                      maxLength: 300,
+                      onChanged: (value){
+                        mystate(() {
+                          enterDescriptionText = value;
+                        });
+                      },
                       validator: (value) {
                         if (value == null || value == "") {
                           return 'Please enter description';
@@ -543,6 +568,7 @@ class _ProjectState extends State<Project> {
                       decoration: InputDecoration(
                           border: titleBorder(color: Colors.grey.shade200),
                           // hintText: "Title",
+                          counterText: "${enterDescriptionText.length}/300",
                           labelText: "Description",
                           labelStyle: CustomTextStyle.styleSemiBold
                               .copyWith(fontSize: DeviceUtil.isTablet ? 16 : 14),
@@ -622,6 +648,7 @@ class _ProjectState extends State<Project> {
                       if(_formKey1.currentState!.validate()){
                         _formKey1.currentState?.save();
                         if(hexColor == null || hexColor == ""){
+                          Fluttertoast.cancel();
                           Fluttertoast.showToast(
                               msg: "Please select color.",
                               toastLength: Toast.LENGTH_LONG,
@@ -640,6 +667,7 @@ class _ProjectState extends State<Project> {
                           );
                         }
                       }else{
+                        Fluttertoast.cancel();
                         Fluttertoast.showToast(
                             msg: "Please fill all the details.",
                             toastLength: Toast.LENGTH_LONG,
@@ -659,7 +687,7 @@ class _ProjectState extends State<Project> {
     );
   }
 
-  editProjectDialog(StateSetter mystate,int index,TextEditingController title, TextEditingController description) {
+  editProjectDialog(String descriptionTextForEdit, StateSetter mystate,int index,TextEditingController title, TextEditingController description) {
     print("Color $selectedColorsForEdit");
     return Form(
         key: _formKey,
@@ -720,16 +748,23 @@ class _ProjectState extends State<Project> {
                     ),
                     controller: description,
                     maxLines: 5,
+                    maxLength: 300,
                     validator: (value) {
                       if (value == null || value == "") {
                         return 'Please enter description';
                       }
                       return null;
                     },
+                    onChanged: (value){
+                      mystate(() {
+                        descriptionTextForEdit = value;
+                      });
+                    },
                     decoration: InputDecoration(
                         border: titleBorder(color: Colors.grey.shade200),
                         // hintText: "Title",
                         labelText: "Description",
+                        counterText: "${descriptionTextForEdit.length}/300",
                         labelStyle: CustomTextStyle.styleSemiBold
                             .copyWith(fontSize: DeviceUtil.isTablet ? 16 : 14),
                         hintStyle: CustomTextStyle.styleSemiBold.copyWith(
@@ -795,7 +830,7 @@ class _ProjectState extends State<Project> {
                             borderRadius: BorderRadius.circular(4),
                             shape: BoxShape.rectangle,
                             color: e),
-                        child: selectedColorsForEdit.value == e.value
+                        child: selectedColorsForEdit!.value == e.value
                             ?  const Icon(Icons.check)
                             : Container(),
                       ),
@@ -816,12 +851,13 @@ class _ProjectState extends State<Project> {
                           status_id: getAllProjectsModel.data![index].statusId,
                           duration: 0,
                           archive: getAllProjectsModel.data![index].archive,
-                          color: (hexColor == null) ? selectedColorsForEdit.toHex() : hexColor,
+                          color: (hexColor == null || hexColor == "") ? selectedColorsForEdit!.toHex(): hexColor,
                           is_private: getAllProjectsModel.data![index].isPrivate,
                           name: titleController?.text,
                           description: descriptionController?.text
                       );
                     }else{
+                      Fluttertoast.cancel();
                       Fluttertoast.showToast(
                           msg: "Please fill all the details.",
                           toastLength: Toast.LENGTH_LONG,

@@ -116,124 +116,166 @@ So it will be easier for user to set priority and set their work.
 
 ## Directory Structure
 
-```sh
-├── core
-│   ├── api_call
-│   ├── base
-│   ├── failure
-│   ├── Strings
-│   └── usecase.dart
-├── custom
-├── features
-│   └── login
-│       ├── data
-│       │   ├── datasource
-│       │   ├── model
-│       │   └── repositories
-│       ├── domain
-│       │   ├── entities
-│       │   ├── repositories
-│       │   └── usecases
-│       └── presentation
-│           ├── bloc
-│           └── pages
-├── onboarding
-├── ui
-│   ├── home
-│   │   ├── fab_menu_option
-│   │   │   ├── add_note
-│   │   │   │   ├── data
-│   │   │   │   │   ├── datasource
-│   │   │   │   │   ├── model
-│   │   │   │   │   └── repositories
-│   │   │   │   ├── domain
-│   │   │   │   │   ├── repositories
-│   │   │   │   │   └── usecases
-│   │   │   │   └── presentation
-│   │   │   │       ├── bloc
-│   │   │   │       └── pages
-│   │   │   ├── add_task
-│   │   │   │   ├── data
-│   │   │   │   │   ├── datasource
-│   │   │   │   │   ├── model
-│   │   │   │   │   └── repositories
-│   │   │   │   ├── domain
-│   │   │   │   │   ├── repositories
-│   │   │   │   │   └── usecases
-│   │   │   │   └── presentation
-│   │   │   │       ├── bloc
-│   │   │   │       └── pages
-│   │   ├── pages
-│   │   │   ├── add_member
-│   │   │   │   ├── data
-│   │   │   │   │   ├── datasource
-│   │   │   │   │   ├── model
-│   │   │   │   │   └── repositories
-│   │   │   │   ├── domain
-│   │   │   │   │   ├── repositories
-│   │   │   │   │   └── usecases
-│   │   │   │   └── presentation
-│   │   │   │       ├── bloc
-│   │   │   │       └── pages
-│   │   │   ├── comment
-│   │   │   │   ├── data
-│   │   │   │   │   ├── datasource
-│   │   │   │   │   ├── model
-│   │   │   │   │   └── repositories
-│   │   │   │   ├── domain
-│   │   │   │   │   ├── repositories
-│   │   │   │   │   └── usecases
-│   │   │   │   └── presentation
-│   │   │   │       ├── bloc
-│   │   │   │       └── pages
-│   │   │   ├── Profile
-│   │   │   │   ├── data
-│   │   │   │   │   ├── datasource
-│   │   │   │   │   ├── model
-│   │   │   │   │   └── repositories
-│   │   │   │   ├── domain
-│   │   │   │   │   ├── repositories
-│   │   │   │   │   └── usecases
-│   │   │   │   └── presentation
-│   │   │   │       ├── bloc
-│   │   │   │       └── pages
-│   │   │   ├── Project
-│   │   │   │   ├── data
-│   │   │   │   │   ├── datasource
-│   │   │   │   │   ├── model
-│   │   │   │   │   └── repositories
-│   │   │   │   ├── domain
-│   │   │   │   │   ├── repositories
-│   │   │   │   │   └── usecases
-│   │   │   │   └── presentation
-│   │   │   │       ├── bloc
-│   │   │   │       └── pages
-│   │   │   ├── tag
-│   │   │   │   ├── data
-│   │   │   │   │   ├── datasource
-│   │   │   │   │   ├── model
-│   │   │   │   │   └── repositories
-│   │   │   │   ├── domain
-│   │   │   │   │   ├── repositories
-│   │   │   │   │   └── usecases
-│   │   │   │   └── presentation
-│   │   │   │       ├── bloc
-│   │   │   │       └── presentation
-│   │   │   ├── user_status
-│   │   │   │   ├── data
-│   │   │   │   │   ├── datasource
-│   │   │   │   │   ├── model
-│   │   │   │   │   └── repositories
-│   │   │   │   ├── domain
-│   │   │   │   │   ├── repositories
-│   │   │   │   │   └── usecases
-│   │   │   │   └── presentation
-│   │   │   │       └── bloc
-│   │   ├── task
-├── utils
-├── widget
-└── main.dart
+```s
+├── lib
+│   ├── core
+│   │   ├── api_call
+│   │   │   ├── api_constant.dart
+│   │   │   ├── base_response.dart
+│   │   │   ├── baseClient.dart
+│   │   │   ├── baseClient.g.dart
+│   │   │   └── custom_dio_client.dart
+│   │   ├── base
+│   │   │   ├── base_bloc.dart
+│   │   │   ├── base_event.dart
+│   │   │   └── base_state.dart
+│   │   ├── failure
+│   │   │   ├── exceptions.dart
+│   │   │   └── failure.dart
+│   │   ├── Strings
+│   │   │   └── strings.dart
+│   │   └── usecase.dart
+│   ├── custom
+│   │   ├── curve_painter.dart
+│   │   ├── custom_progress_painter.dart
+│   │   └── progress_bar.dart
+│   ├── features
+│   │   └── login
+│   │       ├── data
+│   │       │   ├── datasource
+│   │       │   ├── model
+│   │       │   └── repositories
+│   │       ├── domain
+│   │       │   ├── entities
+│   │       │   ├── repositories
+│   │       │   └── usecases
+│   │       └── presentation
+│   │           ├── bloc
+│   │           └── pages
+│   ├── onboarding
+│   │   └── onboarding.dart
+│   ├── ui
+│   │   ├── home
+│   │   │   ├── fab_menu_option
+│   │   │   │   ├── add_note
+│   │   │   │   │   ├── data
+│   │   │   │   │   │   ├── datasource
+│   │   │   │   │   │   ├── model
+│   │   │   │   │   │   └── repositories
+│   │   │   │   │   ├── domain
+│   │   │   │   │   │   ├── repositories
+│   │   │   │   │   │   └── usecases
+│   │   │   │   │   └── presentation
+│   │   │   │   │       ├── bloc
+│   │   │   │   │       └── pages
+│   │   │   │   ├── add_task
+│   │   │   │   │   ├── data
+│   │   │   │   │   │   ├── datasource
+│   │   │   │   │   │   ├── model
+│   │   │   │   │   │   └── repositories
+│   │   │   │   │   ├── domain
+│   │   │   │   │   │   ├── repositories
+│   │   │   │   │   │   └── usecases
+│   │   │   │   │   └── presentation
+│   │   │   │   │       ├── bloc
+│   │   │   │   │       └── pages
+│   │   │   ├── pages
+│   │   │   │   ├── add_member
+│   │   │   │   │   ├── data
+│   │   │   │   │   │   ├── datasource
+│   │   │   │   │   │   ├── model
+│   │   │   │   │   │   └── repositories
+│   │   │   │   │   ├── domain
+│   │   │   │   │   │   ├── repositories
+│   │   │   │   │   │   └── usecases
+│   │   │   │   │   └── presentation
+│   │   │   │   │       ├── bloc
+│   │   │   │   │       └── pages
+│   │   │   │   ├── comment
+│   │   │   │   │   ├── data
+│   │   │   │   │   │   ├── datasource
+│   │   │   │   │   │   ├── model
+│   │   │   │   │   │   └── repositories
+│   │   │   │   │   ├── domain
+│   │   │   │   │   │   ├── repositories
+│   │   │   │   │   │   └── usecases
+│   │   │   │   │   └── presentation
+│   │   │   │   │       ├── bloc
+│   │   │   │   │       └── pages
+│   │   │   │   ├── Profile
+│   │   │   │   │   ├── data
+│   │   │   │   │   │   ├── datasource
+│   │   │   │   │   │   ├── model
+│   │   │   │   │   │   └── repositories
+│   │   │   │   │   ├── domain
+│   │   │   │   │   │   ├── repositories
+│   │   │   │   │   │   └── usecases
+│   │   │   │   │   └── presentation
+│   │   │   │   │       ├── bloc
+│   │   │   │   │       └── pages
+│   │   │   │   ├── Project
+│   │   │   │   │   ├── data
+│   │   │   │   │   │   ├── datasource
+│   │   │   │   │   │   ├── model
+│   │   │   │   │   │   └── repositories
+│   │   │   │   │   ├── domain
+│   │   │   │   │   │   ├── repositories
+│   │   │   │   │   │   └── usecases
+│   │   │   │   │   └── presentation
+│   │   │   │   │       ├── bloc
+│   │   │   │   │       └── pages
+│   │   │   │   ├── tag
+│   │   │   │   │   ├── data
+│   │   │   │   │   │   ├── datasource
+│   │   │   │   │   │   ├── model
+│   │   │   │   │   │   └── repositories
+│   │   │   │   │   ├── domain
+│   │   │   │   │   │   ├── repositories
+│   │   │   │   │   │   └── usecases
+│   │   │   │   │   └── presentation
+│   │   │   │   │       ├── bloc
+│   │   │   │   │       └── presentation
+│   │   │   │   ├── user_status
+│   │   │   │   │   ├── data
+│   │   │   │   │   │   ├── datasource
+│   │   │   │   │   │   ├── model
+│   │   │   │   │   │   └── repositories
+│   │   │   │   │   ├── domain
+│   │   │   │   │   │   ├── repositories
+│   │   │   │   │   │   └── usecases
+│   │   │   │   │   └── presentation
+│   │   │   │   │       └── bloc
+│   │   │   ├── task
+│   │   │   ├── home.dart
+│   │   └── splash.dart
+│   ├── utils
+│   │   ├── border.dart
+│   │   ├── calendar_tile.dart
+│   │   ├── calendar.dart
+│   │   ├── color_extension.dart
+│   │   ├── colors.dart
+│   │   ├── device_file.dart
+│   │   ├── simple_gesture_detector.dart
+│   │   └── style.dart
+│   ├── widget
+│   │   ├── appbar.dart
+│   │   ├── button.dart
+│   │   ├── decoration.dart
+│   │   ├── home_appbar.dart
+│   │   ├── profile_pi.dart
+│   │   ├── rounded_corner_page.dart
+│   │   ├── size.dart
+│   │   ├── task_list.dart
+│   │   └── textfield.dart
+│   ├── injection_container.dart
+│   └── main.dart
+├── test
+│   └── widget_test.dart
+├── pubspec.lock
+├── pubspec.yaml
+└── README.md
 ```
+
 
 
 

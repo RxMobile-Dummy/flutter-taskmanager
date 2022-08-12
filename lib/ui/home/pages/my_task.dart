@@ -84,6 +84,7 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                   ProgressDialog.hideLoadingDialog(context);
                   getTaskModel = state.model!;
                  if(getTaskModel.success == true){
+                   Fluttertoast.cancel();
                    Fluttertoast.showToast(
                        msg: getTaskModel.message ?? "",
                        toastLength: Toast.LENGTH_LONG,
@@ -92,6 +93,7 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                        textColor: Colors.white
                    );
                  }else{
+                   Fluttertoast.cancel();
                    Fluttertoast.showToast(
                        msg: getTaskModel.error ?? "",
                        toastLength: Toast.LENGTH_LONG,
@@ -108,6 +110,7 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                   ProgressDialog.hideLoadingDialog(context);
                   DeleteTaskModel? model = state.model;
                   if(model!.success == true){
+                    Fluttertoast.cancel();
                     Fluttertoast.showToast(
                         msg: getTaskModel.message ?? "",
                         toastLength: Toast.LENGTH_LONG,
@@ -116,6 +119,7 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                         textColor: Colors.white
                     );
                   }else{
+                    Fluttertoast.cancel();
                     Fluttertoast.showToast(
                         msg: getTaskModel.error ?? "",
                         toastLength: Toast.LENGTH_LONG,
@@ -129,6 +133,7 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                   // await _getTask();
                 }else if (state is StateErrorGeneral) {
                   ProgressDialog.hideLoadingDialog(context);
+                  Fluttertoast.cancel();
                   Fluttertoast.showToast(
                       msg: state.message,
                       toastLength: Toast.LENGTH_LONG,

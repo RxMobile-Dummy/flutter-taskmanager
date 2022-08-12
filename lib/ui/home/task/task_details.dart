@@ -58,6 +58,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   File? imageFileForEdit;
   List<String>? imageList;
   List<String>? imageListForEdit;
+  String addDescriptionText = "";
 
   @override
   void initState() {
@@ -82,6 +83,7 @@ class _TaskDetailsState extends State<TaskDetails> {
               ProgressDialog.hideLoadingDialog(context);
               DeleteTaskModel? model = state.model;
               if(model!.success == true){
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.message ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -91,6 +93,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                 );
                 Navigator.of(context).pop();
               }else{
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.error ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -101,6 +104,7 @@ class _TaskDetailsState extends State<TaskDetails> {
               }
             } else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
@@ -280,6 +284,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                         // GetCommentModel? model = state.model;
                         getCommentModel = state.model!;
                        if(getCommentModel.success == true){
+                         Fluttertoast.cancel();
                          Fluttertoast.showToast(
                              msg: getCommentModel.message ?? "",
                              toastLength: Toast.LENGTH_LONG,
@@ -288,6 +293,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                              textColor: Colors.white
                          );
                        }else{
+                         Fluttertoast.cancel();
                          Fluttertoast.showToast(
                              msg: getCommentModel.error ?? "",
                              toastLength: Toast.LENGTH_LONG,
@@ -301,6 +307,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                         ProgressDialog.hideLoadingDialog(context);
                         AddCommentModel? model = state.model;
                         if(model!.success == true){
+                          Fluttertoast.cancel();
                           Fluttertoast.showToast(
                               msg: model.message ?? "",
                               toastLength: Toast.LENGTH_LONG,
@@ -311,6 +318,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                           imageFile = null;
                           await _getComment(comment_user_id: authToken);
                         }else{
+                          Fluttertoast.cancel();
                           Fluttertoast.showToast(
                               msg: model.error ?? "",
                               toastLength: Toast.LENGTH_LONG,
@@ -324,6 +332,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                         ProgressDialog.hideLoadingDialog(context);
                         UpdateCommentModel? model = state.model;
                         if(model!.success == true){
+                          Fluttertoast.cancel();
                           Fluttertoast.showToast(
                               msg: model.message ?? "",
                               toastLength: Toast.LENGTH_LONG,
@@ -334,6 +343,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                           Navigator.of(context).pop();
                           await _getComment(comment_user_id: authToken);
                         }else{
+                          Fluttertoast.cancel();
                           Fluttertoast.showToast(
                               msg: model.error ?? "",
                               toastLength: Toast.LENGTH_LONG,
@@ -346,6 +356,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                         ProgressDialog.hideLoadingDialog(context);
                         DeleteCommentModel? model = state.model;
                         if(model!.success == true){
+                          Fluttertoast.cancel();
                           Fluttertoast.showToast(
                               msg: model.message ?? "",
                               toastLength: Toast.LENGTH_LONG,
@@ -355,6 +366,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                           );
                           await _getComment(comment_user_id: authToken);
                         }else{
+                          Fluttertoast.cancel();
                           Fluttertoast.showToast(
                               msg: model.error ?? "",
                               toastLength: Toast.LENGTH_LONG,
@@ -365,6 +377,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                         }
                       } else if (state is StateErrorGeneral) {
                         ProgressDialog.hideLoadingDialog(context);
+                        Fluttertoast.cancel();
                         Fluttertoast.showToast(
                             msg: state.message,
                             toastLength: Toast.LENGTH_LONG,
@@ -532,46 +545,67 @@ class _TaskDetailsState extends State<TaskDetails> {
                       ),
                       controller: commentControllerForAdd,
                       maxLines: 3,
+                      maxLength: 300,
+                      onChanged: (value){
+                        setState(() {
+                          addDescriptionText = value;
+                        });
+                      },
                       decoration: InputDecoration(
                           hintStyle: CustomTextStyle.styleMedium
                               .copyWith(color: Colors.grey,
                               fontSize: DeviceUtil.isTablet ? 16 : 14),
                           hintText: "Write a comment",
+                          counterText: "${addDescriptionText.length}/300",
                           labelStyle: CustomTextStyle.styleSemiBold.copyWith(
                               fontSize: DeviceUtil.isTablet ? 16 : 14
                           ),
                           enabledBorder: titleBorder(color: Colors.transparent),
                           focusedBorder: titleBorder(color: Colors.transparent)),
                     ),
-                   Row(
-                     mainAxisAlignment: MainAxisAlignment.end,
-                     children: [
-                       GestureDetector(
-                         onTap: () async {
-                           FocusScope.of(context).unfocus();
-                           SharedPreferences prefs =
-                           await SharedPreferences.getInstance();
-                           var authToken = prefs.getString('id');
-                           print(authToken);
-                           imageList = [];
-                           if(imageFile != null){
-                             imageList?.add(imageFile!.path);
-                           }
-                           _addComment(
-                             comment_user_id: authToken,
-                             description: commentControllerForAdd.text,
-                             files: imageList,
-                           );
-                           commentControllerForAdd.clear();
-                         },
-                         child: Text(
-                           "Send",
-                           style: CustomTextStyle.styleBold
-                               .copyWith(color: CustomColors.colorBlue),
-                         ),
-                       )
-                     ],
-                   )
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child:  Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            FocusScope.of(context).unfocus();
+                            SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                            var authToken = prefs.getString('id');
+                            print(authToken);
+                            imageList = [];
+                            if(imageFile != null){
+                              imageList?.add(imageFile!.path);
+                            }
+                            if(commentControllerForAdd.text.isNotEmpty){
+                              _addComment(
+                                comment_user_id: authToken,
+                                description: commentControllerForAdd.text,
+                                files: imageList,
+                              );
+                              commentControllerForAdd.clear();
+                            }else{
+                              Fluttertoast.cancel();
+                              Fluttertoast.showToast(
+                                msg: "Please enter comment.",
+                                toastLength: Toast.LENGTH_LONG,
+                                fontSize: DeviceUtil.isTablet ? 20 : 12,
+                                backgroundColor: CustomColors.colorBlue,
+                                textColor: Colors.white,
+                              );
+                            }
+                          },
+                          child: Text(
+                            "Send",
+                            style: CustomTextStyle.styleBold
+                                .copyWith(color: CustomColors.colorBlue),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
                    /* Container(
                       color: Colors.grey.shade100,
                       padding: const EdgeInsets.only(
@@ -831,7 +865,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                             ? getCommentModel.data![index].files![0]
                                 : "");
                         print(".................");
-                        openBottomSheet(context, index, commentController);
+                        openBottomSheet(context, index, commentController,commentController.text);
                         /*_updateComment(
                           description: getCommentModel.data![index].description,
                           task_id: "",
@@ -885,7 +919,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   openBottomSheet(BuildContext context, int index,
-      TextEditingController textEditingController) {
+      TextEditingController textEditingController,String enterDescriptionText) {
     showModalBottomSheet(
         context: context,
         builder: (context1) {
@@ -971,7 +1005,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                   child: Container(
                                     padding: EdgeInsets.all(2.0),
                                     alignment: Alignment.bottomCenter,
-                                    color: Colors.black26,
+                                    color: Colors.transparent,
                                     child: Row(
                                       mainAxisSize: MainAxisSize.max,
                                       mainAxisAlignment:
@@ -1053,21 +1087,52 @@ class _TaskDetailsState extends State<TaskDetails> {
                         ),
                         const SizedBox(
                           height: 32,
+                        ), TextFormField(
+                          style: CustomTextStyle.styleSemiBold.copyWith(
+                              fontSize: DeviceUtil.isTablet ? 16 : 14
+                          ),
+                          controller: textEditingController,
+                          maxLines: 5,
+                          validator: (value) {
+                            if (value == null || value == "") {
+                              return 'Please enter description';
+                            }
+                            return null;
+                          },
+                          maxLength: 300,
+                          onChanged: (value){
+                            setState(() {
+                              enterDescriptionText = value;
+                            });
+                          },
+                          decoration: InputDecoration(
+                              hintStyle: CustomTextStyle.styleSemiBold.copyWith(
+                                  fontSize: DeviceUtil.isTablet ? 16 : 14
+                              ),
+                              counterText: "${enterDescriptionText.length}/300",
+                              labelStyle: CustomTextStyle.styleSemiBold.copyWith(
+                                  fontSize: DeviceUtil.isTablet ? 16 : 14
+                              ),
+                              hintText: "Description",
+                              enabledBorder:
+                              titleBorder(color: Colors.transparent),
+                              focusedBorder:
+                              titleBorder(color: Colors.transparent)),
                         ),
-                        CustomTextField(
+                        /*CustomTextField(
                           //initialValue: description.text,
+                          lengthLimit: 300,
                           label: "Description",
                           minLines: 5,
                           textEditingController: textEditingController,
-                        ),
+                        ),*/
                         Button(
                           "Done",
                           onPress: () {
                             FocusScope.of(context).unfocus();
                             imageListForEdit = [];
-                            imageListForEdit?.add(imageFileForEdit!.path);
-                            if(!imageFileForEdit!.path.contains('static')){
-                              imageList?.add(imageFileForEdit!.path);
+                            if(imageFileForEdit!.path.isNotEmpty && !imageFileForEdit!.path.contains('static')){
+                              imageListForEdit?.add(imageFileForEdit!.path);
                             }
                             _updateComment(
                               description: textEditingController.text,
@@ -1245,7 +1310,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   divider() {
-    return Divider(
+    return const Divider(
       height: 2,
       indent: 8,
     );
@@ -1314,7 +1379,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                   : 100),
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-      icon: Icon(
+      icon: const Icon(
         Icons.settings,
         color: Colors.white,
       ),
@@ -1322,7 +1387,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   }
 
   Future<String> _deleteTask({int? id}) {
-    return Future.delayed(Duration()).then((_) {
+    return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddTaskBloc>(context).add(DeleteTaskEvent(id: id ?? 0));
       return "";
@@ -1331,7 +1396,7 @@ class _TaskDetailsState extends State<TaskDetails> {
 
   Future<String> _addComment(
       {String? comment_user_id, List<String>? files, String? description}) {
-    return Future.delayed(Duration()).then((_) {
+    return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<CommentBloc>(context).add(AddCommentEvent(
         description: description ?? "",
@@ -1348,7 +1413,7 @@ class _TaskDetailsState extends State<TaskDetails> {
       String? task_id,
       String? description,
       List<String>? files}) {
-    return Future.delayed(Duration()).then((_) {
+    return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<CommentBloc>(context).add(UpdateCommentEvent(
         id: id ?? 0,
@@ -1365,7 +1430,7 @@ class _TaskDetailsState extends State<TaskDetails> {
     int? id,
     String? comment_user_id,
   }) {
-    return Future.delayed(Duration()).then((_) {
+    return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<CommentBloc>(context).add(DeleteCommentEvent(
         id: id ?? 0,
@@ -1378,7 +1443,7 @@ class _TaskDetailsState extends State<TaskDetails> {
   Future<String> _getComment({
     String? comment_user_id,
   }) {
-    return Future.delayed(Duration()).then((_) {
+    return Future.delayed(const Duration()).then((_) {
       //ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<CommentBloc>(context).add(GetCommentEvent(
         comment_user_id: comment_user_id ?? "",

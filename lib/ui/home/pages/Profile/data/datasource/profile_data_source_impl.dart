@@ -42,7 +42,7 @@ class UpdateProfileDataSourceImpl implements ProfileDataSource {
     map['email'] = params.email;
     map['mobile_number'] = params.mobile_number;
     map['role'] = params.role;
-    map['status_id'] = params.status_id;
+    map['status'] = params.status_id;
     map['profile_pic'] = params.profile_pic!.isNotEmpty ? multipartImageList : params.profile_pic;
     FormData formData = FormData.fromMap(map);
     final response = await _apiClient.updateUserprofile(formData);

@@ -39,11 +39,11 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
       await MultipartFile.fromFile(file, filename: pathManager.basename(file));
       multipartImageList.add(multipartFile);
     }
-    var map = new HashMap<String, dynamic>();
-    map['comment_user_id'] = params.comment_user_id;
+    var map =  HashMap<String, dynamic>();
+    map['comment_user'] = params.comment_user_id;
     map['description'] = params.description;
     map['files'] =  multipartImageList;
-    FormData formData = new FormData.fromMap(map);
+    FormData formData =  FormData.fromMap(map);
     final response = await _apiClient.addComment(formData);
     var data ;
     if(response != null ){
@@ -78,7 +78,7 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
     }*/
     var map = new HashMap<String, dynamic>();
     map['id'] = params.id;
-    map['comment_user_id'] = params.comment_user_id;
+    map['comment_user'] = params.comment_user_id;
     map['task_id'] = params.task_id;
     map['description'] = params.description;
     map['files'] =  params.files!.isNotEmpty ? multipartImageList : params.files;
@@ -103,7 +103,7 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
     // var restClient = ApiClient(dio);
     var map = new HashMap<String, dynamic>();
     map['id'] = params.id;
-    map['comment_user_id'] = params.comment_user_id;
+    map['comment_user'] = params.comment_user_id;
     final response = await _apiClient.deleteComment(map);
     var data ;
     if(response != null ){
@@ -123,7 +123,7 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
     // dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
     // var restClient = ApiClient(dio);
     var map = new HashMap<String, dynamic>();
-    map['comment_user_id'] = params.comment_user_id;
+    map['comment_user'] = params.comment_user_id;
     final response = await _apiClient.getComment(map);
     var data ;
     if(response != null ){

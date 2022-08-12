@@ -3,22 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
 import 'package:task_management/ui/home/pages/Profile/presentation/bloc/profile_bloc.dart';
-import 'package:task_management/ui/home/pages/Project/presentation/bloc/project_bloc.dart';
 import 'package:task_management/ui/home/pages/my_task.dart';
 import 'package:task_management/ui/home/pages/Project/presentation/pages/project.dart';
 import 'package:task_management/ui/home/pages/Profile/presentation/pages/profile.dart';
 import 'package:task_management/ui/home/pages/quick_notes.dart';
 import 'package:task_management/ui/home/pages/user_status/presentation/bloc/user_status_bloc.dart';
-import 'package:task_management/utils/colors.dart';
-
-import '../../custom/progress_bar.dart';
 import '../../utils/device_file.dart';
 import '../../utils/style.dart';
 import 'fab_menu_option/add_check_list.dart';
-import 'fab_menu_option/add_note/presentation/bloc/add_note_event.dart';
 import 'fab_menu_option/add_note/presentation/pages/add_note.dart';
 import 'fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import 'fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
@@ -295,14 +288,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin{
                 icon:  Icon(Icons.note_add_outlined,
                   size: DeviceUtil.isTablet ? 30 : 20,),
               ),
-             /* IconButton(
+              IconButton(
                 onPressed: (){
                   Get.back();
                   Get.to(AddCheckList());
                 },
                 icon:  Icon(Icons.check_box_outlined,
                   size: DeviceUtil.isTablet ? 30 : 20,),
-              )*/
+              )
             ]
         ));
   }
@@ -357,7 +350,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin{
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => AddNote()),
+                            builder: (context) => const AddNote()),
                       );
                       //Get.to(AddNote());
                     },

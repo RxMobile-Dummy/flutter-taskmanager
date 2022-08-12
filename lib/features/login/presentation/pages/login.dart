@@ -55,6 +55,7 @@ class _LoginState extends State<Login> {
             ProgressDialog.hideLoadingDialog(context);
             LoginModel? model = state.model;
             if(model!.success == true){
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: model.message ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -78,6 +79,7 @@ class _LoginState extends State<Login> {
                     (route) => false,
               );
             }else {
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: model.error ?? "",
                   toastLength: Toast.LENGTH_LONG,
@@ -88,6 +90,7 @@ class _LoginState extends State<Login> {
             }
           } else if (state is StateErrorGeneral) {
             ProgressDialog.hideLoadingDialog(context);
+            Fluttertoast.cancel();
             Fluttertoast.showToast(
                 msg: state.message,
                 toastLength: Toast.LENGTH_LONG,
@@ -184,6 +187,7 @@ class _LoginState extends State<Login> {
                       _loginUser(userName.text,tiePassword.text);
                     }else{
                       FocusScope.of(context).unfocus();
+                      Fluttertoast.cancel();
                       Fluttertoast.showToast(
                           msg: "Please fill all the details.",
                           toastLength: Toast.LENGTH_LONG,

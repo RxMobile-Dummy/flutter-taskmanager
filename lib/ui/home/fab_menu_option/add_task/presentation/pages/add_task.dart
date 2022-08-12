@@ -38,6 +38,8 @@ class _AddNoteState extends State<AddTask> {
   TextEditingController startDate = TextEditingController();
   TextEditingController endDate = TextEditingController();
   final GlobalKey<FormState> _formKey =  GlobalKey<FormState>();
+  String enterDescriptionText = "";
+  String enterCommentText = "";
   List<Color> listColors = [
     CustomColors.colorPurple,
     CustomColors.colorBlue,
@@ -91,6 +93,7 @@ class _AddNoteState extends State<AddTask> {
              /* BlocProvider.of<AddTaskBloc>(context).add(
                   GetTaskEvent(date: getFormatedDate(DateTime.now().toString()),));*/
               if(model!.success == true){
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.message ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -100,6 +103,7 @@ class _AddNoteState extends State<AddTask> {
                 );
                 Navigator.of(context).pop(model.data!.startDate);
               }else{
+                Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.error ?? "",
                     toastLength: Toast.LENGTH_LONG,
@@ -110,6 +114,7 @@ class _AddNoteState extends State<AddTask> {
               }
             }else if (state is StateErrorGeneral) {
               ProgressDialog.hideLoadingDialog(context);
+              Fluttertoast.cancel();
               Fluttertoast.showToast(
                   msg: state.message,
                   toastLength: Toast.LENGTH_LONG,
@@ -227,14 +232,21 @@ Widget buildWidget(){
                       ),
                       maxLines: 15,
                       controller: descriptionController,
+                      onChanged: (value){
+                        setState(() {
+                          enterDescriptionText = value;
+                        });
+                      },
                       validator: (value) {
                         if (value == null || value == "") {
                           return 'Please enter description';
                         }
                         return null;
                       },
+                      maxLength: 300,
                       decoration: InputDecoration(
                           hintText: "Description",
+                          counterText: "${enterDescriptionText.length}/300",
                           hintStyle: CustomTextStyle.styleSemiBold.copyWith(
                               fontSize: DeviceUtil.isTablet ? 16 : 14
                           ),
@@ -262,12 +274,17 @@ Widget buildWidget(){
                     ),
                           maxLines: 3,
                           maxLength: 50,
+                          onChanged: (value){
+                            setState(() {
+                              enterCommentText = value;
+                            });
+                          },
                           controller: commentController,
                           decoration: InputDecoration(
                               hintStyle: CustomTextStyle.styleSemiBold.copyWith(
                                   fontSize: DeviceUtil.isTablet ? 16 : 14
                               ),
-                              counterText: "${commentController.text.length}/50",
+                              counterText: "${enterCommentText.length}/50",
                               labelStyle: CustomTextStyle.styleSemiBold.copyWith(
                                   fontSize: DeviceUtil.isTablet ? 16 : 14
                               ),
@@ -467,7 +484,9 @@ Widget buildWidget(){
                             onTap: () async {
                               DateTime? pickedDate = await showDatePicker(
                                   context: context,
-                                  initialDate: DateTime.now(),
+                                  initialDate: (startDateStore != null && startDateStore != "")
+                                      ? startDateStore
+                                      :DateTime.now(),
                                   builder: (BuildContext context, Widget ?child) {
                                     return Theme(
                                       data: ThemeData(
@@ -579,8 +598,8 @@ Widget buildWidget(){
                                   },
                                   items: projectList.map((project) {
                                     return DropdownMenuItem(
-                                      child: Text(project),
                                       value: project,
+                                      child: Text(project),
                                     );
                                   }).toList(),
                                 ),
@@ -590,6 +609,7 @@ Widget buildWidget(){
                         );
                       }else if (state is StateErrorGeneral) {
                         ProgressDialog.hideLoadingDialog(context);
+                        Fluttertoast.cancel();
                         Fluttertoast.showToast(
                             msg: state.message,
                             toastLength: Toast.LENGTH_LONG,
@@ -623,6 +643,7 @@ Widget buildWidget(){
                      if(_formKey.currentState!.validate()){
                        _formKey.currentState?.save();
                      if(projectId == null || projectId == ""){
+                       Fluttertoast.cancel();
                        Fluttertoast.showToast(
                            msg: "Please Add Project before adding task.",
                            toastLength: Toast.LENGTH_LONG,
@@ -647,6 +668,7 @@ Widget buildWidget(){
                        );
                      }
                      }else{
+                       Fluttertoast.cancel();
                        Fluttertoast.showToast(
                            msg: "Please fill all the details.",
                            toastLength: Toast.LENGTH_LONG,
