@@ -12,6 +12,15 @@ import 'package:task_management/features/login/domain/usecases/get_user_role_use
 import 'package:task_management/features/login/domain/usecases/reset_passward_usecase.dart';
 import 'package:task_management/features/login/domain/usecases/sign_up_usecase.dart';
 import 'package:task_management/features/login/presentation/bloc/login_bloc.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/datasource/check_list_data_source.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/datasource/check_list_data_source_impl.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/repositories/check_list_repositories.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/domain/repositories/check_list_repositories.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/domain/usecases/add_check_list_usecase.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/domain/usecases/delete_check_list_usecase.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/domain/usecases/get_check_list_usecase.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/domain/usecases/update_check_list_usecase.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/presentation/bloc/check_list_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/datasource/add_note_data_source.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/datasource/add_note_data_source_impl.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/repositories/add_note_repositories.dart';
@@ -112,6 +121,11 @@ Future<void> init() async {
       updateCommentUsecase: Sl.call(),
       deleteCommentUsecase: Sl.call(),
       getCommentUsecase: Sl.call()));
+  Sl.registerFactory(() => AddCheckListBloc(
+    updateCheckListUsecase: Sl.call(),
+      addCheckListUsecase: Sl.call(),
+      getCheckListUsecase: Sl.call(),
+  deleteCheckListUsecase: Sl.call()));
   // Use cases
   Sl.registerLazySingleton(() => LoginCase(loginRepositories: Sl()));
   Sl.registerLazySingleton(() => GetMemberUsecase(addMemberRepositories: Sl()));
@@ -148,6 +162,18 @@ Future<void> init() async {
   Sl.registerLazySingleton(
           () => DeleteProjectUsecase(projectRepositories: Sl()));
 
+  Sl.registerLazySingleton(
+          () => AddCheckListUsecase(addCheckListRepositories: Sl()));
+
+  Sl.registerLazySingleton(
+          () => GetCheckListUsecase(addCheckListRepositories: Sl()));
+
+  Sl.registerLazySingleton(
+          () => DeleteCheckListUsecase(addCheckListRepositories: Sl()));
+
+  Sl.registerLazySingleton(
+          () => UpdateCheckListUsecase(addCheckListRepositories: Sl()));
+
   // Repository
   Sl.registerLazySingleton<LoginRepositories>(
         () => LoginRepositoriesImpl(localDataSource: Sl()),
@@ -178,6 +204,10 @@ Future<void> init() async {
   );
   Sl.registerLazySingleton<AddCommentRepositories>(
         () => AddCommentRepositoriesImpl(addCommentDataSource: Sl()),
+  );
+
+  Sl.registerLazySingleton<AddCheckListRepositories>(
+        () => AddCheckListRepositoriesImpl(addCheckListDataSource: Sl()),
   );
 /*  Sl.registerLazySingleton<CharRepository>(
         () => CharRepositoryImpl(
@@ -215,6 +245,10 @@ Future<void> init() async {
 
   Sl.registerLazySingleton<AddCommentDataSource>(
         () => AddCommentDataSourceImpl(Sl.get()),
+  );
+
+  Sl.registerLazySingleton<AddCheckListDataSource>(
+        () => AddCheckListDataSourceImpl(Sl.get()),
   );
 
   /*Sl.registerLazySingleton<CharRemoteDataSource>(

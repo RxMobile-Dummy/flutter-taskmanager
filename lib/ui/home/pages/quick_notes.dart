@@ -5,6 +5,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/delete_check_list_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/get_check_list_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/update_check_list_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/presentation/bloc/check_list_bloc.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/presentation/bloc/check_list_event.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/presentation/bloc/check_list_state.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/delete_note_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/get_note_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/update_note_model.dart';
@@ -15,6 +21,7 @@ import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bl
 import '../../../core/base/base_bloc.dart';
 import '../../../custom/progress_bar.dart';
 import '../../../utils/border.dart';
+import '../../../utils/color_extension.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/device_file.dart';
 import '../../../utils/style.dart';
@@ -31,6 +38,7 @@ class QuickNotes extends StatefulWidget {
 class _QuickNotesState extends State<QuickNotes> {
   Random random = new Random(255);
   GetNoteModel getNoteModel = GetNoteModel();
+  GetCheckListModel getCheckListModel = GetCheckListModel();
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   final GlobalKey<FormState> _formKey =  GlobalKey<FormState>();
@@ -42,16 +50,40 @@ class _QuickNotesState extends State<QuickNotes> {
       var id = prefs.getString('access');
       print(id);
       await _getNote();
+      await _getCheckList();
     });
 
   }
 
   Future<String> _getNote() {
     //loginBloc = BlocProvider.of<LoginBloc>(context);
-  return Future.delayed(Duration()).then((_) {
+  return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddNoteBloc>(context).add(
           GetNoteEvent());
+      return "";
+    });
+  }
+
+  Future<String> _getCheckList() {
+    //loginBloc = BlocProvider.of<LoginBloc>(context);
+    return Future.delayed(const Duration()).then((_) {
+      //ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<AddCheckListBloc>(context).add(
+          GetCheckListEvent());
+      return "";
+    });
+  }
+
+  Future<String> _updateCheckList({int? id, String? is_completed}) {
+    //loginBloc = BlocProvider.of<LoginBloc>(context);
+    return Future.delayed(const Duration()).then((_) {
+      //ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<AddCheckListBloc>(context).add(
+          UpdateCheckListEvent(
+              id: id ?? 0,
+              is_completed: is_completed ?? "false",
+          ));
       return "";
     });
   }
@@ -201,19 +233,136 @@ class _QuickNotesState extends State<QuickNotes> {
 
   Widget buildWidget(){
     return Container(
-      child: ListView.builder(
-        padding: EdgeInsets.only(bottom: 16),
-        itemBuilder: (context, index) {
-          return notesItem(index);
-        },
-        itemCount: getNoteModel.data!.length,
-      ),
+      child: SingleChildScrollView(
+        child:  Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListView.builder(
+              shrinkWrap: true,
+              padding: const EdgeInsets.only(bottom: 16),
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                return notesItem(index);
+              },
+              itemCount: getNoteModel.data!.length,
+            ),
+            BlocBuilder<AddCheckListBloc, BaseState>(
+              builder: (context, state) {
+                if (state is GetCheckListState) {
+                  ProgressDialog.hideLoadingDialog(context);
+                  getCheckListModel = state.model!;
+                  if(getCheckListModel.success == true){
+                    return  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                            "Check List",
+                            style: CustomTextStyle.styleBold
+                                .copyWith(color: CustomColors.colorBlue,
+                                fontSize: DeviceUtil.isTablet ? 20 : 16),
+                          ),
+                        ),
+                ListView.builder(
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.only(bottom: 16),
+                  physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              return checkListItem(index);
+                            },
+                            itemCount: getCheckListModel.data!.length,
+                          ),
+                      ],
+                    );
+                  }else{
+                    ProgressDialog.hideLoadingDialog(context);
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(
+                        msg: state.model!.error ?? "",
+                        toastLength: Toast.LENGTH_LONG,
+                        fontSize: DeviceUtil.isTablet ? 20 : 12,
+                        backgroundColor: CustomColors.colorBlue,
+                        textColor: Colors.white
+                    );
+                  }
+
+                }else if (state is DeleteCheckListState) {
+                  ProgressDialog.hideLoadingDialog(context);
+                  DeleteCheckListModel? model = state.model;
+                  print(model!.message??"");
+                  if(model.success == true){
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(
+                        msg: model.message ?? "",
+                        toastLength: Toast.LENGTH_LONG,
+                        fontSize: DeviceUtil.isTablet ? 20 : 12,
+                        backgroundColor: CustomColors.colorBlue,
+                        textColor: Colors.white
+                    );
+                    _getCheckList();
+                  }else{
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(
+                        msg: model.error ?? "",
+                        toastLength: Toast.LENGTH_LONG,
+                        fontSize: DeviceUtil.isTablet ? 20 : 12,
+                        backgroundColor: CustomColors.colorBlue,
+                        textColor: Colors.white
+                    );
+                  }
+                }else if (state is UpdateCheckListState) {
+                  ProgressDialog.hideLoadingDialog(context);
+                  UpdateCheckListModel? model = state.model;
+                  print(model!.message??"");
+                  if(model.success == true){
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(
+                        msg: model.message ?? "",
+                        toastLength: Toast.LENGTH_LONG,
+                        fontSize: DeviceUtil.isTablet ? 20 : 12,
+                        backgroundColor: CustomColors.colorBlue,
+                        textColor: Colors.white
+                    );
+                    _getCheckList();
+                  }else{
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(
+                        msg: model.error ?? "",
+                        toastLength: Toast.LENGTH_LONG,
+                        fontSize: DeviceUtil.isTablet ? 20 : 12,
+                        backgroundColor: CustomColors.colorBlue,
+                        textColor: Colors.white
+                    );
+                  }
+                } else if (state is StateErrorGeneral) {
+                  ProgressDialog.hideLoadingDialog(context);
+                  Fluttertoast.cancel();
+                  Fluttertoast.showToast(
+                      msg: state.message,
+                      toastLength: Toast.LENGTH_LONG,
+                      fontSize: DeviceUtil.isTablet ? 20 : 12,
+                      backgroundColor: CustomColors.colorBlue,
+                      textColor: Colors.white
+                  );
+                  return const SizedBox();
+                }else {
+                  ProgressDialog.hideLoadingDialog(context);
+                  return const SizedBox();
+                }
+                ProgressDialog.hideLoadingDialog(context);
+                return const SizedBox();
+              },
+            ),
+          ],
+        ),
+      )
     );
   }
 
   Widget notesItem(int index) {
     return Container(
-      margin: EdgeInsets.only(left: 16, right: 16, top: 16),
+      margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
       decoration: BoxDecoration(
           boxShadow: [BoxShadow(color: Colors.grey.withOpacity(.01), offset: Offset(0, 100))],
           color: Colors.white,
@@ -221,7 +370,7 @@ class _QuickNotesState extends State<QuickNotes> {
       child: Stack(
         children: [
           Container(
-            margin: EdgeInsets.only(left: 16),
+            margin: const EdgeInsets.only(left: 16),
             height: 3,
             decoration: BoxDecoration(
                 color: Color.fromRGBO(random.nextInt(255), random.nextInt(255),
@@ -235,7 +384,7 @@ class _QuickNotesState extends State<QuickNotes> {
             children: [
               Container(
                 padding:
-                EdgeInsets.symmetric(horizontal: 15,vertical: 20),
+                const EdgeInsets.symmetric(horizontal: 15,vertical: 20),
                 child: Text(
                   getNoteModel.data![index].title ?? "",
                   softWrap: true,
@@ -246,7 +395,7 @@ class _QuickNotesState extends State<QuickNotes> {
               ),
               Container(
                 padding:
-                EdgeInsets.symmetric(horizontal: 15,vertical: 10),
+                const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
                 child: Text(
                   getNoteModel.data![index].description ?? "",
                   softWrap: true,
@@ -385,11 +534,134 @@ class _QuickNotesState extends State<QuickNotes> {
       ),
     );
   }
+  Widget checkListItem(int i) {
+    return Container(
+      margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
+      decoration: BoxDecoration(
+          boxShadow: [BoxShadow(color: Colors.grey.withOpacity(.01), offset: Offset(0, 100))],
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8)),
+      child: Stack(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(left: 16),
+            height: 3,
+            decoration: BoxDecoration(
+                color: HexColor.fromHex(getCheckListModel.data![i].color ?? ""),
+                borderRadius: BorderRadius.circular(4)),
+            width: MediaQuery.of(context).size.width / 2.5,
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 15,vertical: 20),
+                child: Text(
+                  getCheckListModel.data![i].title ?? "",
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                  style: CustomTextStyle.styleMedium.copyWith(
+                      fontSize: DeviceUtil.isTablet ? 16 : 15),
+                ),
+              ),
+              ListView.builder(
+                padding: const EdgeInsets.only(left: 6),
+                primary: false,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return noteSubItem(index,i);
+                },
+                itemCount: getCheckListModel.data![i].optionsDetails!.length,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.delete,color: CustomColors.colorBlue,
+                      size: DeviceUtil.isTablet ? 24 : 20,),
+                    onPressed: (){
+                      showDialog(
+                          context: context,
+                          builder: (ctx) => Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: AlertDialog(
+                              title:  Text(
+                                "Delete Check List",
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize:  DeviceUtil.isTablet ? 18 : 14),
+                              ),
+                              /*titlePadding: EdgeInsets.all(10),
+                         contentPadding: EdgeInsets.all(10),*/
+                              content:  Container(
+                                child: Text(
+                                  "Are you sure you want to delete?",
+                                  softWrap: true,
+                                  overflow: TextOverflow.fade,
+                                  style:  CustomTextStyle.styleMedium.copyWith(
+                                      fontSize: DeviceUtil.isTablet ? 18 : 14
+                                  ),
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    _deleteCheckList(
+                                      id: getCheckListModel.data![i].id,
+                                    );
+                                    Navigator.of(ctx).pop();
+                                  },
+                                  child: Text(
+                                    "Okay",
+                                    style: CustomTextStyle.styleSemiBold
+                                        .copyWith(color: CustomColors.colorBlue, fontSize:
+                                    DeviceUtil.isTablet ? 18 : 16),),
+                                ),
+                              ],
+                            ),
+                          ));
+                      /*    showDialog(
+                       context: context,
+                       builder: (ctx) => AlertDialog(
+                         title: const Text("Delete Task"),
+                         content: const Text("Are you sure you want to delete this note ?"),
+                         actions: <Widget>[
+                           TextButton(
+                             onPressed: () {
+                               _deleteNote(
+                                 id: getNoteModel.data![index].id,
+                               );
+                               Navigator.of(ctx).pop();
+                             },
+                             child: Container(
+                               //color: CustomColors.colorBlue,
+                               padding: const EdgeInsets.all(14),
+                               child:  Text(
+                                 "Okay",
+                                 style: CustomTextStyle.styleSemiBold
+                                     .copyWith(color: CustomColors.colorBlue, fontSize: 18),),
+                             ),
+                           ),
+                         ],
+                       ),
+                     );*/
+                    },
+                  )
+                ],
+              )
+            ],
+          )
+        ],
+      ),
+    );
+  }
   Future<String> _updateNote({
     int? id,String? title,String? description,
   }) {
     //loginBloc = BlocProvider.of<LoginBloc>(context);
-    return Future.delayed(Duration()).then((_) {
+    return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddNoteBloc>(context).add(
           UpdateNoteEvent(
@@ -405,11 +677,25 @@ class _QuickNotesState extends State<QuickNotes> {
     int? id,
   }) {
     //loginBloc = BlocProvider.of<LoginBloc>(context);
-    return Future.delayed(Duration()).then((_) {
+    return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddNoteBloc>(context).add(
           DeleteNoteEvent(
               id: id ?? 0,
+          ));
+      return "";
+    });
+  }
+
+  Future<String> _deleteCheckList({
+    int? id,
+  }) {
+    //loginBloc = BlocProvider.of<LoginBloc>(context);
+    return Future.delayed(const Duration()).then((_) {
+      ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<AddCheckListBloc>(context).add(
+          DeleteCheckListEvent(
+            id: id.toString(),
           ));
       return "";
     });
@@ -552,16 +838,29 @@ class _QuickNotesState extends State<QuickNotes> {
       ),
     );
   }
-  noteSubItem() {
+  noteSubItem(int i,int index) {
     return Container(
       child: Row(
         children: [
           Checkbox(
-            value: false,
-            onChanged: (checked) {},
+            value: getCheckListModel.data![index].optionsDetails![i].is_completed ?? false,
+            onChanged: (checked) async {
+              await _updateCheckList(
+                is_completed: checked.toString(),
+                id: getCheckListModel.data![index].optionsDetails![i].id,
+              );
+            },
+            activeColor: CustomColors.colorBlue,
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          Text("Buy a milk")
+          Text(
+            getCheckListModel.data![index].optionsDetails![i].checklistDetail ?? "",
+            softWrap: true,
+            overflow: TextOverflow.ellipsis,
+            style: CustomTextStyle.styleMedium
+                .copyWith(
+                fontSize: DeviceUtil.isTablet ? 18 : 14),
+          ),
         ],
       ),
     );

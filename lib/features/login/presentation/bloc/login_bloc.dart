@@ -133,7 +133,7 @@ class LoginBloc extends Bloc<BaseEvent, BaseState> {
       lastName: lastName ?? "",
       mobile: mobile ?? "",
       password: password ?? "",
-       role: role ?? "",
+      role_id: role ?? "",
     ))
         .listen((data) {
       data.fold((onError) {

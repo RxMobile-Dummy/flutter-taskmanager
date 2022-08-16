@@ -340,7 +340,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                         ],
                                         child: UpdateProfile(
                                           selectedUserStatus: int.parse(userMap['status_id']),
-                                          selectedUserRole: int.parse(userMap['role']),
+                                          selectedUserRole: int.parse(userMap['role_id']),
                                           mobile: mobile,
                                           email: email,
                                           lastName: lastName,

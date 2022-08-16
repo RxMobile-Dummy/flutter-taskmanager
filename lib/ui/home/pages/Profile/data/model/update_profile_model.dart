@@ -34,7 +34,7 @@ class Data {
   String? profilePic;
   String? email;
   String? mobileNumber;
-  String? role;
+  String? role_id;
   String? createdAt;
   String? updatedAt;
 
@@ -47,7 +47,7 @@ class Data {
         this.profilePic,
         this.email,
         this.mobileNumber,
-        this.role,
+        this.role_id,
         this.createdAt,
         this.updatedAt});
 
@@ -60,7 +60,7 @@ class Data {
     profilePic = json['profile_pic'];
     email = json['email'];
     mobileNumber = json['mobile_number'];
-    role = json['role'];
+    role_id = json['role_id'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
@@ -75,7 +75,7 @@ class Data {
     data['profile_pic'] = this.profilePic;
     data['email'] = this.email;
     data['mobile_number'] = this.mobileNumber;
-    data['role'] = this.role;
+    data['role_id'] = this.role_id;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     return data;

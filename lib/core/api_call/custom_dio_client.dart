@@ -20,6 +20,9 @@ Future<RefreshTokenModel> refreshTokenCall() async {
   var data;
   if(response != null ){
     data = response;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove("access");
+    prefs.setString("access", data.access);
     return data;
   }else {
     SharedPreferences preferences = await SharedPreferences.getInstance();

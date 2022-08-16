@@ -8,6 +8,10 @@ import 'package:retrofit/retrofit.dart';
 import 'package:task_management/features/login/data/model/refresh_token_model.dart';
 import 'package:task_management/features/login/data/model/reset_passward_model.dart';
 import 'package:task_management/features/login/data/model/sign_up_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/add_check_list_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/delete_check_list_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/get_check_list_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/update_check_list_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/add_note_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/get_note_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
@@ -138,6 +142,21 @@ abstract class  ApiClient {
 
   @POST('update_profile/')
   Future<UpdateUserProfileModel> updateUserprofile(@Body() FormData formData);
+
+  @POST('add_new_checklist/')
+  Future<AddCheckListModel> addCheckList(
+      @Body() HashMap<String, dynamic> hashMap);
+
+  @POST('getchecklist/')
+  Future<GetCheckListModel> getCheckList();
+
+  @POST('delete_checklist/')
+  Future<DeleteCheckListModel> deleteCheckList(
+      @Body() HashMap<String, dynamic> hashMap);
+
+  @POST('update_checklist/')
+  Future<UpdateCheckListModel> updateCheckList(
+      @Body() HashMap<String, dynamic> hashMap);
 /*  factory ApiClient(Dio dio, {String baseUrl}) = _ApiClient;
  // final Dio _dio = Dio();
   String api = "https://8ebf-180-211-112-179.in.ngrok.io/";
