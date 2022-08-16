@@ -604,7 +604,7 @@ class _ProjectState extends State<Project> {
                     ),
                   ),
                   Container(
-                    height: 56,
+                    height: DeviceUtil.isTablet ? 56 : 46,
                     margin: const EdgeInsets.only(top: 24),
                     child: ListView(
                       primary: false,
@@ -624,8 +624,8 @@ class _ProjectState extends State<Project> {
                           });
                         },
                         child: Container(
-                          width: 56,
-                          height: 56,
+                          width: DeviceUtil.isTablet ? 56 : 46,
+                          height: DeviceUtil.isTablet ? 56 : 46,
                           child: selectedColors == e
                               ? const Icon(Icons.check)
                               : Container(),
@@ -801,7 +801,7 @@ class _ProjectState extends State<Project> {
                   ),
                 ),
                 Container(
-                  height: 56,
+                  height: DeviceUtil.isTablet ? 56 : 46,
                   margin: const EdgeInsets.only(top: 24),
                   child: ListView(
                     primary: false,
@@ -823,8 +823,8 @@ class _ProjectState extends State<Project> {
                         });
                       },
                       child: Container(
-                        width: 56,
-                        height: 56,
+                        width: DeviceUtil.isTablet ? 56 : 46,
+                        height: DeviceUtil.isTablet ? 56 : 46,
                         margin: const EdgeInsets.only(left: 16),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(4),

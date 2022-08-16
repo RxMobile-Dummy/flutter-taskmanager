@@ -87,7 +87,7 @@ class LocalDataSourceImpl implements LocalDataSource {
     map['email'] = params.email;
     map['mobile_number'] = params.mobile;
     map['password'] = params.password;
-    map['role'] = params.role;
+    map['role'] = params.role_id;
     final response = await _apiClient.signUp(map);
     var data ;
     if(response != null ){

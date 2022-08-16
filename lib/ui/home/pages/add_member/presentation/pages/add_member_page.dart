@@ -52,6 +52,10 @@ class _GetAllUserListState extends State<GetAllUserList> {
       appBar: AppBar(
         elevation: 2,
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: Text(
           "All User List",
           style: CustomTextStyle.styleSemiBold.copyWith(fontSize: 18),
@@ -74,11 +78,33 @@ class _GetAllUserListState extends State<GetAllUserList> {
                     backgroundColor: CustomColors.colorBlue,
                     textColor: Colors.white
                 );
-                Navigator.of(context).pop();
+               // Navigator.of(context).pop();
               }else{
                 Fluttertoast.cancel();
                 Fluttertoast.showToast(
                     msg: model.error ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
+              }
+            } else if (state is AddMemberState) {
+              ProgressDialog.hideLoadingDialog(context);
+              addMemberModel = state.model!;
+              if(addMemberModel.success == true){
+                Fluttertoast.cancel();
+                Fluttertoast.showToast(
+                    msg: addMemberModel.message ?? "",
+                    toastLength: Toast.LENGTH_LONG,
+                    fontSize: DeviceUtil.isTablet ? 20 : 12,
+                    backgroundColor: CustomColors.colorBlue,
+                    textColor: Colors.white
+                );
+              }else{
+                Fluttertoast.cancel();
+                Fluttertoast.showToast(
+                    msg: addMemberModel.error ?? "",
                     toastLength: Toast.LENGTH_LONG,
                     fontSize: DeviceUtil.isTablet ? 20 : 12,
                     backgroundColor: CustomColors.colorBlue,
@@ -100,7 +126,17 @@ class _GetAllUserListState extends State<GetAllUserList> {
           bloc: BlocProvider.of<AddMemberBloc>(context),
           child:  BlocBuilder<AddMemberBloc, BaseState>(
             builder: (context, state) {
-              if (state is AddMemberState) {
+              return (addMemberModel.data != null && addMemberModel.data!.isNotEmpty)
+                  ? buildWidget(addMemberModel.data ?? [])
+                  : (addMemberModel.data == null)
+                  ? const SizedBox():Center(
+                child: Text(
+                  "No user found",
+                  style: CustomTextStyle.styleSemiBold
+                      .copyWith(color: CustomColors.colorBlue, fontSize: 18),
+                ),
+              );
+              /* if (state is AddMemberState) {
                 ProgressDialog.hideLoadingDialog(context);
                 addMemberModel = state.model!;
                 return buildWidget(addMemberModel.data ?? []);
@@ -123,7 +159,7 @@ class _GetAllUserListState extends State<GetAllUserList> {
                         .copyWith(color: CustomColors.colorBlue, fontSize: 18),
                   ),
                 );
-              }
+              }*/
             },
           ),));
   }

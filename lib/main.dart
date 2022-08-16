@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/presentation/bloc/check_list_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import 'package:task_management/ui/home/pages/Project/presentation/bloc/project_bloc.dart';
@@ -31,6 +32,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider<ProjectBloc>(
             create: (context) => Sl.Sl<ProjectBloc>(),
+          ),
+          BlocProvider<AddCheckListBloc>(
+            create: (context) => Sl.Sl<AddCheckListBloc>(),
           ),
         ],
         child: GetMaterialApp(

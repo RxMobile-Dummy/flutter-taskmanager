@@ -30,7 +30,7 @@ class SignUpParams extends Equatable {
   String email;
   String password;
   String mobile;
-  String role;
+  String role_id;
 
   SignUpParams({
     required this.email,
@@ -38,7 +38,7 @@ class SignUpParams extends Equatable {
     required this.mobile,
     required this.lastName,
     required this.firstName,
-    required this.role,
+    required this.role_id,
   });
 
   @override
@@ -52,7 +52,7 @@ class SignUpParams extends Equatable {
     data['firstName'] = this.firstName;
     data['lastName'] = this.lastName;
     data['mobile'] = this.mobile;
-    data['role'] = this.role;
+    data['role_id'] = this.role_id;
 
     return data;
   }
