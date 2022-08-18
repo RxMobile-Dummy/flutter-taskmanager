@@ -4,7 +4,7 @@ class RefreshTokenModel {
   String? message;
   String? error;
 
-  RefreshTokenModel({this.success, this.data, this.message,this.error});
+  RefreshTokenModel({this.success, this.data, this.message});
 
   RefreshTokenModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];

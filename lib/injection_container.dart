@@ -3,9 +3,11 @@ import 'dart:io';
 
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/core/api_call/baseClient.dart';
+import 'package:task_management/core/failure/error_object.dart';
 import 'package:task_management/features/login/domain/repositories/login_repositories.dart';
 import 'package:task_management/features/login/domain/usecases/forgot_password_uasecase.dart';
 import 'package:task_management/features/login/domain/usecases/get_user_role_usecase.dart';
@@ -296,16 +298,18 @@ Future<Dio> createDioClient() async {
       onError: (err, handler) async {
         if (err.response?.statusCode == 401) {
           try {
-            await refreshTokenCall();
+            ErrorObject.logout();
+          /*  await refreshTokenCall();
             var authToken = prefs.getString('access');
             if (authToken != null || authToken != "") {
               headers["Accept"] = 'application/json';
               headers["Authorization"] = authToken;
               dio.options.headers = headers;
-              dio.interceptors
-                  .add(LogInterceptor(responseBody: true, requestBody: true));
-            }
-          } catch (err, st) {}
+              dio.request(err.requestOptions.path);
+            }*/
+          } catch (err, st) {
+            print(err);
+          }
         }else{
           handler.reject(err);
         }
@@ -314,3 +318,5 @@ Future<Dio> createDioClient() async {
   );
   return dio;
 }
+
+

@@ -1,9 +1,17 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/core/failure/failure.dart';
 
+import '../../custom/progress_bar.dart';
+import '../../features/login/presentation/bloc/login_bloc.dart';
+import '../../features/login/presentation/pages/login.dart';
+import '../../main.dart';
 import '../Strings/strings.dart';
+import 'package:task_management/injection_container.dart' as Sl;
 
 class ErrorObject {
 
@@ -18,6 +26,23 @@ class ErrorObject {
         return failure.message;
       }
     }
+  }
+
+  static logout() async {
+    ProgressDialog.hideLoadingDialog(navigatorKey.currentContext!);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+    prefs.setString("isOnBoardingCompleted", "true");
+    print(prefs);
+    Future.delayed(Duration.zero, () {
+      Navigator.pushAndRemoveUntil(
+        navigatorKey.currentContext!,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+        create: (context) => Sl.Sl<LoginBloc>(),
+        child: Login(),
+      )),
+            (route) => false,
+      );
+    });
   }
 
  static Future<Failure> checkErrorState(e) async {

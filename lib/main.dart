@@ -12,6 +12,9 @@ import 'package:task_management/ui/home/pages/Project/presentation/bloc/project_
 import 'package:task_management/ui/splash.dart';
 import 'package:task_management/injection_container.dart' as Sl;
 
+
+final navigatorKey =  GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Sl.init();
@@ -40,6 +43,7 @@ class MyApp extends StatelessWidget {
         child: GetMaterialApp(
           title: 'Flutter Demo',
           debugShowCheckedModeBanner: false,
+          navigatorKey: navigatorKey,
           theme: ThemeData(
             primarySwatch: Colors.blue,
             visualDensity: VisualDensity.adaptivePlatformDensity,
