@@ -1,23 +1,16 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
-import 'package:task_management/utils/colors.dart';
-import 'package:task_management/widget/task_list.dart';
-
-
 import '../../../core/base/base_bloc.dart';
+import '../../../core/error_bloc_listener/error_bloc_listener.dart';
 import '../../../custom/progress_bar.dart';
 import '../../../utils/device_file.dart';
 import '../../../utils/style.dart';
 import '../../../widget/home_appbar.dart';
-import '../fab_menu_option/add_task/data/model/delete_task_model.dart';
 import '../fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
-import '../fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
 import '../month_page.dart';
 import '../today_page.dart';
 
@@ -31,7 +24,6 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
   late PageController pageController;
    bool isFilterApply = false;
    bool isCompleted = false;
-  //var monthPage = MonthPage();
   int selectedTaskValue = 3;
   GetTaskModel getTaskModel = GetTaskModel();
 
@@ -40,7 +32,6 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
      await _getTask();
     });
-   // var todayPage =  TodayPage(isCompleted: isCompleted,isFilterApply: isFilterApply,);
     tabController = TabController(vsync: this, length: 2);
     tabController.addListener(() {});
     pageController = PageController();
@@ -76,73 +67,7 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
         title: "Work List",
         leading: Container(),
         actions: [
-          BlocListener<AddTaskBloc, BaseState>(
-              listener: (context, state) {
-                if (state is StateOnSuccess) {
-                  ProgressDialog.hideLoadingDialog(context);
-                } else if (state is GetTaskState) {
-                  ProgressDialog.hideLoadingDialog(context);
-                  getTaskModel = state.model!;
-                 if(getTaskModel.success == true){
-                   Fluttertoast.cancel();
-                   Fluttertoast.showToast(
-                       msg: getTaskModel.message ?? "",
-                       toastLength: Toast.LENGTH_LONG,
-                       fontSize: DeviceUtil.isTablet ? 20 : 12,
-                       backgroundColor: CustomColors.colorBlue,
-                       textColor: Colors.white
-                   );
-                 }else{
-                   Fluttertoast.cancel();
-                   Fluttertoast.showToast(
-                       msg: getTaskModel.error ?? "",
-                       toastLength: Toast.LENGTH_LONG,
-                       fontSize: DeviceUtil.isTablet ? 20 : 10,
-                       backgroundColor: CustomColors.colorBlue,
-                       textColor: Colors.white
-                   );
-                 }
-                  /*ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                    content: Text(getTaskModel.message ?? ""),
-                  ));*/
-                  print(getTaskModel.message??"");
-                }else if (state is DeleteTaskState) {
-                  ProgressDialog.hideLoadingDialog(context);
-                  DeleteTaskModel? model = state.model;
-                  if(model!.success == true){
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(
-                        msg: getTaskModel.message ?? "",
-                        toastLength: Toast.LENGTH_LONG,
-                        fontSize: DeviceUtil.isTablet ? 20 : 12,
-                        backgroundColor: CustomColors.colorBlue,
-                        textColor: Colors.white
-                    );
-                  }else{
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(
-                        msg: getTaskModel.error ?? "",
-                        toastLength: Toast.LENGTH_LONG,
-                        fontSize: DeviceUtil.isTablet ? 20 : 12,
-                        backgroundColor: CustomColors.colorBlue,
-                        textColor: Colors.white
-                    );
-                  }
-                  print(model.message ?? "");
-                  // Navigator.of(context).pop();
-                  // await _getTask();
-                }else if (state is StateErrorGeneral) {
-                  ProgressDialog.hideLoadingDialog(context);
-                  Fluttertoast.cancel();
-                  Fluttertoast.showToast(
-                      msg: state.message,
-                      toastLength: Toast.LENGTH_LONG,
-                      fontSize: DeviceUtil.isTablet ? 20 : 12,
-                      backgroundColor: CustomColors.colorBlue,
-                      textColor: Colors.white
-                  );
-                }
-              },
+          ErrorBlocListener<AddTaskBloc>(
               bloc: BlocProvider.of<AddTaskBloc>(context),
               child:  BlocBuilder<AddTaskBloc, BaseState>(builder: (context, state) {
                 return PopupMenuButton(
@@ -152,10 +77,6 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                         value: 1,
                         onTap: () async {
                           await _getTask(isCompleted: false);
-                          // setState((){
-                          //   isFilterApply= true;
-                          //   isCompleted = false;
-                          // });
                         },
                         child: Text(
                           "InCompleted Tasks",
@@ -180,10 +101,6 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
                         value: 3,
                         onTap: ()async{
                           await _getTask();
-                        //   setState(() {
-                        //     isFilterApply= false;
-                        //     isCompleted = false;
-                        //   });
                         },
                         child: Text(
                           "All Tasks",
@@ -241,24 +158,7 @@ class _MyTaskState extends State<MyTask> with SingleTickerProviderStateMixin {
           ),
         ),
       ).build(),
-      body: buildWidget()/*BlocListener<AddTaskBloc, BaseState>(
-          listener: (context, state) {
-            if (state is StateOnSuccess) {
-              ProgressDialog.hideLoadingDialog(context);
-            } else if (state is GetTaskState) {
-              ProgressDialog.hideLoadingDialog(context);
-              getTaskModel = state.model!;
-              print(getTaskModel.message??"");
-              Navigator.of(context).pop();
-            }else if (state is StateErrorGeneral) {
-              ProgressDialog.hideLoadingDialog(context);
-            }
-          },
-          bloc: BlocProvider.of<AddTaskBloc>(context),
-          child:  BlocBuilder<AddTaskBloc, BaseState>(builder: (context, state) {
-            return buildWidget();
-          })
-      ),*/
+      body: buildWidget()
     );
   }
 

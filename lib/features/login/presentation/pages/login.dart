@@ -1,19 +1,14 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_management/features/login/data/model/forgot_password_model.dart';
 import 'package:task_management/features/login/presentation/pages/sign_up.dart';
 
 import '../../../../core/base/base_bloc.dart';
+import '../../../../core/error_bloc_listener/error_bloc_listener.dart';
 import '../../../../custom/progress_bar.dart';
 import '../../../../ui/forgot_password.dart';
-import '../../../../ui/home/fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
-import '../../../../ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import '../../../../ui/home/home.dart';
 import '../../../../utils/colors.dart';
 import '../../../../utils/device_file.dart';
@@ -22,7 +17,6 @@ import '../../../../widget/button.dart';
 import '../../../../widget/decoration.dart';
 import '../../../../widget/rounded_corner_page.dart';
 import '../../../../widget/textfield.dart';
-import '../../data/model/login_model.dart';
 import '../bloc/login_bloc.dart';
 import '../bloc/login_event.dart';
 import '../bloc/login_state.dart';
@@ -47,61 +41,18 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: BlocListener<LoginBloc, BaseState>(
-        listener: (context, state) async {
-          if (state is StateOnSuccess) {
-            ProgressDialog.hideLoadingDialog(context);
-          }else if (state is LoginState) {
-            ProgressDialog.hideLoadingDialog(context);
-            LoginModel? model = state.model;
-            if(model!.success == true){
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setString('access', model.data!.authenticationToken!.access ?? "");
-              prefs.setString('refresh', model.data!.authenticationToken!.refresh ?? "");
-              prefs.setString('id', model.data?.id!.toString() ?? "");
-              String? token = prefs.getString("access");
-              print(token);
-              String user = jsonEncode(model.data?.toJson());
-              prefs.setString('userData', user);
-              Navigator.pushAndRemoveUntil<dynamic>(
-                context,
-                MaterialPageRoute(builder: (context) {
-                  return Home();
-                },),
-                    (route) => false,
-              );
-            }else {
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.error ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }
-          } else if (state is StateErrorGeneral) {
-            ProgressDialog.hideLoadingDialog(context);
-            Fluttertoast.cancel();
-            Fluttertoast.showToast(
-                msg: state.message,
-                toastLength: Toast.LENGTH_LONG,
-                fontSize: DeviceUtil.isTablet ? 20 : 12,
-                backgroundColor: CustomColors.colorBlue,
-                textColor: Colors.white
-            );
-          }
-        },
+      body: ErrorBlocListener<LoginBloc>(
         bloc: BlocProvider.of<LoginBloc>(context),
-        child:  BlocBuilder<LoginBloc, BaseState>(builder: (context, state) {
+       // callback:  _loginUser(userName.text,tiePassword.text),
+        child:  BlocBuilder<LoginBloc, BaseState>(builder: (context, state)  {
+          if(state is LoginState) {
+            ProgressDialog.hideLoadingDialog(context);
+            Future.delayed(Duration.zero, () {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => Home()),
+                      (route) => false);
+            });
+          }
           return Form(
               key: _formKey,
               child: buildWidget());
@@ -121,11 +72,11 @@ class _LoginState extends State<Login> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 32,
                 ),
                 CustomTextField(
-                  key: Key("tefUsername"),
+                  key: const Key("tefUsername"),
                   label: "Username",
                   isEmail: true,
                   hint: "Enter username",
@@ -137,7 +88,7 @@ class _LoginState extends State<Login> {
                   height: 24,
                 ),
                 CustomTextField(
-                  key: Key("tefPassword"),
+                  key: const Key("tefPassword"),
                   label: "Password",
                   hint: "Enter password",
                   errorMessage: "Please Enter Password",
@@ -158,14 +109,15 @@ class _LoginState extends State<Login> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                        create: (context) => Sl.Sl<LoginBloc>(),
-                        child: ForgotPassword(),
-                      )),
-                    );
-                   // Get.to(ForgotPassword());
+                    Future.delayed(Duration.zero, () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                          create: (context) => Sl.Sl<LoginBloc>(),
+                          child: ForgotPassword(),
+                        )),
+                      );
+                    });
                   },
                   child: Container(
                     margin: const EdgeInsets.only(left: 8, top: 16, right: 16),
@@ -196,7 +148,6 @@ class _LoginState extends State<Login> {
                           textColor: Colors.white
                       );
                     }
-                    //Get.off(Home());
                   },
                 ),
                 Row(
@@ -211,14 +162,15 @@ class _LoginState extends State<Login> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                            create: (context) => Sl.Sl<LoginBloc>(),
-                            child: SignUp(),
-                          )),
-                        );
-                        // Get.to(ForgotPassword());
+                        Future.delayed(Duration.zero, () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                              create: (context) => Sl.Sl<LoginBloc>(),
+                              child: SignUp(),
+                            )),
+                          );
+                        });
                       },
                       child:Text(
                           " Create One",
@@ -241,7 +193,6 @@ class _LoginState extends State<Login> {
   }
 
   Future<String> _loginUser(String email,String password) {
-    //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<LoginBloc>(context).add(

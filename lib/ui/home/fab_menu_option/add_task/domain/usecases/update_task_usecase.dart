@@ -1,14 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:task_management/features/login/data/model/forgot_password_model.dart';
-import 'package:task_management/features/login/data/model/reset_passward_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
 
 import '../../../../../../core/failure/failure.dart';
 import '../../../../../../core/usecase.dart';
-import '../../../../../../features/login/domain/repositories/login_repositories.dart';
-import '../../data/model/update_task.dart';
 import '../repositories/add_task_repositories.dart';
 
 

@@ -3,7 +3,6 @@
 
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:task_management/ui/home/pages/comment/data/model/add_comment_model.dart';
 import 'package:task_management/ui/home/pages/comment/data/model/update_comment_model.dart';
 import 'package:task_management/ui/home/pages/comment/domain/repositories/comment_repositories.dart';
 

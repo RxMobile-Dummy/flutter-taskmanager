@@ -1,11 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_management/ui/home/pages/add_member/data/model/add_member_model.dart';
 import 'package:task_management/ui/home/pages/add_member/domain/usecases/add_member_usecase.dart';
 import 'package:task_management/ui/home/pages/add_member/presentation/bloc/add_member_event.dart';
 import 'package:task_management/ui/home/pages/add_member/presentation/bloc/add_member_state.dart';
 
 import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/base/base_bloc.dart';
+import '../../../../../../core/failure/error_object.dart';
 import '../../../../../../core/failure/failure.dart';
+import '../../data/model/invite_project_assign_model.dart';
 import '../../domain/usecases/invite_project_assign_usecase.dart';
 
 class AddMemberBloc extends Bloc<BaseEvent, BaseState> {
@@ -26,9 +29,19 @@ class AddMemberBloc extends Bloc<BaseEvent, BaseState> {
       } else if (event is AddMemberEvent) {
         getMemberCall();
       } else if (event is AddMemberSuccessEvent) {
-        emit(AddMemberState(model: event.model));
+        AddMemberModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else {
+          emit(AddMemberState(model: model));
+        }
       } else if (event is InviteProjectAssignSuccessEvent) {
-        emit(InviteProjectAssignState(model: event.model));
+        InviteProjectAssignModel? model = event.model;
+        if(model?.status != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(InviteProjectAssignState(model: model));
+        }
       }else if (event is EventErrorGeneral) {
         emit(StateErrorGeneral(event.message));
       }
@@ -42,7 +55,7 @@ class AddMemberBloc extends Bloc<BaseEvent, BaseState> {
         project_id: project_id ?? "", assignee_ids: assignee_ids ?? ""))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(InviteProjectAssignSuccessEvent(model: onSuccess));
       });
@@ -53,23 +66,11 @@ class AddMemberBloc extends Bloc<BaseEvent, BaseState> {
         .call(AddMemberParams( ))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(AddMemberSuccessEvent(model: onSuccess));
       });
     });
   }
 
-
-  String? _mapFailureToMessage(Failure failure) {
-    if (failure.runtimeType == ServerFailure) {
-      return Strings.kServerFailureMessage;
-    } else if (failure.runtimeType == CacheFailure) {
-      return Strings.kCacheFailureMessage;
-    } else if (failure.runtimeType == FailureMessage) {
-      if (failure is FailureMessage) {
-        return failure.message;
-      }
-    }
-  }
 }

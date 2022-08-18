@@ -3,18 +3,18 @@
 
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_management/ui/home/pages/Project/domain/usecases/add_project_usecase.dart';
-import 'package:task_management/ui/home/pages/Project/presentation/bloc/project_event.dart';
-import 'package:task_management/ui/home/pages/Project/presentation/bloc/project_state.dart';
+import 'package:task_management/ui/home/pages/comment/data/model/add_comment_model.dart';
+import 'package:task_management/ui/home/pages/comment/data/model/delete_comment_model.dart';
+import 'package:task_management/ui/home/pages/comment/data/model/get_comment_model.dart';
+import 'package:task_management/ui/home/pages/comment/data/model/update_comment_model.dart';
 import 'package:task_management/ui/home/pages/comment/domain/usecases/add_comment_usecase.dart';
 import 'package:task_management/ui/home/pages/comment/domain/usecases/delete_comment_usecase.dart';
 import 'package:task_management/ui/home/pages/comment/domain/usecases/get_comment_usecase.dart';
 import 'package:task_management/ui/home/pages/comment/domain/usecases/update_comment_usecase.dart';
 import 'package:task_management/ui/home/pages/comment/presentation/bloc/comment_state.dart';
 
-import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/base/base_bloc.dart';
-import '../../../../../../core/failure/failure.dart';
+import '../../../../../../core/failure/error_object.dart';
 import 'comment_event.dart';
 
 class CommentBloc extends Bloc<BaseEvent, BaseState> {
@@ -53,13 +53,33 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
           comment_user_id: event.comment_user_id,
         );
       }else if (event is AddCommentSuccessEvent){
-        emit(AddCommentState(model: event.model));
+        AddCommentModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(AddCommentState(model: model));
+        }
       }  else if (event is UpdateCommentSuccessEvent){
-        emit(UpdateCommentState(model: event.model));
+        UpdateCommentModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(UpdateCommentState(model: model));
+        }
       }else if (event is DeleteCommentSuccessEvent){
-        emit(DeleteCommentState(model: event.model));
+        DeleteCommentModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(DeleteCommentState(model: model));
+        }
       }else if (event is GetCommentSuccessEvent){
-        emit(GetCommentState(model: event.model));
+        GetCommentModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(GetCommentState(model: model));
+        }
       }else if (event is EventErrorGeneral) {
         emit(StateErrorGeneral(event.message));
       }
@@ -80,7 +100,7 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
     ))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(AddCommentSuccessEvent(model: onSuccess));
       });
@@ -104,7 +124,7 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
     ))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(UpdateCommentSuccessEvent(model: onSuccess));
       });
@@ -122,7 +142,7 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
     ))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(DeleteCommentSuccessEvent(model: onSuccess));
       });
@@ -138,23 +158,12 @@ class CommentBloc extends Bloc<BaseEvent, BaseState> {
     ))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(GetCommentSuccessEvent(model: onSuccess));
       });
     });
   }
 
-  String? _mapFailureToMessage(Failure failure) {
-    if (failure.runtimeType == ServerFailure) {
-      return Strings.kServerFailureMessage;
-    } else if (failure.runtimeType == CacheFailure) {
-      return Strings.kCacheFailureMessage;
-    } else if (failure.runtimeType == FailureMessage) {
-      if (failure is FailureMessage) {
-        return failure.message;
-      }
-    }
-  }
 
 }

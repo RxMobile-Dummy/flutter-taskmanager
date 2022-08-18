@@ -2,15 +2,17 @@
 
 import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/add_note_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/delete_note_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/update_note_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/domain/usecases/add_note_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/domain/usecases/delete_note_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/domain/usecases/get_note_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/domain/usecases/update_note_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_event.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_state.dart';
-
-import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/base/base_bloc.dart';
+import '../../../../../../core/failure/error_object.dart';
 import '../../../../../../core/failure/failure.dart';
 import '../../data/model/get_note_model.dart';
 
@@ -49,20 +51,39 @@ class AddNoteBloc extends Bloc<BaseEvent, BaseState> {
         var data  = await getNoteCall();
 
         data.fold((onError) {
-          add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+          add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
         }, (onSuccess) {
           emit(GetNoteState(model: onSuccess));
-          //add(GetNoteSuccessEvent(model: onSuccess));
         });
       }else if (event is AddNoteSuccessEvent){
-        emit(AddNoteState(model: event.model));
+        AddNotesModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(AddNoteState(model: model));
+        }
       }else if (event is GetNoteSuccessEvent){
-        emit(StateLoading());
-        emit(GetNoteState(model: event.model));
+        GetNoteModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(StateLoading());
+          emit(GetNoteState(model: model));
+        }
       }else if (event is UpdateNoteSuccessEvent){
-        emit(UpdateNoteState(model: event.model));
+        UpdateNoteModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(UpdateNoteState(model: model));
+        }
       }else if (event is DeleteNoteSuccessEvent){
-        emit(DeleteNoteState(model: event.model));
+        DeleteNoteModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(DeleteNoteState(model: model));
+        }
       }else if (event is EventErrorGeneral) {
         emit(StateErrorGeneral(event.message));
       }
@@ -85,7 +106,7 @@ class AddNoteBloc extends Bloc<BaseEvent, BaseState> {
     ))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError)?? ""));
       }, (onSuccess) {
         add(AddNoteSuccessEvent(model: onSuccess));
       });
@@ -105,7 +126,7 @@ class AddNoteBloc extends Bloc<BaseEvent, BaseState> {
    ))
        .listen((data) {
      data.fold((onError) {
-       add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+       add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
      }, (onSuccess) {
        add(UpdateNoteSuccessEvent(model: onSuccess));
      });
@@ -121,7 +142,7 @@ class AddNoteBloc extends Bloc<BaseEvent, BaseState> {
    ))
        .listen((data) {
      data.fold((onError) {
-       add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+       add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
      }, (onSuccess) {
        add(DeleteNoteSuccessEvent(model: onSuccess));
      });
@@ -129,23 +150,10 @@ class AddNoteBloc extends Bloc<BaseEvent, BaseState> {
  }
 
  Future<Either<Failure, GetNoteModel>> getNoteCall() async{
-   /*getNoteUsecase!
-       .call(GetNotesParams()).single.then((value) => BlocProvider.of<AddNoteBloc>(context).add(GetNoteEvent()));*/
    return await getNoteUsecase!
        .call(GetNotesParams())
        .first;
  }
 
-  String? _mapFailureToMessage(Failure failure) {
-    if (failure.runtimeType == ServerFailure) {
-      return Strings.kServerFailureMessage;
-    } else if (failure.runtimeType == CacheFailure) {
-      return Strings.kCacheFailureMessage;
-    } else if (failure.runtimeType == FailureMessage) {
-      if (failure is FailureMessage) {
-        return failure.message;
-      }
-    }
-  }
 
 }

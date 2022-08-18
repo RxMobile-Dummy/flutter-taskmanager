@@ -89,30 +89,16 @@ So it will be easier for user to set priority and set their work.
 ```
 
 ## How to run a project
-
-```
-    Use below command to run project based on your requirement
-    - For development debug: flutter run -t lib/main_dev.dart --flavor dev
-    - For development release: flutter run -t lib/main_dev.dart --flavor dev --release
-    - For production debug: flutter run -t lib/main_prod.dart --flavor prod
-    - For production release: flutter run -t lib/main_prod.dart --flavor prod --release
-```
+Use below command to run project based on your requirement
+- Clone project from git.
+- Run command in terminal ```flutter pub get ```
+- After that run this command ```flutter packages pub run build_runner build --delete-conflicting-outputs``` for generate .g.dart file
+- For development debug: ```flutter run -t lib/main.dart```
 
 ## How to generate apk/ipa for project
-
-```
-    Use below command to generate apk/ipa of project based on your requirement
-    - For development apk: flutter build apk -t lib/main_dev.dart --flavor dev --release
-    - For development ipa: flutter build ipa -t lib/main_dev.dart --flavor dev --release
-    - For production apk: flutter build apk -t lib/main_prod.dart --flavor prod --release
-    - For production ipa: flutter build ipa -t lib/main_prod.dart --flavor prod --release
-```
-
-## How to manage flavor
-
-```
-    Go through https://medium.com/@animeshjain/build-flavors-in-flutter-android-and-ios-with-different-firebase-projects-per-flavor-27c5c5dac10b link to understand how flavor is managed in flutter
-```
+Use below command to generate apk/ipa of project based on your requirement
+- For development apk: ```flutter build apk -t lib/main.dart```
+- For development ipa: ```flutter build ipa -t lib/main.dart```
 
 ## Directory Structure
 

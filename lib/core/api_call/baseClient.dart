@@ -18,7 +18,6 @@ import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/pages/add_member/data/model/invite_project_assign_model.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 import 'package:task_management/ui/home/pages/Profile/data/model/update_profile_model.dart';
 import 'package:task_management/ui/home/pages/Project/data/model/add_project_model.dart';
 import 'package:task_management/ui/home/pages/Project/data/model/delete_project_model.dart';
@@ -157,38 +156,5 @@ abstract class  ApiClient {
   @POST('update_checklist/')
   Future<UpdateCheckListModel> updateCheckList(
       @Body() HashMap<String, dynamic> hashMap);
-/*  factory ApiClient(Dio dio, {String baseUrl}) = _ApiClient;
- // final Dio _dio = Dio();
-  String api = "https://8ebf-180-211-112-179.in.ngrok.io/";
-
-  @POST('task_app/')
-  Future<LoginModel> login(String email, String password) async {
-  *//*  BaseOptions options = BaseOptions(
-      baseUrl: api,
-      connectTimeout: 10000,
-      receiveTimeout: 10000,);
-    final dioClient = Dio(options);
-    final params = <String, dynamic>{
-      'email': email,
-      'password': password,
-    };*//*
-    try {
-      Response response = await _dio.post(
-        "signin",
-        data: {
-          'email': email,
-          'password': password,
-        },
-        options: Options(
-          headers: {
-            HttpHeaders.contentTypeHeader: "application/json",
-            HttpHeaders.authorizationHeader: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTc4NjMxOTMsImVtYWlsIjoicmVlY2hhLnBhdGVsQHJhZGl4d2ViLmNvbSIsInBhc3N3b3JkIjoiUmFkaXh3ZWJAMTUifQ.7FyEWh4Wx1bMwJvZRqz7T9et2MWGfh_7yflT_JDbZLE',
-          },),
-      );
-      return response.data;
-    } on DioError catch (e) {
-      return e.response!.data;
-    }
-  }*/
 
 }

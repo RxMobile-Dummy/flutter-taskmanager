@@ -6,23 +6,20 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_management/ui/home/pages/Project/data/model/add_project_model.dart';
-import 'package:task_management/ui/home/pages/Project/data/model/delete_project_model.dart';
 import 'package:task_management/ui/home/pages/Project/data/model/get_all_project_model.dart';
-import 'package:task_management/ui/home/pages/Project/data/model/update_project_model.dart';
 import 'package:task_management/ui/home/pages/Project/presentation/bloc/project_bloc.dart';
 import 'package:task_management/ui/home/pages/Project/presentation/bloc/project_event.dart';
 import 'package:task_management/ui/home/pages/Project/presentation/bloc/project_state.dart';
 import 'package:task_management/utils/color_extension.dart';
 
 import '../../../../../../core/base/base_bloc.dart';
+import '../../../../../../core/error_bloc_listener/error_bloc_listener.dart';
 import '../../../../../../custom/progress_bar.dart';
 import '../../../../../../utils/border.dart';
 import '../../../../../../utils/colors.dart';
 import '../../../../../../utils/device_file.dart';
 import '../../../../../../utils/style.dart';
 import '../../../../../../widget/button.dart';
-import '../../../../../../widget/textfield.dart';
 
 Random random = Random();
 
@@ -38,8 +35,6 @@ class _ProjectState extends State<Project> {
   TextEditingController? descriptionController = TextEditingController();
   final GlobalKey<FormState> _formKey =  GlobalKey<FormState>();
   final GlobalKey<FormState> _formKey1 =  GlobalKey<FormState>();
-/*  "Personal", "TeamWorks", "Home", "Meet"*/
-  //List<String> listTitle = [];
   List<Color> listColors = [
     Colors.blue,
     Colors.pink,
@@ -54,9 +49,6 @@ class _ProjectState extends State<Project> {
 
   @override
   void initState() {
-   /* WidgetsBinding.instance.addPostFrameCallback((_) async {
-
-    });*/
     _getProject();
   }
 
@@ -74,125 +66,31 @@ class _ProjectState extends State<Project> {
         ),
         backgroundColor: Colors.white,
       ),
-      body: BlocListener<ProjectBloc, BaseState>(
-        listener: (context, state) async {
-          if (state is StateOnSuccess) {
-            ProgressDialog.hideLoadingDialog(context);
-          } else if (state is GetAllProjectsState) {
-            ProgressDialog.hideLoadingDialog(context);
-            getAllProjectsModel = state.model!;
-           // GetAllProjectsModel? model = state.model;
-            /*for(var i=0;i< getAllProjectsModel.data!.length;i++){
-              listTitle.add(getAllProjectsModel.data![i].name ?? "");
-            }*/
-            if(getAllProjectsModel.success == true){
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: getAllProjectsModel.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }else{
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: getAllProjectsModel.error ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }
-           // Navigator.of(context).pop();
-          } else if (state is DeleteProjectState) {
-            ProgressDialog.hideLoadingDialog(context);
-            DeleteProjectModel? model = state.model;
-            if(model!.success == true){
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              _getProject();
-            }else{
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.error ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }
-          }else if (state is AddProjectState) {
-            ProgressDialog.hideLoadingDialog(context);
-            AddProjectModel? model = state.model;
-           /* SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setString('project_id', model?.data?.id.toString() ?? "");*/
-            if(model!.success == true){
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              Navigator.of(context).pop();
-              _getProject();
-            }else{
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.error ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }
-          }else if (state is UpdateProjectState) {
-            ProgressDialog.hideLoadingDialog(context);
-            UpdateProjectModel? model = state.model;
-            if(model!.success == true){
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              Navigator.of(context).pop();
-              _getProject();
-            }else{
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.error ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }
-          }else if (state is StateErrorGeneral) {
-            ProgressDialog.hideLoadingDialog(context);
-            Fluttertoast.cancel();
-            Fluttertoast.showToast(
-                msg: state.message,
-                toastLength: Toast.LENGTH_LONG,
-                fontSize: DeviceUtil.isTablet ? 20 : 12,
-                backgroundColor: CustomColors.colorBlue,
-                textColor: Colors.white
-            );
-          }
-        },
+      body: ErrorBlocListener<ProjectBloc>(
         bloc: BlocProvider.of<ProjectBloc>(context),
-        child:  BlocBuilder<ProjectBloc, BaseState>(builder: (context, state) {
-          return buildWidget();
+        child:  BlocBuilder<ProjectBloc, BaseState>(
+            builder: (context, state) {
+              if(state is GetAllProjectsState){
+                ProgressDialog.hideLoadingDialog(context);
+                getAllProjectsModel = state.model!;
+                return buildWidget();
+              }else if(state is AddProjectState){
+                ProgressDialog.hideLoadingDialog(context);
+                Future.delayed(Duration.zero, () {
+                  Navigator.of(context).pop();
+                });
+                _getProject();
+              }else if (state is UpdateProjectState){
+                ProgressDialog.hideLoadingDialog(context);
+                Future.delayed(Duration.zero, () {
+                  Navigator.of(context).pop();
+                });
+                _getProject();
+              } else if (state is DeleteProjectState){
+                ProgressDialog.hideLoadingDialog(context);
+                _getProject();
+              }
+              return SizedBox();
         }),
       ),
     );
@@ -366,20 +264,6 @@ class _ProjectState extends State<Project> {
           const Spacer(
             flex: 1,
           ),
-         /* Text(
-            createDate,
-            style: CustomTextStyle.styleSemiBold
-                .copyWith(color: Colors.black, fontSize: 18),
-          ),
-          const Spacer(
-            flex: 1,
-          ),*/
-       /*   Text(
-            "10 Tasks",
-            style: CustomTextStyle.styleMedium
-                .copyWith(color: Colors.grey, fontSize: 14),
-          ),
-          const Spacer(flex: 2),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -428,8 +312,6 @@ class _ProjectState extends State<Project> {
                           "Delete Project",
                           style: TextStyle(fontSize:  DeviceUtil.isTablet ? 18 : 14),
                         ),
-                       /* titlePadding: EdgeInsets.all(10),
-                        contentPadding: EdgeInsets.all(10),*/
                         content:  Container(
                           child: Text(
                             "Are you sure you want to delete?",
@@ -449,7 +331,7 @@ class _ProjectState extends State<Project> {
                               Navigator.of(ctx).pop();
                             },
                             child: Text(
-                              "Okay",
+                              "Yes",
                               style: CustomTextStyle.styleSemiBold
                                   .copyWith(color: CustomColors.colorBlue, fontSize:
                               DeviceUtil.isTablet ? 18 : 16),),
@@ -457,31 +339,6 @@ class _ProjectState extends State<Project> {
                         ],
                       ),
                     ));
-                  /*  showDialog(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text("Delete Task"),
-                        content: const Text("Are you sure you want to delete this project ?"),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              _deleteProject(
-                                  id: getAllProjectsModel.data![index].id
-                              );
-                              Navigator.of(ctx).pop();
-                            },
-                            child: Container(
-                              //color: CustomColors.colorBlue,
-                              padding: const EdgeInsets.all(14),
-                              child:  Text(
-                                "Okay",
-                                style: CustomTextStyle.styleSemiBold
-                                    .copyWith(color: CustomColors.colorBlue, fontSize: 18),),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );*/
                   },
                   icon:  Icon(Icons.delete,color: CustomColors.colorBlue,
                     size: DeviceUtil.isTablet ? 24 : 20,),
@@ -530,7 +387,6 @@ class _ProjectState extends State<Project> {
                       },
                       decoration: InputDecoration(
                           border: titleBorder(color: Colors.grey.shade200),
-                          // hintText: "Title",
                           labelText: "Title",
                           labelStyle: CustomTextStyle.styleSemiBold
                               .copyWith(fontSize: DeviceUtil.isTablet ? 16 : 14),
@@ -567,7 +423,6 @@ class _ProjectState extends State<Project> {
                       },
                       decoration: InputDecoration(
                           border: titleBorder(color: Colors.grey.shade200),
-                          // hintText: "Title",
                           counterText: "${enterDescriptionText.length}/300",
                           labelText: "Description",
                           labelStyle: CustomTextStyle.styleSemiBold
@@ -581,19 +436,6 @@ class _ProjectState extends State<Project> {
                           titleBorder(color: Colors.transparent)),
                     ),
                   ),
-                  /* CustomTextField(
-                  label: "Title",
-                  minLines: 5,
-                  textEditingController: titleController,
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                CustomTextField(
-                  label: "Description",
-                  minLines: 5,
-                  textEditingController: descriptionController,
-                ),*/
                   Container(
                     margin: const EdgeInsets.only(left: 16, top: 32),
                     child: Text(
@@ -614,9 +456,6 @@ class _ProjectState extends State<Project> {
                           .map((e) => GestureDetector(
                         onTap: () {
                           mystate(()  {
-                            /* SharedPreferences prefs = await SharedPreferences.getInstance();
-                              var authToken = prefs.getString('id');
-                              print(authToken);*/
                             selectedColors = e;
                             hexColor = e.toHex();
                             Color color = HexColor.fromHex(hexColor);
@@ -725,7 +564,6 @@ class _ProjectState extends State<Project> {
                     },
                     decoration: InputDecoration(
                         border: titleBorder(color: Colors.grey.shade200),
-                        // hintText: "Title",
                         labelText: "Title",
                         labelStyle: CustomTextStyle.styleSemiBold
                             .copyWith(fontSize: DeviceUtil.isTablet ? 16 : 14),
@@ -762,7 +600,6 @@ class _ProjectState extends State<Project> {
                     },
                     decoration: InputDecoration(
                         border: titleBorder(color: Colors.grey.shade200),
-                        // hintText: "Title",
                         labelText: "Description",
                         counterText: "${descriptionTextForEdit.length}/300",
                         labelStyle: CustomTextStyle.styleSemiBold
@@ -776,21 +613,6 @@ class _ProjectState extends State<Project> {
                         titleBorder(color: Colors.transparent)),
                   ),
                 ),
-                /*  CustomTextField(
-                //initialValue: title.text,
-                label: "Title",
-                minLines: 5,
-                textEditingController: title,
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              CustomTextField(
-                //initialValue: description.text,
-                label: "Description",
-                minLines: 5,
-                textEditingController: description,
-              ),*/
                 Container(
                   margin: const EdgeInsets.only(left: 16, top: 32),
                   child: Text(
@@ -812,9 +634,6 @@ class _ProjectState extends State<Project> {
                       onTap: () {
                         FocusScope.of(context).unfocus();
                         mystate(()  {
-                          /*SharedPreferences prefs = await SharedPreferences.getInstance();
-                              var authToken = prefs.getString('access');
-                              print(authToken);*/
                           selectedColorsForEdit = e;
                           hexColor = e.toHex();
 

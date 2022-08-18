@@ -1,23 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/get.dart';
 import 'package:task_management/ui/reset_password.dart';
 
 import '../core/base/base_bloc.dart';
+import '../core/error_bloc_listener/error_bloc_listener.dart';
 import '../custom/progress_bar.dart';
-import '../features/login/data/model/forgot_password_model.dart';
-import '../features/login/data/model/login_model.dart';
 import '../features/login/presentation/bloc/login_bloc.dart';
 import '../features/login/presentation/bloc/login_event.dart';
 import '../features/login/presentation/bloc/login_state.dart';
-import '../features/login/presentation/pages/login.dart';
 import '../utils/colors.dart';
 import '../utils/device_file.dart';
 import '../widget/button.dart';
 import '../widget/rounded_corner_page.dart';
 import '../widget/textfield.dart';
-import 'package:task_management/injection_container.dart' as Sl;
 
 class ForgotPassword extends StatefulWidget {
   @override
@@ -34,55 +30,18 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: BlocListener<LoginBloc, BaseState>(
-          listener: (context, state) {
-            if (state is StateOnSuccess) {
-              ProgressDialog.hideLoadingDialog(context);
-            }else if (state is ForgotPasswordStatus) {
-              ProgressDialog.hideLoadingDialog(context);
-              ForgotPasswordModel? model = state.model;
-              if(model!.success == true){
-                Fluttertoast.cancel();
-                Fluttertoast.showToast(
-                    msg: model.message ?? "",
-                    toastLength: Toast.LENGTH_LONG,
-                    fontSize: DeviceUtil.isTablet ? 20 : 12,
-                    backgroundColor: CustomColors.colorBlue,
-                    textColor: Colors.white
-                );
-                Navigator.pushAndRemoveUntil<dynamic>(
-                  context,
-                  MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                    create: (context) => Sl.Sl<LoginBloc>(),
-                    child: ResetPassword(email: emailController.text),
-                  )),
-                      (route) => false,
-                );
-              }else{
-                Fluttertoast.cancel();
-                Fluttertoast.showToast(
-                    msg: model.error ?? "",
-                    toastLength: Toast.LENGTH_LONG,
-                    fontSize: DeviceUtil.isTablet ? 20 : 12,
-                    backgroundColor: CustomColors.colorBlue,
-                    textColor: Colors.white
-                );
-              }
-             // Get.off(ResetPassword());
-            }else if (state is StateErrorGeneral) {
-              ProgressDialog.hideLoadingDialog(context);
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: state.message,
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }
-          },
+      body: ErrorBlocListener<LoginBloc>(
           bloc: BlocProvider.of<LoginBloc>(context),
-          child:  BlocBuilder<LoginBloc, BaseState>(builder: (context, state) {
+          child:  BlocBuilder<LoginBloc, BaseState>(
+              builder: (context, state) {
+                if(state is ForgotPasswordStatus){
+                  ProgressDialog.hideLoadingDialog(context);
+                  Future.delayed(Duration.zero, () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => ResetPassword(email: emailController.text),),
+                            (route) => false);
+                  });
+                }
             return Form(
                 key: _formKey,
                 child: buildWidget());
@@ -136,7 +95,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           textColor: Colors.white
                       );
                     }
-                   // Get.to(ResetPassword());
                   },),
                   const SizedBox(
                     height: 48,

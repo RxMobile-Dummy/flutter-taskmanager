@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import 'package:task_management/ui/home/pages/add_member/data/model/add_member_model.dart';
 import 'package:task_management/ui/home/pages/add_member/presentation/bloc/add_member_bloc.dart';
 import 'package:task_management/ui/home/pages/add_member/presentation/bloc/add_member_event.dart';
@@ -9,14 +7,13 @@ import 'package:task_management/ui/home/pages/add_member/presentation/bloc/add_m
 
 import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/base/base_bloc.dart';
+import '../../../../../../core/error_bloc_listener/error_bloc_listener.dart';
 import '../../../../../../custom/progress_bar.dart';
 import '../../../../../../utils/colors.dart';
 import '../../../../../../utils/device_file.dart';
 import '../../../../../../utils/style.dart';
 import '../../../../../../widget/profile_pi.dart';
 import '../../../../../../widget/size.dart';
-import '../../../../fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
-import '../../data/model/invite_project_assign_model.dart';
 
 class GetAllUserList extends StatefulWidget {
 String project_id;
@@ -62,104 +59,29 @@ class _GetAllUserListState extends State<GetAllUserList> {
         ),
         backgroundColor: Colors.white,
       ),
-      body: BlocListener<AddMemberBloc, BaseState>(
-          listener: (context, state) {
-            if (state is StateOnSuccess) {
-              ProgressDialog.hideLoadingDialog(context);
-            } else if (state is InviteProjectAssignState) {
-              ProgressDialog.hideLoadingDialog(context);
-              InviteProjectAssignModel? model = state.model;
-              if(model!.status == true){
-                Fluttertoast.cancel();
-                Fluttertoast.showToast(
-                    msg: model.message ?? "",
-                    toastLength: Toast.LENGTH_LONG,
-                    fontSize: DeviceUtil.isTablet ? 20 : 12,
-                    backgroundColor: CustomColors.colorBlue,
-                    textColor: Colors.white
-                );
-               // Navigator.of(context).pop();
-              }else{
-                Fluttertoast.cancel();
-                Fluttertoast.showToast(
-                    msg: model.error ?? "",
-                    toastLength: Toast.LENGTH_LONG,
-                    fontSize: DeviceUtil.isTablet ? 20 : 12,
-                    backgroundColor: CustomColors.colorBlue,
-                    textColor: Colors.white
-                );
-              }
-            } else if (state is AddMemberState) {
-              ProgressDialog.hideLoadingDialog(context);
-              addMemberModel = state.model!;
-              if(addMemberModel.success == true){
-                Fluttertoast.cancel();
-                Fluttertoast.showToast(
-                    msg: addMemberModel.message ?? "",
-                    toastLength: Toast.LENGTH_LONG,
-                    fontSize: DeviceUtil.isTablet ? 20 : 12,
-                    backgroundColor: CustomColors.colorBlue,
-                    textColor: Colors.white
-                );
-              }else{
-                Fluttertoast.cancel();
-                Fluttertoast.showToast(
-                    msg: addMemberModel.error ?? "",
-                    toastLength: Toast.LENGTH_LONG,
-                    fontSize: DeviceUtil.isTablet ? 20 : 12,
-                    backgroundColor: CustomColors.colorBlue,
-                    textColor: Colors.white
-                );
-              }
-            } else if (state is StateErrorGeneral) {
-              ProgressDialog.hideLoadingDialog(context);
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: state.message,
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }
-          },
+      body: ErrorBlocListener<AddMemberBloc>(
           bloc: BlocProvider.of<AddMemberBloc>(context),
           child:  BlocBuilder<AddMemberBloc, BaseState>(
             builder: (context, state) {
-              return (addMemberModel.data != null && addMemberModel.data!.isNotEmpty)
-                  ? buildWidget(addMemberModel.data ?? [])
-                  : (addMemberModel.data == null)
-                  ? const SizedBox():Center(
-                child: Text(
-                  "No user found",
-                  style: CustomTextStyle.styleSemiBold
-                      .copyWith(color: CustomColors.colorBlue, fontSize: 18),
-                ),
-              );
-              /* if (state is AddMemberState) {
+              if(state is AddMemberState) {
                 ProgressDialog.hideLoadingDialog(context);
                 addMemberModel = state.model!;
-                return buildWidget(addMemberModel.data ?? []);
-              } else if (state is StateErrorGeneral) {
-                ProgressDialog.hideLoadingDialog(context);
-                Fluttertoast.cancel();
-                Fluttertoast.showToast(
-                    msg: state.message,
-                    toastLength: Toast.LENGTH_LONG,
-                    fontSize: DeviceUtil.isTablet ? 20 : 12,
-                    backgroundColor: CustomColors.colorBlue,
-                    textColor: Colors.white
-                );
-                return const SizedBox();
-              }else {
-                return Center(
+                return (addMemberModel.data != null && addMemberModel.data!.isNotEmpty)
+                    ? buildWidget(addMemberModel.data ?? [])
+                    : (addMemberModel.data == null)
+                    ? const SizedBox():Center(
                   child: Text(
                     "No user found",
                     style: CustomTextStyle.styleSemiBold
                         .copyWith(color: CustomColors.colorBlue, fontSize: 18),
                   ),
                 );
-              }*/
+              }else if(state is InviteProjectAssignState){
+                ProgressDialog.hideLoadingDialog(context);
+                BlocProvider.of<AddMemberBloc>(context).add(
+                    AddMemberEvent());
+              }
+              return SizedBox();
             },
           ),));
   }
@@ -180,7 +102,11 @@ class _GetAllUserListState extends State<GetAllUserList> {
                    Row(
                      children: [
                        sized_16(),
-                       userProfilePic(radius: 30.0,imagePath: "${Strings.baseUrl}${list[index].profilePic}"),
+                       userProfilePic(radius: 30.0,
+                         imagePath:
+                         (list[index].profilePic != null && list[index].profilePic  != "")
+                             ? "${Strings.baseUrl}${list[index].profilePic}"
+                             : "",),
                        sized_16(size: 16.0),
                        Column(
                          mainAxisAlignment: MainAxisAlignment.start,
@@ -256,7 +182,6 @@ class _GetAllUserListState extends State<GetAllUserList> {
     String? assignee_ids,
   }) {
     return Future.delayed(Duration()).then((_) {
-      //ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddMemberBloc>(context).add(InviteProjectAssignEvent(
         project_id: project_id ?? "",
         assignee_ids: assignee_ids ?? "",

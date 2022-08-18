@@ -23,16 +23,6 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
 
   @override
   Future<AddCommentModel> addCommentCall(AddCommentParams params) async {
-    // Dio dio = new Dio();
-    // dio.options.headers['Accept'] = 'application/json';
-    // dio.options.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
-    // dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    // var restClient = ApiClient(dio);
-   /* List multipartArray = [];
-    for (var i = 0; i < params.files!.length; i++){
-      multipartArray.add(MultipartFile.fromFileSync(params.files![i], filename:
-      pathManager.basename(params.files![i])));
-    }*/
     List<MultipartFile> multipartImageList = [];
     for (var file in params.files!) {
       MultipartFile multipartFile =
@@ -57,11 +47,6 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
 
   @override
   Future<UpdateCommentModel> updateCommentCall(UpdateCommentParams params) async {
-    // Dio dio = new Dio();
-    // dio.options.headers['Accept'] = 'application/json';
-    // dio.options.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
-    // dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    // var restClient = ApiClient(dio);
     List<MultipartFile> multipartImageList = [];
 
     if(params.files!.isNotEmpty) {
@@ -71,11 +56,6 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
         multipartImageList.add(multipartFile);
       }
     }
-   /* for (var file in params.files!) {
-      MultipartFile multipartFile =
-      await MultipartFile.fromFile(file, filename: pathManager.basename(file.toString()));
-      multipartImageList.add(multipartFile);
-    }*/
     var map = new HashMap<String, dynamic>();
     map['id'] = params.id;
     map['comment_user'] = params.comment_user_id;
@@ -96,11 +76,6 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
 
   @override
   Future<DeleteCommentModel> deleteCommentCall(DeleteCommentParams params)async {
-    // Dio dio = new Dio();
-    // dio.options.headers['Accept'] = 'application/json';
-    // dio.options.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
-    // dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    // var restClient = ApiClient(dio);
     var map = new HashMap<String, dynamic>();
     map['id'] = params.id;
     map['comment_user'] = params.comment_user_id;
@@ -117,11 +92,6 @@ class AddCommentDataSourceImpl implements AddCommentDataSource {
 
   @override
   Future<GetCommentModel> getCommentCall(GetCommentParams params) async {
-    // Dio dio = new Dio();
-    // dio.options.headers['Accept'] = 'application/json';
-    // dio.options.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
-    // dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    // var restClient = ApiClient(dio);
     var map = new HashMap<String, dynamic>();
     map['comment_user'] = params.comment_user_id;
     final response = await _apiClient.getComment(map);

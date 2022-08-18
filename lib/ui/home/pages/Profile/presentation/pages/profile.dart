@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -12,6 +12,8 @@ import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/get_
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import 'package:task_management/ui/home/pages/Profile/presentation/bloc/profile_bloc.dart';
+import 'package:task_management/ui/home/pages/Profile/presentation/bloc/profile_event.dart';
+import 'package:task_management/ui/home/pages/Profile/presentation/bloc/profile_state.dart';
 import 'package:task_management/ui/home/pages/Profile/presentation/pages/update_profile.dart';
 import 'package:task_management/ui/home/pages/user_status/presentation/bloc/user_status_state.dart';
 
@@ -25,7 +27,6 @@ import '../../../../../../utils/device_file.dart';
 import '../../../../../../utils/style.dart';
 import '../../../../../../widget/profile_pi.dart';
 import '../../../../../../widget/size.dart';
-import '../../../../fab_menu_option/add_note/data/model/add_note_model.dart';
 import '../../../../fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
 import '../../../../fab_menu_option/add_note/presentation/bloc/add_note_event.dart';
 import '../../../../fab_menu_option/add_note/presentation/bloc/add_note_state.dart';
@@ -70,12 +71,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await _getNote();
+      await _getUserData();
       await _getTask();
       await _getUserStatus();
-      setState(() {
-        userMap = jsonDecode(prefs.getString('userData') ?? "");
-        print(userMap);
-      });
     });
     colorController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
@@ -85,15 +83,21 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   Future<String> _getNote() {
     return Future.delayed(Duration()).then((_) {
-      //ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddNoteBloc>(context).add(GetNoteEvent());
+      return "";
+    });
+  }
+
+  Future<String> _getUserData() {
+    return Future.delayed(Duration()).then((_) {
+      ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<UpdateProfileBloc>(context).add(UpdatedUserDataGetEvent());
       return "";
     });
   }
 
   Future<String> _getUserStatus() {
     return Future.delayed(Duration()).then((_) {
-      //ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<UserStatusBloc>(context).add(GetUserStatusEvent());
       return "";
     });
@@ -101,7 +105,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   Future<String> _getTask() {
     return Future.delayed(Duration()).then((_) {
-      //ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddTaskBloc>(context).add(GetTaskEvent(date: ""));
       return "";
     });
@@ -134,8 +137,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                       "Logout",
                       style: TextStyle(fontSize:  DeviceUtil.isTablet ? 18 : 14),
                     ),
-                    /*titlePadding: EdgeInsets.all(10),
-                    contentPadding: EdgeInsets.all(10),*/
                     content:  Container(
                       child: Text(
                         "Are you sure you want to logout?",
@@ -153,16 +154,18 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           prefs.clear();
                           prefs.setString("isOnBoardingCompleted", "true");
                           print(prefs);
-                          Navigator.pushAndRemoveUntil(
-                            context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                            create: (context) => Sl.Sl<LoginBloc>(),
-                            child: Login(),
-                          )),
-                                (route) => false,
-                          );
+                          Future.delayed(Duration.zero, () {
+                            Navigator.pushAndRemoveUntil(
+                              context,MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                              create: (context) => Sl.Sl<LoginBloc>(),
+                              child: Login(),
+                            )),
+                                  (route) => false,
+                            );
+                          });
                         },
                         child: Text(
-                          "Okay",
+                          "Yes",
                           style: CustomTextStyle.styleSemiBold
                               .copyWith(color: CustomColors.colorBlue, fontSize:
                           DeviceUtil.isTablet ? 18 : 16),),
@@ -175,26 +178,17 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           )
         ],
       ),
-      body: buildWidget(), /*BlocListener<AddTaskBloc, BaseState>(
-        listener: (context, state) {
-          if (state is StateOnSuccess) {
-            ProgressDialog.hideLoadingDialog(context);
-          } else if (state is GetTaskState) {
-            ProgressDialog.hideLoadingDialog(context);
-            getTaskModel = state.model!;
-            noOfTask = getTaskModel.data!.length;
-            print(getTaskModel.message ?? "");
-          } else if (state is StateErrorGeneral) {
-            ProgressDialog.hideLoadingDialog(context);
-          }
-        },
-        bloc: BlocProvider.of<AddTaskBloc>(context),
-        child: BlocBuilder<AddTaskBloc, BaseState>(
-          builder: (context, state) {
-            return buildWidget();
-          },
-        ),
-      ),*/
+      body:  BlocBuilder<UpdateProfileBloc, BaseState>(
+            bloc: BlocProvider.of<UpdateProfileBloc>(context),
+            builder: (context, state)  {
+              print("state is ---------- $state");
+              if(state is UpdatedProfileDataState) {
+                ProgressDialog.hideLoadingDialog(context);
+                userMap = state.userData!;
+                return buildWidget();
+              }
+              return SizedBox();
+            }),
     );
   }
 
@@ -317,7 +311,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               style: CustomTextStyle.styleSemiBold.copyWith(
                                   fontSize: DeviceUtil.isTablet ? 18 : 12,color: CustomColors.colorBlue),
                             ),
-                            onTap: (){
+                            onTap: () async {
                               email.text = userMap['email'];
                               mobile.text = userMap['mobile_number'].toString().substring(3);
                               firstName.text = userMap['first_name'];
@@ -325,36 +319,33 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               imageFile = File(userMap['profile_pic']);
                               Navigator.push(
                                 context,
-                                  MaterialPageRoute(
-                                      builder: (context) => MultiBlocProvider(
-                                        providers: [
-                                          BlocProvider<UserStatusBloc>(
-                                            create: (context) => Sl.Sl<UserStatusBloc>(),
-                                          ),
-                                          BlocProvider<LoginBloc>(
-                                            create: (context) => Sl.Sl<LoginBloc>(),
-                                          ),
-                                          BlocProvider<UpdateProfileBloc>(
-                                            create: (context) => Sl.Sl<UpdateProfileBloc>(),
-                                          ),
-                                        ],
-                                        child: UpdateProfile(
-                                          selectedUserStatus: int.parse(userMap['status_id']),
-                                          selectedUserRole: int.parse(userMap['role_id']),
-                                          mobile: mobile,
-                                          email: email,
-                                          lastName: lastName,
-                                          firstName: firstName,
-                                          imageFile: imageFile,
+                                MaterialPageRoute(
+                                    builder: (context) => MultiBlocProvider(
+                                      providers: [
+                                        BlocProvider<UserStatusBloc>(
+                                          create: (context) => Sl.Sl<UserStatusBloc>(),
                                         ),
-                                      )),
+                                        BlocProvider<LoginBloc>(
+                                          create: (context) => Sl.Sl<LoginBloc>(),
+                                        ),
+                                        BlocProvider<UpdateProfileBloc>(
+                                          create: (context) => Sl.Sl<UpdateProfileBloc>(),
+                                        ),
+                                      ],
+                                      child: UpdateProfile(
+                                        selectedUserStatus: int.parse(userMap['status_id']),
+                                        selectedUserRole: int.parse(userMap['role_id']),
+                                        mobile: mobile,
+                                        email: email,
+                                        lastName: lastName,
+                                        firstName: firstName,
+                                        imageFile: imageFile,
+                                      ),
+                                    )),
                               ).then((value) async {
-                                SharedPreferences prefs = await SharedPreferences.getInstance();
-                                setState(() {
-                                  userMap = jsonDecode(prefs.getString('userData') ?? "");
-                                });
+                                BlocProvider.of<UpdateProfileBloc>(context).add(
+                                    UpdatedUserDataGetEvent());
                               });
-
                             },
                           ),
                         ),
@@ -516,22 +507,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     );
   }
 
-/*  Widget displayCountWidget(int count,){
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(top: 16),
-      height: 100,
-      child: ListView.builder(
-        itemBuilder: (context, index) {
-          return taskCategory(index,count);
-        },
-        itemCount: 2,
-        shrinkWrap: true,
-        primary: false,
-        scrollDirection: Axis.horizontal,
-      ),
-    );
-  }*/
 
   taskCategory(index, int count,String name) {
     return Container(
@@ -612,8 +587,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     }
                   },
                 ),
-                //Expanded(child: Container()),
-               // progressPercentage(0.4, "To Do", CustomColors.colorBlue),
                  const SizedBox( width:  60,),
                 BlocBuilder<AddNoteBloc, BaseState>(
                   builder: (context, state) {
@@ -644,6 +617,14 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         ],
       ),
     );
+  }
+
+  Future<String> _getUpdatedUserData() {
+    return Future.delayed(Duration()).then((_) {
+      ProgressDialog.showLoadingDialog(context);
+      BlocProvider.of<UpdateProfileBloc>(context).add(UpdatedUserDataGetEvent());
+      return "";
+    });
   }
 
   progressPercentage(percentage, title, color) {

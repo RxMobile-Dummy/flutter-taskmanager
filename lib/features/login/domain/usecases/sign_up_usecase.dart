@@ -18,10 +18,6 @@ class SignUpUsecase extends UseCase<SignUpModel, SignUpParams> {
     return loginRepositories!.signUpCall(params);
   }
 
-/* @override
-  Stream<Either<Failure, LoginModel>> call(LoginParams params) {
-
-  }*/
 }
 
 class SignUpParams extends Equatable {

@@ -10,7 +10,6 @@ import '../../utils/colors.dart';
 import '../../utils/style.dart';
 import '../../widget/task_list.dart';
 import 'fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
-import 'package:task_management/injection_container.dart' as Sl;
 
 import 'fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
 
@@ -40,7 +39,6 @@ class _MonthPageState extends State<MonthPage> {
   void initState() {
     super.initState();
     random = Random();
-    // refreshList();
   }
 
   Future<Null> refreshList() async {

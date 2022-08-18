@@ -17,10 +17,6 @@ class LoginCase extends UseCase<LoginModel, LoginParams> {
     return loginRepositories!.loginCall(params);
   }
 
- /* @override
-  Stream<Either<Failure, LoginModel>> call(LoginParams params) {
-
-  }*/
 }
 
 class LoginParams extends Equatable {

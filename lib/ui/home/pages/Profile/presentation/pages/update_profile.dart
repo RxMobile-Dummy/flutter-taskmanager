@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/features/login/presentation/bloc/login_state.dart';
 import 'package:task_management/ui/home/pages/Profile/data/model/update_profile_model.dart';
 import 'package:task_management/ui/home/pages/Profile/presentation/bloc/profile_bloc.dart';
@@ -15,6 +14,7 @@ import 'package:task_management/ui/home/pages/user_status/presentation/bloc/user
 
 import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/base/base_bloc.dart';
+import '../../../../../../core/error_bloc_listener/error_bloc_listener.dart';
 import '../../../../../../custom/progress_bar.dart';
 import '../../../../../../features/login/presentation/bloc/login_bloc.dart';
 import '../../../../../../features/login/presentation/bloc/login_event.dart';
@@ -38,8 +38,6 @@ class UpdateProfile extends StatefulWidget {
   int selectedUserRole;
   int selectedUserStatus;
 
-  //GetUserStatusModel getUserStatusModel = GetUserStatusModel();
-  // GetUserRoleModel getUserRoleModel = GetUserRoleModel();
   UpdateProfile({
     required this.email,
     required this.lastName,
@@ -48,8 +46,6 @@ class UpdateProfile extends StatefulWidget {
     required this.imageFile,
     required this.selectedUserStatus,
     required this.selectedUserRole,
-    // required this.getUserStatusModel,
-    // required this.getUserRoleModel
   });
 
   @override
@@ -60,7 +56,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
   bool isPasswordShow = true;
   UpdateProfileBloc? updateProfileBloc;
 
-  //TextEditingController password = TextEditingController();
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   UpdateUserProfileModel updateUserProfileModel = UpdateUserProfileModel();
   List<String> userRoleList = [];
@@ -73,22 +68,16 @@ class _UpdateProfileState extends State<UpdateProfile> {
 
   @override
   void initState() {
+    updateProfileBloc = BlocProvider.of<UpdateProfileBloc>(context);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _getUserStatus();
       await _getUserRole();
     });
-    /*  for(int i=0;i< widget.getUserRoleModel.data!.length;i++){
-      userRoleList.add(widget.getUserRoleModel.data![i].userRole ?? "");
-    }
-    for(int i=0;i< widget.getUserStatusModel.data!.length;i++){
-      userStatusList.add(widget.getUserStatusModel.data![i].userStatus ?? "");
-    }*/
     super.initState();
   }
 
   Future<String> _getUserStatus() {
     return Future.delayed(Duration()).then((_) {
-      //ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<UserStatusBloc>(context).add(GetUserStatusEvent());
       return "";
     });
@@ -96,7 +85,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
 
   Future<String> _getUserRole() {
     return Future.delayed(Duration()).then((_) {
-      // ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<LoginBloc>(context).add(GetUserRoleEvent());
       return "";
     });
@@ -106,58 +94,29 @@ class _UpdateProfileState extends State<UpdateProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: BlocListener<UpdateProfileBloc, BaseState>(
-          listener: (context, state) async {
-            if (state is StateOnSuccess) {
-              ProgressDialog.hideLoadingDialog(context);
-            } else if (state is UpdateProfileState) {
-              ProgressDialog.hideLoadingDialog(context);
-              updateUserProfileModel = state.model!;
-              if(updateUserProfileModel.success == true){
-                Fluttertoast.cancel();
-                Fluttertoast.showToast(
-                    msg: updateUserProfileModel.message ?? "",
-                    toastLength: Toast.LENGTH_LONG,
-                    fontSize: DeviceUtil.isTablet ? 20 : 12,
-                    backgroundColor: CustomColors.colorBlue,
-                    textColor: Colors.white
-                );
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                String user = jsonEncode(updateUserProfileModel.data?.toJson());
-                prefs.setString('userData', user);
-                Navigator.of(context).pop();
-              }else {
-                Fluttertoast.cancel();
-                Fluttertoast.showToast(
-                    msg: updateUserProfileModel.error ?? "",
-                    toastLength: Toast.LENGTH_LONG,
-                    fontSize: DeviceUtil.isTablet ? 20 : 12,
-                    backgroundColor: CustomColors.colorBlue,
-                    textColor: Colors.white
-                );
-              }
-              //  Get.off(Login());
-            } else if (state is StateErrorGeneral) {
-              ProgressDialog.hideLoadingDialog(context);
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: state.message,
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }
-          },
+      body: ErrorBlocListener<UpdateProfileBloc>(
           bloc: BlocProvider.of<UpdateProfileBloc>(context),
           child: BlocBuilder<UpdateProfileBloc, BaseState>(
+            bloc: updateProfileBloc,
               builder: (context, state) {
+                if(state is UpdateProfileState){
+                  ProgressDialog.hideLoadingDialog(context);
+                  Future.delayed(Duration.zero, () {
+                    Navigator.of(context).pop();
+                  });
+                }
             return Form(
               key: _formKey,
               child: buildWidget(),
             );
           })),
     );
+  }
+
+  Future<String> getString(){
+    return Future.delayed(Duration()).then((_) {
+      return "";
+    });
   }
 
   Widget buildWidget() {
@@ -192,30 +151,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
                             fit: BoxFit.fill
                         ),
                       ),
-                   /*   child:
-                          (widget.imageFile!.path == null || widget.imageFile!.path == "")
-                              ? Image.asset(
-                                  'assets/images/image_holder.png',
-                                  height: DeviceUtil.isTablet ? 120 : 100,
-                                  width: DeviceUtil.isTablet ? 120 : 100,
-                                  fit: BoxFit.fill,
-                                )
-                              : widget.imageFile.toString().contains("static")
-                                  ? Image.network(
-                                      "${Strings.baseUrl}${widget.imageFile?.path}",
-                                      height: DeviceUtil.isTablet ? 120 : 100,
-                                      width: DeviceUtil.isTablet ? 120 : 100,
-                                      fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace){
-                                        return const Text("IMAGE GET ERROR....");
-                            }
-                                    )
-                                  : Image.file(
-                                      widget.imageFile!,
-                                      height: DeviceUtil.isTablet ? 120 : 100,
-                                      width: DeviceUtil.isTablet ?  120 : 100,
-                                      fit: BoxFit.cover,
-                                    ),*/
                     ),
                     onTap: () {
                       showModalBottomSheet(
@@ -481,12 +416,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           textColor: Colors.white
                       );
                     }
-                    //Get.off(Home());
                   },
                 ),
-                /*const SizedBox(
-                  height: 48,
-                )*/
               ],
             ),
           ),

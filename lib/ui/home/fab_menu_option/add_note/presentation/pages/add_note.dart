@@ -6,6 +6,7 @@ import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bl
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_state.dart';
 
 import '../../../../../../core/base/base_bloc.dart';
+import '../../../../../../core/error_bloc_listener/error_bloc_listener.dart';
 import '../../../../../../custom/progress_bar.dart';
 import '../../../../../../utils/border.dart';
 import '../../../../../../utils/colors.dart';
@@ -14,7 +15,6 @@ import '../../../../../../utils/style.dart';
 import '../../../../../../widget/button.dart';
 import '../../../../../../widget/decoration.dart';
 import '../../../../../../widget/rounded_corner_page.dart';
-import '../../data/model/add_note_model.dart';
 import '../../data/model/get_note_model.dart';
 
 class AddNote extends StatefulWidget {
@@ -44,51 +44,18 @@ class _AddNoteState extends State<AddNote> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<AddNoteBloc, BaseState>(
-          listener: (context, state) {
-            if (state is StateOnSuccess) {
-              ProgressDialog.hideLoadingDialog(context);
-            }else if (state is AddNoteState) {
-              ProgressDialog.hideLoadingDialog(context);
-              AddNotesModel? model = state.model;
-              if(model!.success == true){
-                Fluttertoast.cancel();
-                Fluttertoast.showToast(
-                    msg: model.message ?? "",
-                    toastLength: Toast.LENGTH_LONG,
-                    fontSize: DeviceUtil.isTablet ? 20 : 12,
-                    backgroundColor: CustomColors.colorBlue,
-                    textColor: Colors.white
-                );
-                Navigator.of(context).pop();
-                BlocProvider.of<AddNoteBloc>(context).add(
-                    GetNoteEvent());
-              }else {
-                Fluttertoast.cancel();
-                Fluttertoast.showToast(
-                    msg: model.error ?? "",
-                    toastLength: Toast.LENGTH_LONG,
-                    fontSize: DeviceUtil.isTablet ? 20 : 12,
-                    backgroundColor: CustomColors.colorBlue,
-                    textColor: Colors.white
-                );
-              }
-            }else if (state is StateErrorGeneral) {
-              ProgressDialog.hideLoadingDialog(context);
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: state.message,
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              /*ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                content: Text(state.message),
-              ));*/
-            }
-          },
-          child:  BlocBuilder<AddNoteBloc, BaseState>(builder: (context, state) {
+      body: ErrorBlocListener<AddNoteBloc>(
+        bloc: BlocProvider.of<AddNoteBloc>(context),
+          child:  BlocBuilder<AddNoteBloc, BaseState>(
+              builder: (context, state) {
+                if(state is AddNoteState){
+                  ProgressDialog.hideLoadingDialog(context);
+                  Future.delayed(Duration.zero, () {
+                    Navigator.of(context).pop();
+                  });
+                  BlocProvider.of<AddNoteBloc>(context).add(
+                      GetNoteEvent());
+                }
             return Form(
               key: _formKey,
               child: buildWidget(),
@@ -183,59 +150,6 @@ class _AddNoteState extends State<AddNote> {
                   const SizedBox(
                     height: 25,
                   ),
-                  /* CustomTextField(
-                  label: "Title",
-                  minLines: 5,
-                  errorMessage: "Please enter title.",
-                  textEditingController: titleController,
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                CustomTextField(
-                  label: "Description",
-                  errorMessage: "Please enter description.",
-                  minLines: 5,
-                  textEditingController: descriptionController,
-                ),*/
-                  /*Container(
-                  margin: EdgeInsets.only(left: 16, top: 32),
-                  child: Text(
-                    "Choose Color",
-                    style: CustomTextStyle.styleBold,
-                  ),
-                ),
-                Container(
-                  height: 56,
-                  margin: EdgeInsets.only(top: 24),
-                  child: ListView(
-                    primary: false,
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    children: listColors
-                        .map((e) => GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedColors = e;
-                        });
-                      },
-                      child: Container(
-                        width: 56,
-                        height: 56,
-                        child: selectedColors != null &&
-                            selectedColors == e
-                            ? Icon(Icons.check)
-                            : Container(),
-                        margin: EdgeInsets.only(left: 16),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            shape: BoxShape.rectangle,
-                            color: e),
-                      ),
-                    ))
-                        .toList(),
-                  ),
-                ),*/
                   Button(
                     "Done",
                     verticalMargin: 10,
@@ -277,7 +191,6 @@ class _AddNoteState extends State<AddNote> {
     String? title,
     String? description,
   }) {
-    //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddNoteBloc>(context)..add(
@@ -286,7 +199,7 @@ class _AddNoteState extends State<AddNote> {
             project_id: project_id ?? "",
             title: title ?? "",
             task_id: task_id ?? "",
-          ))..add(GetNoteEvent());
+          ));/*..add(GetNoteEvent());*/
       return "";
     });
   }
