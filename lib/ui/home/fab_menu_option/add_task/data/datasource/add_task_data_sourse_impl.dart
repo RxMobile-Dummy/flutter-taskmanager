@@ -5,16 +5,12 @@ import 'package:task_management/ui/home/fab_menu_option/add_task/data/datasource
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
-import 'package:task_management/ui/home/pages/add_member/data/model/invite_project_assign_model.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/add_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/delete_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/get_task_usecase.dart';
-import 'package:task_management/ui/home/pages/add_member/domain/usecases/invite_project_assign_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/update_task_usecase.dart';
 
 import '../../../../../../core/api_call/baseClient.dart';
-import 'package:dio/adapter.dart';
 
 class AddTaskDataSourceImpl implements AddTaskDataSource {
   final ApiClient _apiClient;
@@ -23,11 +19,6 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
 
   @override
   Future<AddTaskModel> addTaskCall(AddTaskParams params) async {
-    /* Dio dio = new Dio();
-    dio.options.headers['Accept'] = 'application/json';
-    dio.options.headers['Authorization'] = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
-    dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    var restClient = ApiClient(dio);*/
     var map = new HashMap<String, String>();
     map['project'] = params.project_id;
     map['name'] = params.name;
@@ -54,11 +45,6 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
 
   @override
   Future<DeleteTaskModel> deleteTaskCall(DeleteTaskParams params) async {
-    // Dio dio = new Dio();
-    // dio.options.headers['Accept'] = 'application/json';
-    // dio.options.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
-    // dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    // var restClient = ApiClient(dio);
     var map = new HashMap<String, dynamic>();
     map['id'] = params.id1;
     final response = await _apiClient.deleteTask(map);
@@ -74,11 +60,6 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
 
   @override
   Future<AddTaskModel> updateTaskCall(UpdateTaskParams params) async {
-    /*Dio dio = new Dio();
-    dio.options.headers['Accept'] = 'application/json';
-    dio.options.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
-    dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    var restClient = ApiClient(dio);*/
     var map = HashMap<String, dynamic>();
     map['id'] = params.id;
     map['project'] = params.project_id;
@@ -108,11 +89,6 @@ class AddTaskDataSourceImpl implements AddTaskDataSource {
 
   @override
   Future<GetTaskModel> getTaskCall(GetTaskParams params) async {
-    // Dio dio = new Dio();
-    // dio.options.headers['Accept'] = 'application/json';
-    // dio.options.headers['Authorization'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMjM1ODYsImVtYWlsIjoicm9taXNoLnBhdG9yaXlhQHJhZGl4d2ViLmNvbSIsIm1vYmlsZV9udW1iZXIiOiIrOTE2MzU2Nzc4ODk5In0._Nz-z-Rm1U4mvebf3RS01sw6Nu6Kacz99NyoYLeBDhc';
-    // dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    // var restClient = ApiClient(dio);
     var map = HashMap<String, dynamic>();
     map['date'] = params.date;
     if (params.isCompleted != null) {

@@ -17,9 +17,6 @@ class ResetPasswardUsecase extends UseCase<ResetPasswardModel, ResetPasswardPara
     return loginRepositories!.resetPasswordCall(params);
   }
 
-
-
-
 }
 
 class ResetPasswardParams extends Equatable {

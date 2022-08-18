@@ -5,20 +5,17 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/delete_check_list_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/get_check_list_model.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/update_check_list_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_check_list/presentation/bloc/check_list_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_check_list/presentation/bloc/check_list_event.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_check_list/presentation/bloc/check_list_state.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/delete_note_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/get_note_model.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_note/data/model/update_note_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_event.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_note/presentation/bloc/add_note_state.dart';
 
 import '../../../core/base/base_bloc.dart';
+import '../../../core/error_bloc_listener/error_bloc_listener.dart';
 import '../../../custom/progress_bar.dart';
 import '../../../utils/border.dart';
 import '../../../utils/color_extension.dart';
@@ -27,7 +24,6 @@ import '../../../utils/device_file.dart';
 import '../../../utils/style.dart';
 
 import '../../../widget/button.dart';
-import '../../../widget/textfield.dart';
 import '../fab_menu_option/add_note/presentation/pages/add_note.dart';
 
 class QuickNotes extends StatefulWidget {
@@ -56,7 +52,6 @@ class _QuickNotesState extends State<QuickNotes> {
   }
 
   Future<String> _getNote() {
-    //loginBloc = BlocProvider.of<LoginBloc>(context);
   return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddNoteBloc>(context).add(
@@ -66,9 +61,7 @@ class _QuickNotesState extends State<QuickNotes> {
   }
 
   Future<String> _getCheckList() {
-    //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(const Duration()).then((_) {
-      //ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddCheckListBloc>(context).add(
           GetCheckListEvent());
       return "";
@@ -76,9 +69,7 @@ class _QuickNotesState extends State<QuickNotes> {
   }
 
   Future<String> _updateCheckList({int? id, String? is_completed}) {
-    //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(const Duration()).then((_) {
-      //ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddCheckListBloc>(context).add(
           UpdateCheckListEvent(
               id: id ?? 0,
@@ -101,131 +92,58 @@ class _QuickNotesState extends State<QuickNotes> {
         ),
         backgroundColor: Colors.white,
       ),
-      body: BlocListener<AddNoteBloc, BaseState>(
-        listener: (context, state) {
-          print("________ $state");
-          if (state is StateOnSuccess) {
-            ProgressDialog.hideLoadingDialog(context);
-          }else if (state is GetNoteState) {
-            ProgressDialog.hideLoadingDialog(context);
-            getNoteModel = state.model!;
-            if(getNoteModel.success == true){
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: getNoteModel.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }else{
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: getNoteModel.error ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }
-            print(getNoteModel.message??"");
-          }else if (state is UpdateNoteState) {
-            ProgressDialog.hideLoadingDialog(context);
-             UpdateNoteModel? model = state.model;
-            print(model!.message??"");
-            if(getNoteModel.success == true){
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              Navigator.of(context).pop();
-              _getNote();
-            }else{
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.error ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }
-          }else if (state is DeleteNoteState) {
-            ProgressDialog.hideLoadingDialog(context);
-            DeleteNoteModel? model = state.model;
-            print(model!.message??"");
-            if(getNoteModel.success == true){
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              _getNote();
-            }else{
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.error ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }
-          }else if (state is StateErrorGeneral) {
-            ProgressDialog.hideLoadingDialog(context);
-            Fluttertoast.cancel();
-            Fluttertoast.showToast(
-                msg: state.message,
-                toastLength: Toast.LENGTH_LONG,
-                fontSize: DeviceUtil.isTablet ? 20 : 12,
-                backgroundColor: CustomColors.colorBlue,
-                textColor: Colors.white
-            );
-          }
-        },
+      body: ErrorBlocListener<AddNoteBloc>(
+        bloc: BlocProvider.of<AddNoteBloc>(context),
         child:  BlocBuilder<AddNoteBloc, BaseState>(builder: (context, state) {
           print(state);
-          return (getNoteModel.data != null && getNoteModel.data!.isNotEmpty)
-              ? buildWidget()  : (getNoteModel.data == null)? SizedBox():   Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  "No Note",
-                  style: CustomTextStyle.styleSemiBold
-                      .copyWith(color: CustomColors.colorBlue,
-                      fontSize: DeviceUtil.isTablet ? 18 : 14),
-                ),
-                const SizedBox(height: 10,),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    primary: Colors.white,
-                    backgroundColor: CustomColors.colorBlue,
-                    onSurface: Colors.grey,
+          if(state is GetNoteState){
+            ProgressDialog.hideLoadingDialog(context);
+            getNoteModel = state.model!;
+            return (getNoteModel.data != null && getNoteModel.data!.isNotEmpty)
+                ? buildWidget()  : (getNoteModel.data == null)? SizedBox():   Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "No Note",
+                    style: CustomTextStyle.styleSemiBold
+                        .copyWith(color: CustomColors.colorBlue,
+                        fontSize: DeviceUtil.isTablet ? 18 : 14),
                   ),
-                  onPressed: (){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AddNote()),
-                    );
-                  }, child:  Text(
-                  "Add Note",
-                  style: CustomTextStyle.styleSemiBold
-                      .copyWith(color: Colors.white,
-                      fontSize: DeviceUtil.isTablet ? 18 : 14),
-                ),)
-              ],
-            ),
-          );
+                  const SizedBox(height: 10,),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      primary: Colors.white,
+                      backgroundColor: CustomColors.colorBlue,
+                      onSurface: Colors.grey,
+                    ),
+                    onPressed: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddNote()),
+                      );
+                    }, child:  Text(
+                    "Add Note",
+                    style: CustomTextStyle.styleSemiBold
+                        .copyWith(color: Colors.white,
+                        fontSize: DeviceUtil.isTablet ? 18 : 14),
+                  ),)
+                ],
+              ),
+            );
+          }else if(state is UpdateNoteState){
+            ProgressDialog.hideLoadingDialog(context);
+            Future.delayed(Duration.zero, () {
+              Navigator.of(context).pop();
+            });
+             _getNote();
+          }else if(state is DeleteNoteState){
+            ProgressDialog.hideLoadingDialog(context);
+            _getNote();
+          }
+          return SizedBox();
         }),
       ),
     );
@@ -251,101 +169,36 @@ class _QuickNotesState extends State<QuickNotes> {
                 if (state is GetCheckListState) {
                   ProgressDialog.hideLoadingDialog(context);
                   getCheckListModel = state.model!;
-                  if(getCheckListModel.success == true){
-                    return  Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text(
-                            "Check List",
-                            style: CustomTextStyle.styleBold
-                                .copyWith(color: CustomColors.colorBlue,
-                                fontSize: DeviceUtil.isTablet ? 20 : 16),
-                          ),
+                 return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          "Check List",
+                          style: CustomTextStyle.styleBold
+                              .copyWith(color: CustomColors.colorBlue,
+                              fontSize: DeviceUtil.isTablet ? 20 : 16),
                         ),
-                ListView.builder(
-                            shrinkWrap: true,
-                            padding: const EdgeInsets.only(bottom: 16),
-                  physics: const NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              return checkListItem(index);
-                            },
-                            itemCount: getCheckListModel.data!.length,
-                          ),
-                      ],
-                    );
-                  }else{
-                    ProgressDialog.hideLoadingDialog(context);
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(
-                        msg: state.model!.error ?? "",
-                        toastLength: Toast.LENGTH_LONG,
-                        fontSize: DeviceUtil.isTablet ? 20 : 12,
-                        backgroundColor: CustomColors.colorBlue,
-                        textColor: Colors.white
-                    );
-                  }
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.only(bottom: 16),
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return checkListItem(index);
+                        },
+                        itemCount: getCheckListModel.data!.length,
+                      ),
+                    ],
+                  );
 
                 }else if (state is DeleteCheckListState) {
                   ProgressDialog.hideLoadingDialog(context);
-                  DeleteCheckListModel? model = state.model;
-                  print(model!.message??"");
-                  if(model.success == true){
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(
-                        msg: model.message ?? "",
-                        toastLength: Toast.LENGTH_LONG,
-                        fontSize: DeviceUtil.isTablet ? 20 : 12,
-                        backgroundColor: CustomColors.colorBlue,
-                        textColor: Colors.white
-                    );
-                    _getCheckList();
-                  }else{
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(
-                        msg: model.error ?? "",
-                        toastLength: Toast.LENGTH_LONG,
-                        fontSize: DeviceUtil.isTablet ? 20 : 12,
-                        backgroundColor: CustomColors.colorBlue,
-                        textColor: Colors.white
-                    );
-                  }
+                  _getCheckList();
                 }else if (state is UpdateCheckListState) {
                   ProgressDialog.hideLoadingDialog(context);
-                  UpdateCheckListModel? model = state.model;
-                  print(model!.message??"");
-                  if(model.success == true){
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(
-                        msg: model.message ?? "",
-                        toastLength: Toast.LENGTH_LONG,
-                        fontSize: DeviceUtil.isTablet ? 20 : 12,
-                        backgroundColor: CustomColors.colorBlue,
-                        textColor: Colors.white
-                    );
-                    _getCheckList();
-                  }else{
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(
-                        msg: model.error ?? "",
-                        toastLength: Toast.LENGTH_LONG,
-                        fontSize: DeviceUtil.isTablet ? 20 : 12,
-                        backgroundColor: CustomColors.colorBlue,
-                        textColor: Colors.white
-                    );
-                  }
-                } else if (state is StateErrorGeneral) {
-                  ProgressDialog.hideLoadingDialog(context);
-                  Fluttertoast.cancel();
-                  Fluttertoast.showToast(
-                      msg: state.message,
-                      toastLength: Toast.LENGTH_LONG,
-                      fontSize: DeviceUtil.isTablet ? 20 : 12,
-                      backgroundColor: CustomColors.colorBlue,
-                      textColor: Colors.white
-                  );
-                  return const SizedBox();
+                  _getCheckList();
                 }else {
                   ProgressDialog.hideLoadingDialog(context);
                   return const SizedBox();
@@ -445,8 +298,6 @@ class _QuickNotesState extends State<QuickNotes> {
                            "Delete Note",
                            style: TextStyle(fontSize:  DeviceUtil.isTablet ? 18 : 14),
                          ),
-                         /*titlePadding: EdgeInsets.all(10),
-                         contentPadding: EdgeInsets.all(10),*/
                          content:  Container(
                            child: Text(
                              "Are you sure you want to delete?",
@@ -466,7 +317,7 @@ class _QuickNotesState extends State<QuickNotes> {
                                Navigator.of(ctx).pop();
                              },
                              child: Text(
-                               "Okay",
+                               "Yes",
                                style: CustomTextStyle.styleSemiBold
                                    .copyWith(color: CustomColors.colorBlue, fontSize:
                                DeviceUtil.isTablet ? 18 : 16),),
@@ -474,60 +325,10 @@ class _QuickNotesState extends State<QuickNotes> {
                          ],
                        ),
                      ));
-                 /*    showDialog(
-                       context: context,
-                       builder: (ctx) => AlertDialog(
-                         title: const Text("Delete Task"),
-                         content: const Text("Are you sure you want to delete this note ?"),
-                         actions: <Widget>[
-                           TextButton(
-                             onPressed: () {
-                               _deleteNote(
-                                 id: getNoteModel.data![index].id,
-                               );
-                               Navigator.of(ctx).pop();
-                             },
-                             child: Container(
-                               //color: CustomColors.colorBlue,
-                               padding: const EdgeInsets.all(14),
-                               child:  Text(
-                                 "Okay",
-                                 style: CustomTextStyle.styleSemiBold
-                                     .copyWith(color: CustomColors.colorBlue, fontSize: 18),),
-                             ),
-                           ),
-                         ],
-                       ),
-                     );*/
                    },
                  )
                ],
              )
-              /*Visibility(
-                  visible: index % 2 == 1,
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(left: 16, top: 24),
-                          child: Text(
-                            "Home work today",
-                            style: CustomTextStyle.styleMedium,
-                          ),
-                        ),
-                        ListView.builder(
-                          padding: EdgeInsets.only(left: 6),
-                          primary: false,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            return noteSubItem();
-                          },
-                          itemCount: 3,
-                        )
-                      ],
-                    ),
-                  ))*/
             ],
           )
         ],
@@ -593,8 +394,6 @@ class _QuickNotesState extends State<QuickNotes> {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(fontSize:  DeviceUtil.isTablet ? 18 : 14),
                               ),
-                              /*titlePadding: EdgeInsets.all(10),
-                         contentPadding: EdgeInsets.all(10),*/
                               content:  Container(
                                 child: Text(
                                   "Are you sure you want to delete?",
@@ -614,7 +413,7 @@ class _QuickNotesState extends State<QuickNotes> {
                                     Navigator.of(ctx).pop();
                                   },
                                   child: Text(
-                                    "Okay",
+                                    "Yes",
                                     style: CustomTextStyle.styleSemiBold
                                         .copyWith(color: CustomColors.colorBlue, fontSize:
                                     DeviceUtil.isTablet ? 18 : 16),),
@@ -622,31 +421,6 @@ class _QuickNotesState extends State<QuickNotes> {
                               ],
                             ),
                           ));
-                      /*    showDialog(
-                       context: context,
-                       builder: (ctx) => AlertDialog(
-                         title: const Text("Delete Task"),
-                         content: const Text("Are you sure you want to delete this note ?"),
-                         actions: <Widget>[
-                           TextButton(
-                             onPressed: () {
-                               _deleteNote(
-                                 id: getNoteModel.data![index].id,
-                               );
-                               Navigator.of(ctx).pop();
-                             },
-                             child: Container(
-                               //color: CustomColors.colorBlue,
-                               padding: const EdgeInsets.all(14),
-                               child:  Text(
-                                 "Okay",
-                                 style: CustomTextStyle.styleSemiBold
-                                     .copyWith(color: CustomColors.colorBlue, fontSize: 18),),
-                             ),
-                           ),
-                         ],
-                       ),
-                     );*/
                     },
                   )
                 ],
@@ -660,7 +434,6 @@ class _QuickNotesState extends State<QuickNotes> {
   Future<String> _updateNote({
     int? id,String? title,String? description,
   }) {
-    //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddNoteBloc>(context).add(
@@ -676,7 +449,6 @@ class _QuickNotesState extends State<QuickNotes> {
   Future<String> _deleteNote({
     int? id,
   }) {
-    //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddNoteBloc>(context).add(
@@ -690,7 +462,6 @@ class _QuickNotesState extends State<QuickNotes> {
   Future<String> _deleteCheckList({
     int? id,
   }) {
-    //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(const Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddCheckListBloc>(context).add(
@@ -738,7 +509,6 @@ class _QuickNotesState extends State<QuickNotes> {
                       },
                       decoration: InputDecoration(
                           border: titleBorder(color: Colors.grey.shade200),
-                         // hintText: "Title",
                           labelText: "Title",
                           labelStyle: CustomTextStyle.styleSemiBold
                               .copyWith(fontSize: DeviceUtil.isTablet ? 16 : 14),
@@ -775,7 +545,6 @@ class _QuickNotesState extends State<QuickNotes> {
                       },
                       decoration: InputDecoration(
                           border: titleBorder(color: Colors.grey.shade200),
-                          // hintText: "Title",
                           labelText: "Description",
                           counterText: "${enterDescriptionText.length}/300",
                           labelStyle: CustomTextStyle.styleSemiBold
@@ -789,21 +558,6 @@ class _QuickNotesState extends State<QuickNotes> {
                           titleBorder(color: Colors.transparent)),
                     ),
                   ),
-                 /* CustomTextField(
-                    //initialValue: title.text,
-                    label: "Title",
-                    minLines: 5,
-                    textEditingController: title,
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  CustomTextField(
-                    //initialValue: description.text,
-                    label: "Description",
-                    minLines: 5,
-                    textEditingController: description,
-                  ),*/
                   Button(
                     "Done",
                     verticalMargin: 10,

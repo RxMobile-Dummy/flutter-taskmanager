@@ -3,16 +3,18 @@
 
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_management/ui/home/pages/Project/data/model/add_project_model.dart';
+import 'package:task_management/ui/home/pages/Project/data/model/delete_project_model.dart';
+import 'package:task_management/ui/home/pages/Project/data/model/get_all_project_model.dart';
+import 'package:task_management/ui/home/pages/Project/data/model/update_project_model.dart';
 import 'package:task_management/ui/home/pages/Project/domain/usecases/add_project_usecase.dart';
 import 'package:task_management/ui/home/pages/Project/domain/usecases/delete_project_usecase.dart';
 import 'package:task_management/ui/home/pages/Project/domain/usecases/get_all_projects_usecase.dart';
 import 'package:task_management/ui/home/pages/Project/domain/usecases/update_project_usecase.dart';
 import 'package:task_management/ui/home/pages/Project/presentation/bloc/project_event.dart';
 import 'package:task_management/ui/home/pages/Project/presentation/bloc/project_state.dart';
-
-import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/base/base_bloc.dart';
-import '../../../../../../core/failure/failure.dart';
+import '../../../../../../core/failure/error_object.dart';
 
 class ProjectBloc extends Bloc<BaseEvent, BaseState> {
 
@@ -51,13 +53,33 @@ class ProjectBloc extends Bloc<BaseEvent, BaseState> {
       }else if (event is DeleteProjectEvent) {
         deleteProjectCall(event.id);
       }else if (event is AddProjectSuccessEvent){
-        emit(AddProjectState(model: event.model));
+        AddProjectModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(AddProjectState(model: model));
+        }
       }else if (event is GetAllProjectsSuccessEvent){
-        emit(GetAllProjectsState(model: event.model));
+        GetAllProjectsModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(GetAllProjectsState(model: model));
+        }
       }else if (event is UpdateProjectSuccessEvent){
-        emit(UpdateProjectState(model: event.model));
+        UpdateProjectModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(UpdateProjectState(model: model));
+        }
       }else if (event is DeleteProjectSuccessEvent){
-        emit(DeleteProjectState(model: event.model));
+        DeleteProjectModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(DeleteProjectState(model: model));
+        }
       }else if (event is EventErrorGeneral) {
         emit(StateErrorGeneral(event.message));
       }
@@ -83,7 +105,7 @@ class ProjectBloc extends Bloc<BaseEvent, BaseState> {
       duration: duration ?? 0,))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(AddProjectSuccessEvent(model: onSuccess));
       });
@@ -112,7 +134,7 @@ class ProjectBloc extends Bloc<BaseEvent, BaseState> {
       duration: duration ?? 0,))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(UpdateProjectSuccessEvent(model: onSuccess));
       });
@@ -127,7 +149,7 @@ class ProjectBloc extends Bloc<BaseEvent, BaseState> {
       id: id))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError)?? ""));
       }, (onSuccess) {
         add(GetAllProjectsSuccessEvent(model: onSuccess));
       });
@@ -142,23 +164,12 @@ class ProjectBloc extends Bloc<BaseEvent, BaseState> {
         id: id))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(DeleteProjectSuccessEvent(model: onSuccess));
       });
     });
   }
 
-  String? _mapFailureToMessage(Failure failure) {
-    if (failure.runtimeType == ServerFailure) {
-      return Strings.kServerFailureMessage;
-    } else if (failure.runtimeType == CacheFailure) {
-      return Strings.kCacheFailureMessage;
-    } else if (failure.runtimeType == FailureMessage) {
-      if (failure is FailureMessage) {
-        return failure.message;
-      }
-    }
-  }
 
 }

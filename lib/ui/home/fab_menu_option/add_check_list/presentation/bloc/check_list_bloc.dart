@@ -1,15 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/add_check_list_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/delete_check_list_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/get_check_list_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/update_check_list_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_check_list/domain/usecases/add_check_list_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_check_list/domain/usecases/delete_check_list_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_check_list/domain/usecases/get_check_list_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_check_list/domain/usecases/update_check_list_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_check_list/presentation/bloc/check_list_event.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_check_list/presentation/bloc/check_list_state.dart';
-import 'package:task_management/ui/home/pages/Profile/domain/usecases/update_profile_usecase.dart';
-
-import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/base/base_bloc.dart';
-import '../../../../../../core/failure/failure.dart';
+import '../../../../../../core/failure/error_object.dart';
 
 class AddCheckListBloc extends Bloc<BaseEvent, BaseState> {
   AddCheckListUsecase? addCheckListUsecase;
@@ -37,13 +38,33 @@ class AddCheckListBloc extends Bloc<BaseEvent, BaseState> {
       }else if (event is DeleteCheckListEvent) {
         deleteCheckListCall(event.id);
       }else if (event is AddCheckListSuccessEvent){
-        emit(AddCheckListState(model: event.model));
+        AddCheckListModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(AddCheckListState(model: model));
+        }
       }else if (event is GetCheckListSuccessEvent){
-        emit(GetCheckListState(model: event.model));
+        GetCheckListModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(GetCheckListState(model: model));
+        }
       }else if (event is DeleteCheckListSuccessEvent){
-        emit(DeleteCheckListState(model: event.model));
+        DeleteCheckListModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(DeleteCheckListState(model: model));
+        }
       }else if (event is UpdateCheckListSuccessEvent){
-        emit(UpdateCheckListState(model: event.model));
+        UpdateCheckListModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(UpdateCheckListState(model: model));
+        }
       }else if (event is EventErrorGeneral) {
         emit(StateErrorGeneral(event.message));
       }
@@ -64,7 +85,7 @@ class AddCheckListBloc extends Bloc<BaseEvent, BaseState> {
     ))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(AddCheckListSuccessEvent(model: onSuccess));
       });
@@ -81,7 +102,7 @@ class AddCheckListBloc extends Bloc<BaseEvent, BaseState> {
     ))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError)?? ""));
       }, (onSuccess) {
         add(UpdateCheckListSuccessEvent(model: onSuccess));
       });
@@ -93,7 +114,7 @@ class AddCheckListBloc extends Bloc<BaseEvent, BaseState> {
         .call(GetCheckListParams())
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(GetCheckListSuccessEvent(model: onSuccess));
       });
@@ -105,23 +126,12 @@ class AddCheckListBloc extends Bloc<BaseEvent, BaseState> {
         .call(DeleteCheckListParams(id1: id))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(DeleteCheckListSuccessEvent(model: onSuccess));
       });
     });
   }
 
-  String? _mapFailureToMessage(Failure failure) {
-    if (failure.runtimeType == ServerFailure) {
-      return Strings.kServerFailureMessage;
-    } else if (failure.runtimeType == CacheFailure) {
-      return Strings.kCacheFailureMessage;
-    } else if (failure.runtimeType == FailureMessage) {
-      if (failure is FailureMessage) {
-        return failure.message;
-      }
-    }
-  }
 
 }

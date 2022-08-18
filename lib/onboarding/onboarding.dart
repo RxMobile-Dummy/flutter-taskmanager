@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_management/features/login/domain/usecases/login.dart';
 
@@ -13,6 +12,8 @@ import '../../utils/style.dart';
 import 'package:task_management/injection_container.dart' as Sl;
 
 class OnBoarding extends StatefulWidget {
+  const OnBoarding({Key? key}) : super(key: key);
+
   @override
   _OnBoardingState createState() => _OnBoardingState();
 }
@@ -65,6 +66,7 @@ class _OnBoardingState extends State<OnBoarding> {
             Column(
               children: [
                 Expanded(
+                  flex: 55,
                   child: PageView.builder(
                     itemBuilder: (context, index) {
                       return pageItem(index);
@@ -76,7 +78,6 @@ class _OnBoardingState extends State<OnBoarding> {
                     },
                     itemCount: listTitle.length,
                   ),
-                  flex: 55,
                 ),
                 Expanded(
                   flex: 20,
@@ -102,8 +103,8 @@ class _OnBoardingState extends State<OnBoarding> {
                       )),
                 ),
                 Expanded(
-                  child: Container(),
                   flex: 25,
+                  child: Container(),
                 )
               ],
             ),
@@ -114,22 +115,25 @@ class _OnBoardingState extends State<OnBoarding> {
                   children: [
                     Container(
                       width: double.infinity,
-                      margin: EdgeInsets.only(left: 32, right: 32),
+                      margin: const EdgeInsets.only(left: 32, right: 32),
                       child: RaisedButton(
                         color: Colors.white,
                         elevation: 2,
                         splashColor: listColors[currentPage].withOpacity(.2),
-                        padding: EdgeInsets.only(top: 12, bottom: 12),
+                        padding: const EdgeInsets.only(top: 12, bottom: 12),
                         onPressed: () async {
                           SharedPreferences prefs = await SharedPreferences.getInstance();
                           prefs.setString("isOnBoardingCompleted", "true");
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                              create: (context) => Sl.Sl<LoginBloc>(),
-                              child: Login(),
-                            )),
-                          );
+                          Future.delayed(Duration.zero, () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
+                                create: (context) => Sl.Sl<LoginBloc>(),
+                                child: Login(),
+                              )),
+                            );
+                          });
+
                          // Get.off(Login());
                         },
                         child: Text("Get Started",
@@ -137,27 +141,7 @@ class _OnBoardingState extends State<OnBoarding> {
                                 .copyWith(color: Colors.black, fontSize: 14)),
                       ),
                     ),
-                  /*  SizedBox(
-                      height: 16,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) =>BlocProvider<LoginBloc>(
-                            create: (context) => Sl.Sl<LoginBloc>(),
-                            child: Login(),
-                          )),
-                        );
-                       // Get.off(Login());
-                      },
-                      child: Text(
-                        "Login",
-                        style: CustomTextStyle.styleBold
-                            .copyWith(color: Colors.white),
-                      ),
-                    ),*/
-                    SizedBox(
+                    const SizedBox(
                       height: 16,
                     )
                   ],
@@ -169,28 +153,22 @@ class _OnBoardingState extends State<OnBoarding> {
   }
 
   pageItem(int index) {
-    return Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Flexible(child: Container(
-            margin: EdgeInsets.all(16),
-            child: Image.asset(listImage[index]),
-          ),),
-          Container(
-            child: Text(
-              listTitle[index],
-              style: CustomTextStyle.styleBold.copyWith(fontSize: 20),
-            ),
-          ),
-          Container(
-            child: Text(
-              listDescription[index],
-              style: CustomTextStyle.styleRegular.copyWith(fontSize: 12),
-            ),
-          ),
-        ],
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Flexible(child: Container(
+          margin: const EdgeInsets.all(16),
+          child: Image.asset(listImage[index]),
+        ),),
+        Text(
+          listTitle[index],
+          style: CustomTextStyle.styleBold.copyWith(fontSize: 20),
+        ),
+        Text(
+          listDescription[index],
+          style: CustomTextStyle.styleRegular.copyWith(fontSize: 12),
+        ),
+      ],
     );
   }
 }

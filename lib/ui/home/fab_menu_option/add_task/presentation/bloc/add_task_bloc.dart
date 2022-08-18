@@ -1,17 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_management/features/login/domain/usecases/forgot_password_uasecase.dart';
-import 'package:task_management/features/login/domain/usecases/reset_passward_usecase.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/delete_task_model.dart';
+import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/add_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/delete_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/get_task_usecase.dart';
-import 'package:task_management/ui/home/pages/add_member/domain/usecases/invite_project_assign_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/domain/usecases/update_task_usecase.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
-
-import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/base/base_bloc.dart';
-import '../../../../../../core/failure/failure.dart';
+import '../../../../../../core/failure/error_object.dart';
+
 
 class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
   AddTaskUsecase? addTaskUsecase;
@@ -66,13 +65,33 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
       } else if (event is GetTaskEvent) {
         getTaskCall(date: event.date, isCompleted: event.isCompleted);
       } else if (event is AddTaskSuccessEvent) {
-        emit(AddTaskState(model: event.model));
+        AddTaskModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(AddTaskState(model: model));
+        }
       } else if (event is DeleteTaskSuccessEvent) {
-        emit(DeleteTaskState(model: event.model));
+        DeleteTaskModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(DeleteTaskState(model: model));
+        }
       } else if (event is UpdateTaskSuccessEvent) {
-        emit(UpdateTaskState(model: event.model));
+        AddTaskModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(UpdateTaskState(model: model));
+        }
       } else if (event is GetTaskSuccessEvent) {
-        emit(GetTaskState(model: event.model));
+        GetTaskModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(GetTaskState(model: model));
+        }
       }else if (event is EventErrorGeneral) {
         emit(StateErrorGeneral(event.message));
       }
@@ -110,7 +129,7 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
     ))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(AddTaskSuccessEvent(model: onSuccess));
       });
@@ -151,7 +170,7 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
     ))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(UpdateTaskSuccessEvent(model: onSuccess));
       });
@@ -161,7 +180,7 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
   deleteTskCall({int? id}) {
     deleteTaskUsecase!.call(DeleteTaskParams(id1: id ?? 0)).listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(DeleteTaskSuccessEvent(model: onSuccess));
       });
@@ -174,7 +193,7 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
         .call(GetTaskParams(date: date ?? "", isCompleted: isCompleted))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(GetTaskSuccessEvent(model: onSuccess));
       });
@@ -182,15 +201,5 @@ class AddTaskBloc extends Bloc<BaseEvent, BaseState> {
   }
 
 
-  String? _mapFailureToMessage(Failure failure) {
-    if (failure.runtimeType == ServerFailure) {
-      return Strings.kServerFailureMessage;
-    } else if (failure.runtimeType == CacheFailure) {
-      return Strings.kCacheFailureMessage;
-    } else if (failure.runtimeType == FailureMessage) {
-      if (failure is FailureMessage) {
-        return failure.message;
-      }
-    }
-  }
+
 }

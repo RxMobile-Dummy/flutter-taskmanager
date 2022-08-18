@@ -19,13 +19,6 @@ class UpdateProfileDataSourceImpl implements ProfileDataSource {
   Future<UpdateUserProfileModel> updateUserProfileCall(UpdateProfileParams params) async {
     var map = new HashMap<String, dynamic>();
 
-    /*List multipartArray = [];
-
-    for (var i = 0; i < params.profile_pic!.length; i++){
-      multipartArray.add(MultipartFile.fromFileSync(params.profile_pic![i], filename:
-      pathManager.basename(params.profile_pic![i])));
-    }*/
-
     List<MultipartFile> multipartImageList = [];
     List<File> fileList = [];
     

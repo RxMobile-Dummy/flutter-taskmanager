@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_management/ui/home/pages/user_status/data/model/get_user_status_model.dart';
 import 'package:task_management/ui/home/pages/user_status/domain/usecases/get_user_status_usecase.dart';
 import 'package:task_management/ui/home/pages/user_status/presentation/bloc/user_status_event.dart';
 import 'package:task_management/ui/home/pages/user_status/presentation/bloc/user_status_state.dart';
 
-import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/base/base_bloc.dart';
-import '../../../../../../core/failure/failure.dart';
+import '../../../../../../core/failure/error_object.dart';
 
 class UserStatusBloc extends Bloc<BaseEvent, BaseState> {
 
@@ -19,7 +19,12 @@ GetUserStatusUsecase? getUserStatusUsecase;
       } else if (event is GetUserStatusEvent) {
         getUserStatusCall();
       } else if (event is GetUserStatusSuccessEvent){
-        emit(GetUserStatusState(model: event.model));
+        GetUserStatusModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          emit(GetUserStatusState(model: model));
+        }
       }else if (event is EventErrorGeneral) {
         emit(StateErrorGeneral(event.message));
       }
@@ -32,7 +37,7 @@ GetUserStatusUsecase? getUserStatusUsecase;
         .call(GetUserStatusParams( ))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(GetUserStatusSuccessEvent(model: onSuccess));
       });
@@ -41,16 +46,6 @@ GetUserStatusUsecase? getUserStatusUsecase;
 
 
 
-  String? _mapFailureToMessage(Failure failure) {
-    if (failure.runtimeType == ServerFailure) {
-      return Strings.kServerFailureMessage;
-    } else if (failure.runtimeType == CacheFailure) {
-      return Strings.kCacheFailureMessage;
-    } else if (failure.runtimeType == FailureMessage) {
-      if (failure is FailureMessage) {
-        return failure.message;
-      }
-    }
-  }
+
 
 }

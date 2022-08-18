@@ -18,10 +18,6 @@ class GetUserRoleUsecase extends UseCase<GetUserRoleModel, GetUserRoleParams> {
     return loginRepositories!.getUserRoleCall(params);
   }
 
-/* @override
-  Stream<Either<Failure, LoginModel>> call(LoginParams params) {
-
-  }*/
 }
 
 class GetUserRoleParams extends Equatable {
@@ -33,8 +29,6 @@ class GetUserRoleParams extends Equatable {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-
-
     return data;
   }
 }

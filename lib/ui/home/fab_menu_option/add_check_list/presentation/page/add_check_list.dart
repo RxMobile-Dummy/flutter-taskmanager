@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_check_list/data/model/add_check_list_model.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_check_list/presentation/bloc/check_list_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_check_list/presentation/bloc/check_list_event.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_check_list/presentation/bloc/check_list_state.dart';
 import 'package:task_management/utils/color_extension.dart';
 
 import '../../../../../../core/base/base_bloc.dart';
+import '../../../../../../core/error_bloc_listener/error_bloc_listener.dart';
 import '../../../../../../custom/progress_bar.dart';
 import '../../../../../../utils/colors.dart';
 import '../../../../../../utils/device_file.dart';
@@ -94,21 +94,6 @@ class _AddNoteState extends State<AddCheckList> {
           });
         },
       ),
-   /*   onTap: () {
-        final controller = TextEditingController();
-        final field = TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: "name${_controllers.length + 1}",
-          ),
-        );
-
-        setState(() {
-          _controllers.add(controller);
-          _fields.add(field);
-        });
-      },*/
     );
   }
 
@@ -116,13 +101,13 @@ class _AddNoteState extends State<AddCheckList> {
     return ListView.builder(
       itemCount: _fields.length,
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         return  Row(
             children: [
               Expanded(
                 child: Container(
-                  margin: EdgeInsets.all(5),
+                  margin: const EdgeInsets.all(5),
                   child: _fields[index],
                 ),
               ),
@@ -141,83 +126,22 @@ class _AddNoteState extends State<AddCheckList> {
     );
   }
 
-  Widget _okButton() {
-    return ElevatedButton(
-      onPressed: () async {
-        String text = _controllers
-            .where((element) => element.text != "")
-            .fold("", (acc, element) => acc += "${element.text}\n");
-        final alert = AlertDialog(
-          title: Text("Count: ${_controllers.length}"),
-          content: Text(text.trim()),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("OK"),
-            ),
-          ],
-        );
-        await showDialog(
-          context: context,
-          builder: (BuildContext context) => alert,
-        );
-        setState(() {});
-      },
-      child: Text("OK"),
-    );
-  }
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<AddCheckListBloc, BaseState>(
-        listener: (context, state) {
-          if (state is StateOnSuccess) {
-            ProgressDialog.hideLoadingDialog(context);
-          }else if (state is AddCheckListState) {
-            ProgressDialog.hideLoadingDialog(context);
-            AddCheckListModel? model = state.model;
-            if(model!.success == true){
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.message ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-              Navigator.of(context).pop();
-              BlocProvider.of<AddCheckListBloc>(context).add(
-                  GetCheckListEvent());
-            }else {
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: model.error ?? "",
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }
-          }else if (state is StateErrorGeneral) {
-            ProgressDialog.hideLoadingDialog(context);
-            Fluttertoast.cancel();
-            Fluttertoast.showToast(
-                msg: state.message,
-                toastLength: Toast.LENGTH_LONG,
-                fontSize: DeviceUtil.isTablet ? 20 : 12,
-                backgroundColor: CustomColors.colorBlue,
-                textColor: Colors.white
-            );
-            /*ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                content: Text(state.message),
-              ));*/
-          }
-        },
-        child:  BlocBuilder<AddCheckListBloc, BaseState>(builder: (context, state) {
+      body: ErrorBlocListener<AddCheckListBloc>(
+        child:  BlocBuilder<AddCheckListBloc, BaseState>(
+            builder: (context, state) {
+              if(state is AddCheckListState){
+                ProgressDialog.hideLoadingDialog(context);
+                Future.delayed(Duration.zero, () {
+                      Navigator.of(context).pop();
+                  });
+                BlocProvider.of<AddCheckListBloc>(context).add(
+                    GetCheckListEvent());
+              }
           return Form(
             key: _formKey,
             child: buildWidget(),
@@ -256,15 +180,6 @@ class _AddNoteState extends State<AddCheckList> {
                     //_okButton(),
                   ],
                 ),
-                /* ListView.builder(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.only(top: 8),
-                    primary: false,
-                    itemBuilder: (context, index) {
-                      return checkListItem(index);
-                    },
-                    itemCount: 4,
-                  ),*/
                 Container(
                   margin: const EdgeInsets.only(left: 16, top: 32),
                   child: Text(

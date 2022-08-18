@@ -58,7 +58,6 @@ class _ResetSuccessState extends State<ResetSuccess> {
                 )),
                       (route) => false,
                 );
-                // Get.off(Login());
               },
               child: Text(
                 "Login",

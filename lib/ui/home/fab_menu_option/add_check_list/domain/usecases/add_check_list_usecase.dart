@@ -5,7 +5,6 @@ import 'package:task_management/ui/home/fab_menu_option/add_check_list/domain/re
 
 import '../../../../../../core/failure/failure.dart';
 import '../../../../../../core/usecase.dart';
-import '../../../add_note/data/model/add_note_model.dart';
 
 class AddCheckListUsecase extends UseCase<AddCheckListModel, AddCheckListParams> {
   final AddCheckListRepositories? addCheckListRepositories;

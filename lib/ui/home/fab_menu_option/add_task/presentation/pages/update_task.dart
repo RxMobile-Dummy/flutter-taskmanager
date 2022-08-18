@@ -5,12 +5,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/add_task_model.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/update_task.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
 import 'package:task_management/ui/home/fab_menu_option/add_task/presentation/bloc/add_task_state.dart';
 
 import '../../../../../../core/base/base_bloc.dart';
+import '../../../../../../core/error_bloc_listener/error_bloc_listener.dart';
 import '../../../../../../custom/progress_bar.dart';
 import '../../../../../../utils/border.dart';
 import '../../../../../../utils/colors.dart';
@@ -70,7 +69,6 @@ class _UpdateTaskState extends State<UpdateTask> {
     var id = prefs.getString('id');
     print(id);
     return Future.delayed(Duration()).then((_) {
-      //ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<ProjectBloc>(context).add(
           GetAllProjectsEvent(
             id: int.parse(id ?? ""),
@@ -82,47 +80,18 @@ class _UpdateTaskState extends State<UpdateTask> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:BlocListener<AddTaskBloc, BaseState>(
-          listener: (context, state) {
-            if (state is StateOnSuccess) {
-              ProgressDialog.hideLoadingDialog(context);
-            } else if (state is UpdateTaskState) {
-              ProgressDialog.hideLoadingDialog(context);
-              AddTaskModel? model = state.model;
-              if(model!.success == true){
-                Fluttertoast.cancel();
-                Fluttertoast.showToast(
-                    msg: model.message ?? "",
-                    toastLength: Toast.LENGTH_LONG,
-                    fontSize: DeviceUtil.isTablet ? 20 : 12,
-                    backgroundColor: CustomColors.colorBlue,
-                    textColor: Colors.white
-                );
-                Navigator.of(context).pop(model.data!.startDate);
-              }else{
-                Fluttertoast.cancel();
-                Fluttertoast.showToast(
-                    msg: model.error ?? "",
-                    toastLength: Toast.LENGTH_LONG,
-                    fontSize: DeviceUtil.isTablet ? 20 : 12,
-                    backgroundColor: CustomColors.colorBlue,
-                    textColor: Colors.white
-                );
-              }
-            }else if (state is StateErrorGeneral) {
-              ProgressDialog.hideLoadingDialog(context);
-              Fluttertoast.cancel();
-              Fluttertoast.showToast(
-                  msg: state.message,
-                  toastLength: Toast.LENGTH_LONG,
-                  fontSize: DeviceUtil.isTablet ? 20 : 12,
-                  backgroundColor: CustomColors.colorBlue,
-                  textColor: Colors.white
-              );
-            }
-          },
+      body:ErrorBlocListener<AddTaskBloc>(
           bloc: BlocProvider.of<AddTaskBloc>(context),
-          child:  BlocBuilder<AddTaskBloc, BaseState>(builder: (context, state) {
+          child:  BlocBuilder<AddTaskBloc, BaseState>(
+              builder: (context, state) {
+                if(state is UpdateTaskState){
+                  ProgressDialog.hideLoadingDialog(context);
+                  Future.delayed(Duration.zero, () {
+                    Navigator.of(context).pop();
+                  });
+                  BlocProvider.of<AddTaskBloc>(context).add(
+                      GetTaskEvent(date: state.model?.data!.startDate ?? "" ));
+                }
             return Form(
               key: _formKey,
               child: buildWidget(),
@@ -143,44 +112,6 @@ class _UpdateTaskState extends State<UpdateTask> {
     child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /*Container(
-                    margin: EdgeInsets.only(left: 16, top: 32),
-                    child: Row(
-                      children: [
-                       *//* Text(
-                          "For",
-                          style: CustomTextStyle.styleBold,
-                        ),
-                        const SizedBox(
-                          width: 16,
-                        ),
-                        Container(
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(100)),
-                          child: const Text("Assignee"),
-                        ),
-                        Expanded(
-                          child: Container(),
-                        ),
-                        Text(
-                          "In",
-                          style: CustomTextStyle.styleBold,
-                        ),*//*
-                        SizedBox(
-                          width: 16,
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(right: 16),
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(100)),
-                          child: Text("Project"),
-                        ),
-                      ],
-                    )),*/
                 Container(
                   margin: EdgeInsets.only(top: 16),
                   color: Colors.grey.shade200,
@@ -245,14 +176,6 @@ class _UpdateTaskState extends State<UpdateTask> {
                         titleBorder(color: Colors.transparent)),
                   ),
                 ),
-                /* Container(
-                  margin: EdgeInsets.only(left: 16, top: 24),
-                  child: Text(
-                    "Description",
-                    style: CustomTextStyle.styleBold
-                        .copyWith(color: Colors.grey),
-                  ),
-                ),*/
                 Container(
                   margin:EdgeInsets.only(/*left: 16, right: 16, */top: 16),
                   decoration: BoxDecoration(
@@ -589,50 +512,6 @@ class _UpdateTaskState extends State<UpdateTask> {
                   ),
                   title: const Text('InCompleted'),
                 ),
-             /*   Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.only(top: 24),
-                    color: Colors.grey.shade200,
-                    padding: EdgeInsets.only(
-                        left: 16, right: 16, top: 16, bottom: 16),
-                    child: Row(
-                      children: [
-                        Text(
-                          "Due Date",
-                          style: CustomTextStyle.styleMedium
-                              .copyWith(fontSize: 14),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(left: 16),
-                          child: Text(
-                            "Anytime",
-                            style: CustomTextStyle.styleMedium
-                                .copyWith(color: Colors.white, fontSize: 14),
-                          ),
-                          padding: EdgeInsets.only(
-                              left: 12, right: 12, top: 6, bottom: 6),
-                          decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(100)),
-                        )
-                      ],
-                    )),*/
-         /*       Container(
-                  margin: EdgeInsets.only(left: 16, top: 24),
-                  child: Text(
-                    "Add Member",
-                    style: CustomTextStyle.styleBold
-                        .copyWith(color: Colors.grey),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 16, top: 16),
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(100)),
-                  child: Text("Anyone"),
-                ),*/
                 const SizedBox(
                   height: 12,
                 ),
@@ -697,7 +576,6 @@ class _UpdateTaskState extends State<UpdateTask> {
     String? start_date,
     bool? isCompleted,
   }) {
-    //loginBloc = BlocProvider.of<LoginBloc>(context);
     return Future.delayed(Duration()).then((_) {
       ProgressDialog.showLoadingDialog(context);
       BlocProvider.of<AddTaskBloc>(context).add(

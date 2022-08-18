@@ -1,14 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_management/ui/home/pages/Profile/data/model/update_profile_model.dart';
 import 'package:task_management/ui/home/pages/Profile/domain/usecases/update_profile_usecase.dart';
 import 'package:task_management/ui/home/pages/Profile/presentation/bloc/profile_event.dart';
 import 'package:task_management/ui/home/pages/Profile/presentation/bloc/profile_state.dart';
-import 'package:task_management/ui/home/pages/user_status/domain/usecases/get_user_status_usecase.dart';
-import 'package:task_management/ui/home/pages/user_status/presentation/bloc/user_status_event.dart';
-import 'package:task_management/ui/home/pages/user_status/presentation/bloc/user_status_state.dart';
-
-import '../../../../../../core/Strings/strings.dart';
 import '../../../../../../core/base/base_bloc.dart';
-import '../../../../../../core/failure/failure.dart';
+import '../../../../../../core/failure/error_object.dart';
 
 class UpdateProfileBloc extends Bloc<BaseEvent, BaseState> {
 
@@ -17,7 +16,7 @@ class UpdateProfileBloc extends Bloc<BaseEvent, BaseState> {
 
   UpdateProfileBloc(
       {required this.updateProfileUsecase}) : super(StateLoading()) {
-    on<BaseEvent>((event, emit) {
+    on<BaseEvent>((event, emit) async {
       if (event is EventRequest) {
       } else if (event is UpdateProfileEvent) {
         updateProfileCall(
@@ -29,8 +28,26 @@ class UpdateProfileBloc extends Bloc<BaseEvent, BaseState> {
           role: event.role,
           email: event.email,
         );
-      } else if (event is UpdateProfileSuccessEvent){
-        emit(UpdateProfileState(model: event.model));
+      } else if(event is UpdatedUserDataGetEvent){
+        emit(StateLoading());
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        Map<String, dynamic> userMap  = jsonDecode(prefs.getString('userData') ?? "");
+        emit(UpdatedProfileDataState(userData: userMap));
+      }else if (event is UpdateProfileSuccessEvent){
+        UpdateUserProfileModel? model = event.model;
+        if(model?.success != true){
+          emit(StateErrorGeneral(model?.error ?? ""));
+        }else{
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          String user = jsonEncode(model?.data?.toJson());
+          prefs.setString('userData', user);
+          emit(UpdateProfileState(model: model));
+        }
+      }else if(event is UpdatedUserDataGetSuccessEvent){
+        // SharedPreferences prefs = await SharedPreferences.getInstance();
+        // Map<String, dynamic> userMap  = jsonDecode(prefs.getString('userData') ?? "");
+        // emit(Uninitialized());
+        // emit(UpdatedProfileDataState(userData: userMap));
       }else if (event is EventErrorGeneral) {
         emit(StateErrorGeneral(event.message));
       }
@@ -59,7 +76,7 @@ class UpdateProfileBloc extends Bloc<BaseEvent, BaseState> {
     ))
         .listen((data) {
       data.fold((onError) {
-        add(EventErrorGeneral(_mapFailureToMessage(onError) ?? ""));
+        add(EventErrorGeneral(ErrorObject.mapFailureToMessage(onError) ?? ""));
       }, (onSuccess) {
         add(UpdateProfileSuccessEvent(model: onSuccess));
       });
@@ -68,16 +85,5 @@ class UpdateProfileBloc extends Bloc<BaseEvent, BaseState> {
 
 
 
-  String? _mapFailureToMessage(Failure failure) {
-    if (failure.runtimeType == ServerFailure) {
-      return Strings.kServerFailureMessage;
-    } else if (failure.runtimeType == CacheFailure) {
-      return Strings.kCacheFailureMessage;
-    } else if (failure.runtimeType == FailureMessage) {
-      if (failure is FailureMessage) {
-        return failure.message;
-      }
-    }
-  }
 
 }

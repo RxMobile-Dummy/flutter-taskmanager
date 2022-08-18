@@ -1,5 +1,4 @@
 import 'package:task_management/ui/home/pages/Profile/data/model/update_profile_model.dart';
-import 'package:task_management/ui/home/pages/Project/data/model/update_project_model.dart';
 
 import '../../../../../../core/base/base_bloc.dart';
 
@@ -27,4 +26,11 @@ class UpdateProfileSuccessEvent extends BaseEvent {
   UpdateUserProfileModel? model;
 
   UpdateProfileSuccessEvent({this.model});
+}
+
+class UpdatedUserDataGetSuccessEvent extends BaseEvent {
+}
+
+class UpdatedUserDataGetEvent extends BaseEvent{
+
 }

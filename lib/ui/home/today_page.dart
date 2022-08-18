@@ -3,13 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:task_management/ui/home/fab_menu_option/add_task/data/model/get_task_model.dart';
 import 'package:task_management/utils/colors.dart';
 
 import '../../custom/progress_bar.dart';
 import '../../widget/task_list.dart';
 import 'fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
-import 'package:task_management/injection_container.dart' as Sl;
 
 import 'fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
 
@@ -32,7 +30,6 @@ class _TodayPageState extends State<TodayPage> {
   void initState() {
     super.initState();
     random = Random();
-   // refreshList();
   }
 
 

@@ -14,7 +14,6 @@ import '../../utils/style.dart';
 import 'fab_menu_option/add_check_list/presentation/page/add_check_list.dart';
 import 'fab_menu_option/add_note/presentation/pages/add_note.dart';
 import 'fab_menu_option/add_task/presentation/bloc/add_task_bloc.dart';
-import 'fab_menu_option/add_task/presentation/bloc/add_task_event.dart';
 import 'fab_menu_option/add_task/presentation/pages/add_task.dart';
 import 'package:task_management/injection_container.dart' as Sl;
 import 'dart:math' as math;
@@ -28,7 +27,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin{
   late Widget myTask;
   Widget dashboardWidget =  Project();
 
-  /* Project();*/
   Widget quickNoteWidget = QuickNotes();
   Widget profileWidget = MultiBlocProvider(
     providers: [
@@ -57,10 +55,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin{
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    myTask =  MyTask();/*BlocProvider<AddTaskBloc>(
-      create: (context) => Sl.Sl<AddTaskBloc>(),
-      child: MyTask(),
-    );*/
+    myTask =  MyTask();
     selectedWidget = myTask;
   }
 
@@ -123,131 +118,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin{
             ),
           ),
         ),
-       //floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: /*DeviceUtil.isTablet ? ExpandableFab(
-          distance: 112.0,
-          children: [
-            ActionButton(
-              onPressed: () {
-                Get.back();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AddTask()
-                )).then((value) {
-                print(value);
-               (value != null) ? BlocProvider.of<AddTaskBloc>(context).add(GetTaskEvent(
-                date: value ?? "",
-                )) : const SizedBox();
-                });
-              },
-              icon: const Icon(Icons.add_task),
-            ),
-            ActionButton(
-              onPressed: () {
-                Get.back();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => AddNote()),
-                );
-              },
-              icon: const Icon(Icons.note_add_outlined),
-            ),
-            ActionButton(
-              onPressed: (){
-                Get.back();
-                Get.to(AddCheckList());
-              },
-              icon: const Icon(Icons.check_box_outlined),
-            ),
-          ],
-        )*/ /*: Column(
-          mainAxisSize: MainAxisSize.min,
-          children:  List.generate(icons.length, (int index) {
-            Widget child =  Container(
-              height: 70.0,
-              width: 56.0,
-              alignment: FractionalOffset.topCenter,
-              child:  ScaleTransition(
-                scale:  CurvedAnimation(
-                  parent: _controller,
-                  curve:  Interval(
-                      0.0,
-                      1.0 - index / icons.length / 2.0,
-                      curve: Curves.easeOut
-                  ),
-                ),
-                child:  FloatingActionButton(
-                  heroTag: null,
-                  backgroundColor: Colors.black,
-                  mini: true,
-                  child:  Icon(icons[index], color: Colors.white),
-                  onPressed: () {
-                    if(index == 0){
-                      Get.back();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AddTask()),
-                      ).then((value) {
-                        print(value);
-                        BlocProvider.of<AddTaskBloc>(context).add(GetTaskEvent(
-                          date: value,
-                        ));
-                      });
-                    }else if(index == 1){
-                      Get.back();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AddNote()),
-                      );
-                    }else{
-                      Get.back();
-                      Get.to(AddCheckList());
-                    }
-                  },
-                ),
-              ),
-            );
-            return child;
-          }).toList()..add(
-             SizedBox(
-               height: 42,
-               width: 42,
-               child: FittedBox(
-                 child: FloatingActionButton(
-                   heroTag: null,
-                   backgroundColor: Colors.black,
-                   child:  AnimatedBuilder(
-                     animation: _controller,
-                     builder: (BuildContext context, Widget? child) {
-                       return  Transform(
-                         transform:  Matrix4.rotationZ(_controller.value * 0.5 * math.pi),
-                         alignment: FractionalOffset.center,
-                         child:  Icon(_controller.isDismissed ? Icons.add : Icons.close,color: Colors.white),
-                       );
-                     },
-                   ),
-                   onPressed: () {
-                     if (_controller.isDismissed) {
-                       _controller.forward();
-                     } else {
-                       _controller.reverse();
-                     }
-                   },
-                 ),
-               ),
-             )
-          ),
-        )*//*FloatingActionButton(
-          onPressed: () {
-            showTaskMenuDialog();
-          },
-          backgroundColor: Colors.black,
-          child: Icon(Icons.add),
-        )*/  FabCircularMenu(
+        floatingActionButton:   FabCircularMenu(
           alignment: Alignment.bottomCenter,
             fabSize: DeviceUtil.isTablet ? 60 : 40,
             fabColor: Colors.black,
@@ -261,15 +132,12 @@ class _HomeState extends State<Home> with TickerProviderStateMixin{
               IconButton(
                 onPressed: () {
                   Get.back();
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AddTask()
-                      )).then((value) {
-                    print(value);
-                    (value != null) ? BlocProvider.of<AddTaskBloc>(context).add(GetTaskEvent(
-                      date: value ?? "",
-                    )) : const SizedBox();
+                  Future.delayed(Duration.zero, () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddTask()
+                        ));
                   });
                 },
                 icon:  Icon(
@@ -279,11 +147,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin{
               IconButton(
                 onPressed: () {
                   Get.back();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AddNote()),
-                  );
+                  Future.delayed(Duration.zero, () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AddNote()),
+                    );
+                  });
                 },
                 icon:  Icon(Icons.note_add_outlined,
                   size: DeviceUtil.isTablet ? 30 : 20,),
@@ -319,21 +189,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin{
                     ),
                     onPressed: () {
                       Get.back();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MultiBlocProvider(providers: [
-                              BlocProvider<AddTaskBloc>(
-                                create: (context) => Sl.Sl<AddTaskBloc>(),
-                              ),
-                            ], child: AddTask())),
-                      )/*.then((value) {
-                        if (value != null) {
-                          context.read<AddTaskBloc>().getTaskCall();
-                        }
-                        print(value);
-                      })*/;
-                      //Get.to(AddTask());
+                      Future.delayed(Duration.zero, () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MultiBlocProvider(providers: [
+                                BlocProvider<AddTaskBloc>(
+                                  create: (context) => Sl.Sl<AddTaskBloc>(),
+                                ),
+                              ], child: AddTask())),
+                        );
+                      });
                     },
                   ),
                 ),
@@ -347,12 +213,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin{
                     ),
                     onPressed: () {
                       Get.back();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const AddNote()),
-                      );
-                      //Get.to(AddNote());
+                      Future.delayed(Duration.zero, () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AddNote()),
+                        );
+                      });
                     },
                   ),
                 ),
@@ -400,12 +267,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin{
     }else if (menuIndex == 3 && selectedWidget != profileWidget) {
       selectedWidget = profileWidget;
       setState(() {});
-    }/*  else {
-      if (selectedWidget != profileWidget) {
-        selectedWidget = profileWidget;
-        setState(() {});
-      }
-    }*/
+    }
   }
 }
 

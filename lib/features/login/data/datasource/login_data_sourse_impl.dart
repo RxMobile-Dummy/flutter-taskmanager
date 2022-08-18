@@ -1,6 +1,4 @@
 import 'dart:collection';
-import 'dart:convert';
-import 'package:dio/dio.dart';
 import 'package:task_management/features/login/data/model/forgot_password_model.dart';
 import 'package:task_management/features/login/data/model/get_user_role_model.dart';
 import 'package:task_management/features/login/data/model/login_model.dart';
@@ -18,15 +16,9 @@ class LocalDataSourceImpl implements LocalDataSource {
   final ApiClient _apiClient;
 
   LocalDataSourceImpl(this._apiClient);
-   //ApiClient? _apiClient;
 
   @override
   Future<LoginModel> loginCall(LoginParams params) async {
-   /* Dio dio = new Dio();
-    dio.options.headers['Accept'] = 'application/json';
-   // dio.options.headers['Authorization'] = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMTkzNzMsImVtYWlsIjoibWFuc2hhLmNoYXdsYUByYWRpeHdlYi5jb20iLCJtb2JpbGVfbnVtYmVyIjoiKzkxNzAzMDgyMzU5MiJ9.uCZlfb2iBUstVI-cMkv1i8jpd9ldHKwPRmwGhHMQIb8';
-    dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    var restClient = ApiClient(dio);*/
     var map = new HashMap<String, String>();
     map['email'] = params.email;
     map['password'] = params.password;
@@ -34,9 +26,7 @@ class LocalDataSourceImpl implements LocalDataSource {
     var data ;
     if(response != null ){
       data = response;
-     // print(data['token']);
       return data;
-      print('Login successfully');
     }else {
       print('failed');
     }
@@ -76,11 +66,6 @@ class LocalDataSourceImpl implements LocalDataSource {
 
   @override
   Future<SignUpModel> signUpCall(SignUpParams params) async {
-    /* Dio dio = new Dio();
-    dio.options.headers['Accept'] = 'application/json';
-   // dio.options.headers['Authorization'] = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTgyMTkzNzMsImVtYWlsIjoibWFuc2hhLmNoYXdsYUByYWRpeHdlYi5jb20iLCJtb2JpbGVfbnVtYmVyIjoiKzkxNzAzMDgyMzU5MiJ9.uCZlfb2iBUstVI-cMkv1i8jpd9ldHKwPRmwGhHMQIb8';
-    dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    var restClient = ApiClient(dio);*/
     var map = new HashMap<String, String>();
     map['first_name'] = params.firstName;
     map['last_name'] = params.lastName;
@@ -92,9 +77,7 @@ class LocalDataSourceImpl implements LocalDataSource {
     var data ;
     if(response != null ){
       data = response;
-      // print(data['token']);
       return data;
-      print('Login successfully');
     }else {
       print('failed');
     }
@@ -103,11 +86,6 @@ class LocalDataSourceImpl implements LocalDataSource {
 
   @override
   Future<GetUserRoleModel> getUserRoleCall(GetUserRoleParams params) async {
-    /* Dio dio = new Dio();
-    dio.options.headers['Accept'] = 'application/json';
-    dio.options.headers['Authorization'] = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTc4ODMwOTgsImVtYWlsIjoibWFuc2hhLmNoYXdsYUByYWRpeHdlYi5jb20iLCJtb2JpbGVfbnVtYmVyIjoiKzkxNzAzMDgyMzU5MiJ9.cRHAAuz7ys0mp_ThHzN0_iFC1b-Jbz0B0t6HoylI35o';
-    dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    var restClient = ApiClient(dio);*/
     final response = await _apiClient.getUserRole();
     var data ;
     if(response != null ){

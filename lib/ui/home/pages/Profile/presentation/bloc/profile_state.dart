@@ -7,3 +7,10 @@ class UpdateProfileState extends BaseState {
 
   UpdateProfileState({this.model});
 }
+
+
+class UpdatedProfileDataState extends BaseState {
+  Map<String, dynamic>? userData;
+
+  UpdatedProfileDataState({this.userData});
+}
